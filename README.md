@@ -95,12 +95,6 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 <!-- MODUULIT JA OHJELMAKOKONAISUUDET-->
 ### MODUULIT
 
-- Koulutus- ja testidatan luontiskripti: _**create_datasets.py**_
-- Kuntoluokituksen koulutus- ja testidatan luontiskripti: _**create_datasets_kunto.py**_
-- Tensor-muotoisten kuvien visualisointi: _**helper\.py**_
-- VGG16-mallin lopputuotteen koodit: _**classifying_all_kaivot_data.py**_
-- YOLO-tiedostojen muuntaminen csv-tiedostoksi: _**txt_to_csv**_
-- Csv-tiedostojen muuntaminen json-tiedostoksi: _**csv_to_json.py**_
 
 
 ### OHJELMAKOKONAISUUDET
