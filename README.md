@@ -62,7 +62,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 docker-compose up
 ```
 
-![Imgur](https://i.imgur.com/IVFDPyn.png)
 
 ##### **YMPÄRISTÖN ALASAJO _(tarvittaessa)_ :**
 
