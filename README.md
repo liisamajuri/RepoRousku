@@ -114,7 +114,9 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 <!-- DOKUMENTAATIO -->
 ## DOKUMENTAATIO
 
-- Projektikurssin Reppu-ympäristö: [_Projektiopinnot 4 - Digitaaliset palvelut_:](https://reppu.kamk.fi/course/view.php?id=1451)
+- Projektikurssin Reppu-ympäristö: [_Projektiopinnot 4 - Digitaaliset palvelut_](https://reppu.kamk.fi/course/view.php?id=1451)
+- Ohjelman vaatimukset: [_Vaatimukset-dokumentaatio_](Tähän linkki)
+- Ohjelman testaus: [_Testausdokumentaatio_](Tähän linkki)
 
 ***
 
