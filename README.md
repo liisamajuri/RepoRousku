@@ -46,6 +46,43 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 <!-- ALOITTAMINEN -->
 ## ALOITTAMINEN
 
+### Personal Access Tokenin lisääminen ympäristömuuttujaan
+- Bash-terminaali:
+  ```
+  # Varmista, että olet kotihakemistossa:
+  cd ~
+  
+  # Avaa .bashrc-tiedosto muokattavaksi:
+  nano .bashrc
+  
+  # Lisää tiedoston loppuun seuraava rivi (vaihda "YOUR_GITLAB_TOKEN" token-arvoon):
+  export GITLAB_TOKEN="YOUR_GITLAB_TOKEN"
+  
+  # Tallenna ja sulje tiedosto:
+  Paina Ctrl + O
+  Paina Enter
+  Paina Ctrl + X
+  
+  # Lataa päivitetty .bashrc-tiedosto: 
+  source ~/.bashrc
+  
+  # Varmista ympäristömuuttujan tallentuminen:
+  echo $GITLAB_TOKEN
+  ```
+  - Ympäristömuuttujaan tallennetun tokenin käyttö:
+      - *docker-compose.yml*:
+      ```
+      ...
+        ...
+          environment:
+            GITLAB_TOKEN: "${GITLAB_TOKEN}"
+
+      ```
+      - *app\.py* tms. kooditiedosto:
+      ```
+      gitlab_token = os.getenv("GITLAB_TOKEN")
+      ```
+
 
 ***
 
