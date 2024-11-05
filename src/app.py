@@ -73,8 +73,8 @@ if project_url:
             if not gitlab_token:
                 st.error("GitLab-tokenia ei löydy ympäristömuuttujista. Tarkista asetus.")
             else:
-                st.subheader("GitLab-tokenia löydetty ympäristömuuttujista.")
+                st.subheader("GitLab-token löydetty ympäristömuuttujista.")
         else:
-            st.error("Projektin ID:n hakeminen epäonnistui. Tarkista linkki tai projektin näkyvyysasetukset.")
+            st.error("Projektin ID:n hakeminen epäonnistui. Tarkista linkki / näkyvyysasetukset.")
     else:
         st.error("Virheellinen GitLab-linkki. Varmista, että linkki on oikeassa muodossa.")
