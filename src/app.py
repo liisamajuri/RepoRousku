@@ -10,18 +10,42 @@ Place-holder -koodi kontin suoritustiedostolle (dockerfilessä määritetty run-
 Lisäksi seuraavat komponentit hyödynnettäväksi / implementoitavaksi:
 - Ympäristömuuttujan tunnistus / käyttö
 - Projekti-ID:n eristäminen linkistä
-
+- fetch_all_items -funktio (looppaus datan hakemiseksi useammalta sivulta)
 """
+
+def fetch_all_items(api_url, headers):
+    """
+    Hakee kaikki tietueet API-kutsusta käyttäen sivutusta.
+    
+    Esimerkkikäyttö:
+    
+    headers = {"Private-Token": gitlab_token}
+    api_url = f"https://gitlab.dclabra.fi/api/v4/projects/{project_id}/repository/commits"
+    commits = fetch_all_items(api_url, headers)    
+    
+    """
+    all_items = []
+    page = 1
+    while True:
+        response = requests.get(api_url, headers=headers, params={'per_page': 100, 'page': page})
+        response.raise_for_status()
+        items = response.json()
+        if not items:
+            break
+        all_items.extend(items)
+        page += 1
+    return all_items
+
 
 # GitLab-tunniste ympäristömuuttujista
 gitlab_token = os.getenv("GITLAB_TOKEN")
 
-st.title("GitLab Projektin Analyysi")
+st.title("RepoRousku coming soon!")
 
-# Käyttäjän syöte: GitLab-projektin linkki
-project_url = st.text_input("Anna GitLab-projektin linkki:")
+# GitLab-projektin linkki
+project_url = st.text_input("GitLab-projektin linkki:")
 
-# Funktio projektipolun poimimiseksi linkistä (muotoa ryhma/projekti)
+# Poimi projektipolku linkistä
 def extract_project_path(url):
     match = re.search(r"gitlab.dclabra.fi/(.+)", url)
     return match.group(1) if match else None
@@ -29,7 +53,7 @@ def extract_project_path(url):
 # Hae projektin ID polun perusteella
 def fetch_project_id(project_path, gitlab_token):
     headers = {"Private-Token": gitlab_token}
-    encoded_path = quote(project_path, safe="")  # URL-enkoodaa polku
+    encoded_path = quote(project_path, safe="")
     api_url = f"https://gitlab.dclabra.fi/api/v4/projects/{encoded_path}"
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
