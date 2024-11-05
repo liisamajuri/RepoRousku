@@ -1,0 +1,9 @@
+services:
+  palikka:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    ports:
+      - "8501:8501"
+    environment:
+      GITLAB_TOKEN: "${GITLAB_TOKEN}"

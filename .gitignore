@@ -1,0 +1,21 @@
+# Ympäristömuuttujatiedosto, joka sisältää arkaluontoiset tiedot
+.env
+
+# Pythonin väliaikaistiedostot ja kääntämiseen liittyvät tiedostot
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Dockerin tilapäistiedostot
+*.log
+*.pid
+
+# Käännöstiedostot ja virtuaaliympäristöt
+*.pyc
+*.pyd
+*.pyo
+.venv/
+venv/
+
+# Streamlitin tilapäistiedostot
+.streamlit/
