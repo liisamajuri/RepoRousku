@@ -15,7 +15,7 @@ proj_data = "proj_data"
 
 
 # Tallennuspaikka projektin datalle
-if project not in st.session_state:
+if proj_data not in st.session_state:
     st.session_state[proj_data] = None
 
 
@@ -37,7 +37,7 @@ def create_navigation_panel():
     Luo navigointivalikon sivustorakenteesta
     """
     # Navigointivalikko
-    pages = {
+    app_pages = {
         connections: [
             st.Page("app_pages/start.py", title=change_project, icon = "📁", default=True),
             st.Page("app_pages/gitlab_link.py", title=open_gitlab, icon = "🔗"),
@@ -48,7 +48,7 @@ def create_navigation_panel():
         ],
     }
 
-    pg = st.navigation(pages)
+    pg = st.navigation(app_pages)
     pg.run()
 
 

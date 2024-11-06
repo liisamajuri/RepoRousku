@@ -13,11 +13,14 @@ def gitlab_link_page():
     """
     Sivu, joka avaa projetin GitLab-repositorion sivun
     """
-    if not True: #st.session_state[proj_data]:
-        cl.make_page_title(gitlab_title)
-        cl.make_start_page_button() 
-    else:
-        webbrowser.open("https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut")
-        st.switch_page('app_pages/project.py')    
+    webbrowser.open(st.session_state[proj_data].get_project_url())
+    st.switch_page("app_pages/project.py")    
 
-gitlab_link_page()
+
+cl.make_page_title(gitlab_title)
+
+if not st.session_state[proj_data]:
+    cl.make_start_page_button()
+else:
+    gitlab_link_page()
+
