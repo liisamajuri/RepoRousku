@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import requests
 
 # Kielikäännökset
 members = "Projektiryhmän jäsenet"
@@ -99,3 +100,19 @@ def make_team_member_selector(member_list):
         member_list,
         member_list,
         help = help_project_member)
+
+
+def validate_url(url):
+    """
+    Tarkastaa, onko annettu url validi
+    TODO: ei toimi oikein
+    """
+    try:
+        response = requests.get(url)
+        try:
+            response.raise_for_status()
+            return True
+        except requests.exceptions.HTTPError:
+            return False
+    except requests.exceptions.ConnectionError:
+        return False
