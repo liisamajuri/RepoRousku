@@ -39,12 +39,12 @@ def create_navigation_panel():
     # Navigointivalikko
     pages = {
         connections: [
-            st.Page("pages/start.py", title=change_project, icon = "📁", default=True),
-            st.Page("pages/gitlab_link.py", title=open_gitlab, icon = "🔗"),
+            st.Page("app_pages/start.py", title=change_project, icon = "📁", default=True),
+            st.Page("app_pages/gitlab_link.py", title=open_gitlab, icon = "🔗"),
         ],
         reports: [
-            st.Page("pages/project.py", title=project, icon = "📊"),
-            st.Page("pages/member.py", title=member, icon = "👤")
+            st.Page("app_pages/project.py", title=project, icon = "📊"),
+            st.Page("app_pages/member.py", title=member, icon = "👤")
         ],
     }
 
