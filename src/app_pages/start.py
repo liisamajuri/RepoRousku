@@ -19,7 +19,7 @@ app_logo = "✨"
 
 def start_page():
     """
-    Sivulla syöttökentät GitLabin ja Clockifyn access tokenien sekä analysoitavan GitLab-projektin url-osoitteen määrittämiseen
+    Sivu sisältää syöttökentät GitLabin ja Clockifyn access tokenien sekä analysoitavan GitLab-projektin url-osoitteen määrittämiseen
     """
     col1, col2, col3 = st.columns([1, 2, 1])
 

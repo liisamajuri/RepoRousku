@@ -8,9 +8,9 @@ connections = "Yhteydet"
 change_project = "Vaihda projekti"
 open_gitlab = "Avaa GitLab"
 project = "Projekti"
-member = "Jäsen"
+member = "Jäsenet"
 
-# Avainsanat
+# Muuttujat
 proj_data = "proj_data"
 
 
@@ -44,7 +44,7 @@ def create_navigation_panel():
         ],
         reports: [
             st.Page("app_pages/project.py", title=project, icon = "📊"),
-            st.Page("app_pages/member.py", title=member, icon = "👤")
+            st.Page("app_pages/members.py", title=member, icon = "👤")
         ],
     }
 
