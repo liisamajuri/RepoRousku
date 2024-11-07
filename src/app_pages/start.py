@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import requests
+from dotenv import load_dotenv
 
 import libraries.components as cl
 from gitlab_api import ProjectData
@@ -24,7 +25,6 @@ invalid_url = "Virheellinen GitLab-projektin osoite!"
 error_msg = "Tarkista GitLab-osoite ja Access Token!"
 
 # Muuttujat
-app_logo = "✨"
 proj_data = "proj_data"
 
 
@@ -48,15 +48,15 @@ def start_page():
     """
     Sivu sisältää syöttökentät GitLabin ja Clockifyn access tokenien sekä analysoitavan GitLab-projektin url-osoitteen määrittämiseen
     """
+
+    col1, col2 = st.columns([1, 5])
+    with col2:
+        st.image("images/logo.png", width=500)
+
     col1, col2, col3 = st.columns([1, 2, 1])
 
-    with col1:
-        st.markdown(f'<h1 style="text-align: right;">{app_logo}</h1>', unsafe_allow_html=True)
-
     with col2:
-        st.title(app_title)
-        st.write("")
-
+        load_dotenv()
         env_gitlab_token = os.getenv("GITLAB_TOKEN")
         env_clockify_token = os.getenv("CLOCKIFY_TOKEN")
 
@@ -69,6 +69,7 @@ def start_page():
         st.write("")
 
         gitlab_url = st.text_input(repo_address, help = help_repo_address)
+        #gitlab_url = st.text_input(repo_address, help = help_repo_address, value="https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut")
         if st.button(crunch, help = help_crunch):
             if not gitlab_url:
                 st.error(missing_url, icon="❗")
