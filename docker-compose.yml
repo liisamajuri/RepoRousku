@@ -7,3 +7,9 @@ services:
       - "8501:8501"
     environment:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
+
+  ruff:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ruff check src
