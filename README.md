@@ -127,6 +127,12 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 <!-- KÄYTTÖ -->
 ## KÄYTTÖ
 
+**Ruff**-linterin käyttö koodin tyyli- ja syntaksivirheiden tunnistamiseen ja korjaamiseen:
+- Asennetaan automaattisesti kontin pystytyksessä (`docker compose up`)
+- *src*-kansion koodien tarkistus (`docker-compose run --rm ruff`)
+
+
+
 ***
 
 <!-- MODUULIT JA OHJELMAKOKONAISUUDET-->
