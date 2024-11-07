@@ -1,0 +1,15 @@
+site_name: RepoRouskun koodidokumentaatio
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - API Reference: api_reference.md
+  - Configuration: configuration.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          rendering:
+            show_root_toc_entry: false

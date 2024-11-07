@@ -1,3 +1,9 @@
 streamlit
 requests  # API-kutsuihin GitLab API:n kautta
 pandas    # Datan käsittelyyn ja analysointiin
+
+
+mkdocs
+mkdocs-material
+mkdocstrings
+mkdocstrings-python

@@ -1,0 +1,15 @@
+image: python:3.9
+
+stages:
+  - deploy
+
+deploy_mkdocs:
+  stage: deploy
+  script:
+    - pip install -r requirements.txt
+    - mkdocs build
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
