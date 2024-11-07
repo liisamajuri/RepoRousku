@@ -1,9 +1,11 @@
-site_name: RepoRousku Documentation
+site_name: RepoRouskun koodidokumentaatio
 theme:
   name: material
 nav:
   - Home: index.md
+  - Usage: usage.md
   - API Reference: api_reference.md
+  - Configuration: configuration.md
 plugins:
   - search
   - mkdocstrings:
