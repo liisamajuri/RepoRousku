@@ -1,0 +1,13 @@
+site_name: RepoRousku Documentation
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - API Reference: api_reference.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          rendering:
+            show_root_toc_entry: false
