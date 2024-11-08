@@ -3,6 +3,7 @@ requests
 pandas
 ruff
 pytest
+pytest-html
 
 
 mkdocs

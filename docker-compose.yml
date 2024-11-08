@@ -7,10 +7,13 @@ services:
       - "8501:8501"
     environment:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
-      PYTHONPATH: "/app/src"
+    volumes:
+      - ./tests/reports:/app/tests/reports
 
+  # Staattinen analyysi `ruff`-lintterillä
   ruff:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ruff check src
+    image: python:3.9-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: ["ruff", "check", "src"]
