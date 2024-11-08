@@ -11,7 +11,7 @@ def member_page():
     """
     Sivu projektiryhmän jäseten statistiikan tarkateluun
     """
-    cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
+    members = cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
 
 
 cl.make_page_title(member_title)

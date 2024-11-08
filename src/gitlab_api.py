@@ -12,10 +12,12 @@ key_id = "id"
 key_name = "name"
 key_desc = "description"
 key_created_at = "created_at"
+key_closed_at = "closed_at"
 key_namespace = "namespace"
 key_visibility = "visibility"
 key_updated = "last_activity_at"
 
+key_milestone = "milestone"
 key_milestones = "milestones"
 key_issues = "issues"
 key_commits = "commits"
@@ -27,10 +29,14 @@ key_pipelines = "pipelines"
 key_expired = "expired"
 key_state = "state"
 key_assignees = "assignees"
+key_start_date = "start_date"
+key_due_date = "due_date"
+key_iid = "iid"
+key_title = "title"
 
 value_opened = "opened"
 value_closed = "closed"
-value_opened = "opened"
+value_active = "active"
 
 project_data = [key_milestones, key_issues, key_commits, key_branches, key_labels, key_merge_requests, key_pipelines]
 
@@ -111,24 +117,28 @@ class ProjectData:
         milestones = self.get_data(key_milestones)
         df = pd.DataFrame(milestones)
 
-        df['start_date'] = pd.to_datetime(df['start_date']).dt.date
-        df['due_date'] = pd.to_datetime(df['due_date']).dt.date
+        df[key_start_date] = pd.to_datetime(df[key_start_date]).dt.date
+        df[key_due_date] = pd.to_datetime(df[key_due_date]).dt.date
 
         # Järjestetään aikajärjestykseen
-        df = df.sort_values(by='start_date')
+        df = df.sort_values(by=key_start_date)
 
         # Lisätään status "Päättynyt", "Aktiivinen", tai "Tuleva"
         today = datetime.now().date()
 
         def milestone_status(row):
-            if row['due_date'] < today:
+            print(row[key_due_date])
+            if row[key_due_date] < today:
                 return "Päättynyt"
-            elif row['start_date'] <= today <= row['due_date']:
+            elif row[key_start_date] <= today <= row[key_due_date]:
                 return "Aktiivinen"
             else:
                 return "Tuleva"
 
         df['status'] = df.apply(milestone_status, axis=1)
+
+        # Valitaan sarakkeet
+        df = df[[key_iid, key_title, key_desc, key_state, key_due_date, key_start_date, "status"]]
 
         return df
 
@@ -141,15 +151,18 @@ class ProjectData:
 
         # Muutetaan json dataframeksi
         df = pd.DataFrame(issues)
+        
+        # Pelkistetään päiväys
+        #df[key_closed_at] = pd.to_datetime(df[key_closed_at]).dt.date
 
-        # Pelkistetään assignees listaksi nimistä
-        df['assignees'] = df['assignees'].apply(lambda x: x[0]['name'] if x else None)
+        # Pelkistetään assignees listaksi nimistä, jos se ei ole tyhjä
+        df[key_assignees] = df[key_assignees].apply(lambda x: [assignee[key_name] for assignee in x] if isinstance(x, list) and x else None)
 
-        # Pelkistetään milestone titleksi
-        df['milestone'] = df['milestone'].apply(lambda x: x['title'] if isinstance(x, dict) and 'title' in x else None)
+        # Pelkistetään milestone titleksi, jos milestone on sanakirja ja siinä on title-avaimen
+        df[key_milestone] = df[key_milestone].apply(lambda x: x.get(key_title) if isinstance(x, dict) and key_title in x else None)
 
         # Valitaan sarakkeet
-        df = df[['iid', 'title', 'description', 'state', 'assignees', 'milestone']]
+        df = df[[key_iid, key_title, key_desc, key_state, key_assignees, key_milestone, key_closed_at]]
 
         return df
 
@@ -160,6 +173,16 @@ class ProjectData:
         """
         commits = self.get_data(key_commits)
         df = pd.DataFrame(commits)
+
+        # Vain päivämäärä
+        df["committed_date"] = df["committed_date"].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
+        df["created_at"] = df["created_at"].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
+        df["committed_date"] = pd.to_datetime(df["committed_date"]).dt.date
+        df["created_at"] = pd.to_datetime(df["created_at"]).dt.date
+   
+        # Valitaan sarakkeet
+        df = df[["created_at", key_title, "message", "author_name", "committed_date"]]
+
         return df
 
 
@@ -176,12 +199,10 @@ class ProjectData:
         """
         Palauttaa branchien lukumäärän
         """
+        branches = self.get_data(key_branches)
+        if branches is not None:
+            return len(pd.DataFrame(branches))
         return 0
-        # TODO
-        #branches = self.get_data(key_branches)
-        #if branches is not None:
-        #    return len(pd.DataFrame(branches))
-        #return 0
 
 
     def get_labels(self):
@@ -236,7 +257,7 @@ class ProjectData:
         """
         milestones = self.get_data(key_milestones)
         today = datetime.now().date()
-        active_milestones = [milestone for milestone in milestones if (datetime.fromisoformat(milestone['start_date']).date() <= today and datetime.fromisoformat(milestone['due_date']).date() >= today)]
+        active_milestones = [milestone for milestone in milestones if (datetime.fromisoformat(milestone[key_start_date]).date() <= today and datetime.fromisoformat(milestone[key_due_date]).date() >= today)]
         return len(active_milestones)
 
 
@@ -246,8 +267,19 @@ class ProjectData:
         """
         milestones = self.get_data(key_milestones)
         today = datetime.now().date()
-        upcoming_milestones = [milestone for milestone in milestones if datetime.fromisoformat(milestone['start_date']).date() > today]
+        upcoming_milestones = [milestone for milestone in milestones if datetime.fromisoformat(milestone[key_start_date]).date() > today]
         return len(upcoming_milestones) if upcoming_milestones else 0
+
+
+    def get_readiness_ml(self):
+        """
+        Palauttaa projektin valmiusasteen milestonejen mukaan
+        """
+        expired = self.get_expired_milestones()
+        all = self.count_milestones()
+        if all:
+            return round((expired / all) * 100)
+        return 0
 
 
     def count_milestones(self):
@@ -258,28 +290,34 @@ class ProjectData:
         return len(milestones)
 
 
-    def count_issues(self):
-        """
-        Palauttaa issueiden kokonaislukumäärän
-        """
-        issues = self.get_data(key_issues)
-        return len(issues)
-
-
     def get_open_issues(self):
         """
-        Palauttaa avoimien issueiden lukumäärän
+        Palauttaa avoimet issuet
         """
-        issues = self.get_data(key_issues)
-        return sum(1 for issue in issues if issue[key_state]==value_opened)
+        issues = self.get_issues()
+        df = pd.DataFrame(issues)
+        df = df[df[key_state] == value_opened]
+        return df
 
 
     def get_closed_issues(self):
         """
-        Palauttaa suljettujen issueiden lukumäärän
+        Palauttaa suljetut issuet
         """
-        issues = self.get_data(key_issues)
-        return sum(1 for issue in issues if issue[key_state]==value_closed)
+        issues = self.get_issues()
+        df = pd.DataFrame(issues)
+        df = df[df[key_state] == value_closed]
+        return df
+
+
+    def get_readiness_issues(self):
+        """
+        Palauttaa projektin valmiusasteen milestonejen mukaan
+        """
+        closed = len(self.get_closed_issues())
+        all = len(self.get_issues())
+        readiness = round((closed / all) * 100)
+        return readiness
 
 
     def get_assignees(self):
@@ -298,7 +336,7 @@ class ProjectData:
 
         df_assignees = pd.DataFrame(assignees_list)
         df_unique_assignees = df_assignees.drop_duplicates().reset_index(drop=True)
-        name_list = df_unique_assignees['name'].tolist()
+        name_list = df_unique_assignees[key_name].tolist()
 
         return  name_list  
 
@@ -336,15 +374,17 @@ class ProjectData:
 
         while True:
             try:
+                params = {**params, 'per_page': 100, 'page': page}
                 response = requests.get(url, headers=self.headers, params=params)
                 response.raise_for_status()
                 items = response.json()
+                if not items:
+                    break
             except requests.exceptions.HTTPError:
                 return None
-            if not items:
-                break
             all_items.extend(items)
             page += 1
+            print(f'page: {page}')
 
         return all_items
 
@@ -353,8 +393,10 @@ class ProjectData:
         """
         Suorittaa hakupyynnön GitLabin REST APIin
         """
-        url = f"{self.api_url}/{self.get_id()}/{data_type}"
-        #params = {'per_page': 100, 'page': page}
+        if data_type == key_commits or data_type == key_branches:
+            url = f"{self.api_url}/{self.get_id()}/repository/{data_type}"
+        else:
+            url = f"{self.api_url}/{self.get_id()}/{data_type}"
         return self.fetch_data(url)
 
 
@@ -433,3 +475,15 @@ class ProjectData:
         with open(self.output_file_name2, 'w') as f:
             json.dump(self.project_meta_data, f, indent=4)
 
+
+# Testing
+if __name__ == "__main__":
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
+    env_gitlab_token = os.getenv("GITLAB_TOKEN")
+
+    #data = ProjectData("https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut", env_gitlab_token)
+    data = ProjectData("https://gitlab.dclabra.fi/lmajuri/palikkatesti-large-private", env_gitlab_token)
+    
+    data.save_data_to_file()

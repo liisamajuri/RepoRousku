@@ -44,7 +44,7 @@ def get_project_data(gitlab_url, gitlab_token):
         st.session_state[proj_data] = gitlab_proj
         return True
     else:
-        st.session_state[proj_data] = None
+        #st.session_state[proj_data] = None # Kommentoitu, jotta aktiivista projektia ei vaihdeta, jos uusi url ei ole validi
         return False
 
 
@@ -83,9 +83,15 @@ def start_page():
         st.write("")
         st.write("")
 
-        #gitlab_url = st.text_input(repo_address, help = help_repo_address)
-        gitlab_url = st.text_input(repo_address, help = help_repo_address, value="https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut")
-        if st.button(crunch, help = help_crunch):
+        act_proj_url = "https://"
+        if st.session_state[proj_data]:
+            act_proj_url = st.session_state[proj_data].get_project_url()
+
+        gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url)
+
+        # Painettu Rouskuta-painiketta tai vaihdetaan projektia enteriä painamalla
+        if st.button(crunch, help = help_crunch) or \
+           (gitlab_url and st.session_state[proj_data] and gitlab_url != st.session_state[proj_data].get_project_url()):
             if not gitlab_url:
                 st.error(missing_url, icon="❗")
             elif not gitlab_token_value:
@@ -96,7 +102,7 @@ def start_page():
                 with st.spinner(fetching_data):
                     # TODO: Clockify-datan haku
                     if get_project_data(gitlab_url, gitlab_token_value):
-                        st.switch_page('app_pages/project.py')
+                        st.switch_page("app_pages/project.py")
                     else:
                         st.error(error_msg, icon="❗")
 
