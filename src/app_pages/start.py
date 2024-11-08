@@ -83,18 +83,19 @@ def start_page():
         st.write("")
         st.write("")
 
-        gitlab_url = st.text_input(repo_address, help = help_repo_address)
-        #gitlab_url = st.text_input(repo_address, help = help_repo_address, value="https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut")
+        #gitlab_url = st.text_input(repo_address, help = help_repo_address)
+        gitlab_url = st.text_input(repo_address, help = help_repo_address, value="https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut")
         if st.button(crunch, help = help_crunch):
             if not gitlab_url:
                 st.error(missing_url, icon="❗")
-            elif not gitlab_token:
+            elif not gitlab_token_value:
                 st.error(missing_g_token, icon="❗")
             elif not cl.validate_url(gitlab_url):
                 st.error(invalid_url, icon="❗")
             else:                
                 with st.spinner(fetching_data):
-                    if get_project_data(gitlab_url, gitlab_token):
+                    # TODO: Clockify-datan haku
+                    if get_project_data(gitlab_url, gitlab_token_value):
                         st.switch_page('app_pages/project.py')
                     else:
                         st.error(error_msg, icon="❗")
