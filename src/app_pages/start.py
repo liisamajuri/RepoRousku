@@ -23,6 +23,10 @@ missing_g_token = "GitLab Access Token puuttuu!"
 missing_url = "GitLab-projektin osoite puuttuu!"
 invalid_url = "Virheellinen GitLab-projektin osoite!"
 error_msg = "Tarkista GitLab-osoite ja Access Token!"
+missing_token_values = "Access Token(it) puuttuu!"
+
+gitlab_token = "GITLAB_TOKEN"
+clockify_token = "CLOCKIFY_TOKEN"
 
 # Muuttujat
 proj_data = "proj_data"
@@ -57,13 +61,24 @@ def start_page():
 
     with col2:
         load_dotenv()
-        env_gitlab_token = os.getenv("GITLAB_TOKEN")
-        env_clockify_token = os.getenv("CLOCKIFY_TOKEN")
+        env_gitlab_token = os.getenv(gitlab_token,"")
+        env_clockify_token = os.getenv(clockify_token,"")
 
-        gitlab_token = st.text_input(text_gitlab_token, value = env_gitlab_token, type = "password", help = help_required)
-        clockify_token = st.text_input(text_clockify_token, value = env_clockify_token, type = "password", help = help_optional)
+        gitlab_token_value = st.text_input(text_gitlab_token, value = env_gitlab_token, type = "password", help = help_required)
+        clockify_token_value = st.text_input(text_clockify_token, value = env_clockify_token, type = "password", help = help_optional)
         if st.button(save, help = save_help):
-            st.error("Toimintoa ei vielä toteutettu", icon="❗")
+            if gitlab_token_value or clockify_token_value:
+                # Poistetaan tiedosto, jos se on olemassa
+                if os.path.exists(".env"):
+                    os.remove(".env")
+                # Arvot tiedostoon
+                with open(".env", "w") as f:
+                    if gitlab_token_value:
+                        f.write(f"{gitlab_token}={gitlab_token_value}\n")
+                    if clockify_token_value:
+                        f.write(f"{clockify_token}={clockify_token_value}\n")
+            else:
+                st.error(missing_token_values, icon="❗")
 
         st.write("")
         st.write("")
