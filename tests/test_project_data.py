@@ -1,9 +1,9 @@
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
+import webbrowser
 import pytest
 from gitlab_api import ProjectData
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 # Testidata: projektin metatiedot
 test_meta_data = {
@@ -40,3 +40,7 @@ def test_get_creation_date(project):
 def test_get_update_date(project):
     print("Testataan projektin päivityspäivän hakemista")
     assert project.get_update_date() == "05.11.2024"
+
+
+# Avataan testiraportti selaimeen
+webbrowser.open('tests/reports/report.html')

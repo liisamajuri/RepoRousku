@@ -1,4 +1,4 @@
-# Virallinen Python 3.9 -image
+# Python 3.9 -image
 FROM python:3.9-slim
 
 # Aseta työhakemisto
@@ -14,5 +14,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src /app/src
 COPY tests /app/tests
 
-# Aseta oletuskomento, joka suorittaa Streamlit-sovelluksen
-CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.enableCORS=false"]
+# Aseta oletuskomento, joka suorittaa Streamlit-sovelluksen (Ei tarvita, jos käytetään docker-composea)
+# CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.enableCORS=false"]

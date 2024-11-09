@@ -2,18 +2,16 @@ services:
   palikka:
     build:
       context: .
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     ports:
       - "8501:8501"
     environment:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
+      PYTHONPATH: "/app/src"
     volumes:
       - ./tests/reports:/app/tests/reports
-
-  # Staattinen analyysi `ruff`-lintterillä
-  ruff:
-    image: python:3.9-slim
-    working_dir: /app
-    volumes:
-      - .:/app
-    command: ["ruff", "check", "src"]
+    command: >
+      sh -c "
+      ruff check src -v &&
+      pytest -v -s --tb=short --html=tests/reports/report.html --self-contained-html tests/test_project_data.py
+      "
