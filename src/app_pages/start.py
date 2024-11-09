@@ -54,7 +54,12 @@ def start_page():
 
     col1, col2 = st.columns([1, 5])
     with col2:
-        st.image("src/images/logo.png", width=500)
+        if os.path.exists("/.dockerenv"):
+            image_path = "src/images/logo.png"
+        else:
+            image_path = "images/logo.png"
+
+        st.image(image_path, width=500)
 
     col1, col2, col3 = st.columns([1, 2, 1])
 

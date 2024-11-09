@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import requests
+import os
+
 
 # Kielikäännökset
 members = "Projektiryhmän jäsenet"
@@ -108,9 +110,8 @@ def make_team_member_selector(member_list):
 def validate_url(url):
     """
     Tarkastaa, onko annettu url validi
-    TODO: ei toimi oikein
     """
-    if not url.startswith("https://"):
+    if not url.startswith("https://") or url == "https://":
         return False
 
     try:
@@ -122,3 +123,18 @@ def validate_url(url):
             return False
     except requests.exceptions.ConnectionError:
         return False
+
+
+def clockify_available():
+    """
+    Palauttaa True, jos Clockifyn tiedot saatavilla
+    TODO: Toteuta funktio
+    """
+    return False
+
+
+def in_docker():
+    """
+    Palauttaa True, jos ohjelmaa ajetaan Docker-kontissa
+    """
+    return os.path.exists("/.dockerenv")
