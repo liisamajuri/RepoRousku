@@ -9,18 +9,19 @@ help_project_member = "Projektiryhmän jäsen on projektin member, jolle on assi
 specify_proj = "Määritä GitLab-projekti"
 info_specify_proj = "Anna ensin tarkasteltavan projektin GitLab-osoite!"
 
+
 def make_page_title(title):
     """
     Sivun otsikko alleviivauksella
     """
     # Otsikko
     st.markdown(
-        f'<h2 style="margin-top: 0px; margin-bottom: 5px; padding-top: 0px;">{title}</h2>',
+        f'<h2 style="margin-top: 0px; margin-bottom: 5px; padding-top: 0px; color: #FAEBC8">{title}</h2>',
         unsafe_allow_html=True
     )
     # Viiva
     st.markdown(
-        "<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid #29b5e8;'>",
+        "<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid #F49E25;'>",
         unsafe_allow_html=True
     )
 
@@ -44,7 +45,7 @@ def make_donut(input_response, input_text, input_color):
     if input_color == 'green':
         chart_color = ['#27AE60', '#12783D']
     if input_color == 'orange':
-        chart_color = ['#F39C12', '#875A12']
+        chart_color = ['#F49E25', '#FAEBC8'] # RepoRouskun väriteema: #DB4128, #F46A25, #F49E25, #F9B049, #FAEBC8
     if input_color == 'red':
         chart_color = ['#E74C3C', '#781F16']
         
@@ -95,11 +96,13 @@ def make_team_member_selector(member_list):
         unsafe_allow_html=True
     )
 
-    options = st.multiselect(
+    selected = st.multiselect(
         members,
         member_list,
         member_list,
         help = help_project_member)
+
+    return selected
 
 
 def validate_url(url):
@@ -107,6 +110,9 @@ def validate_url(url):
     Tarkastaa, onko annettu url validi
     TODO: ei toimi oikein
     """
+    if not url.startswith("https://"):
+        return False
+
     try:
         response = requests.get(url)
         try:

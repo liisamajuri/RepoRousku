@@ -9,7 +9,7 @@ proj_data = "proj_data"
 
 def member_page():
     """
-    Sivu projektiryhmän jäseten statistiikan tarkateluun
+    Sivu projektiryhmän jäseten statistiikan tarkasteluun
     """
     cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
 
