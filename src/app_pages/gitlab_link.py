@@ -1,5 +1,6 @@
 import streamlit as st
 import webbrowser
+import os
 import libraries.components as cl
 
 # Kielikäännökset
@@ -13,8 +14,11 @@ def gitlab_link_page():
     """
     Sivu, joka avaa projetin GitLab-repositorion sivun
     """
-    webbrowser.open(st.session_state[proj_data].get_project_url())
-    st.switch_page("app_pages/project.py")    
+    if os.path.exists("/.dockerenv"):
+        st.write(st.session_state[proj_data].get_project_url())
+    else:
+        webbrowser.open(st.session_state[proj_data].get_project_url())
+        st.switch_page("app_pages/project.py")
 
 
 cl.make_page_title(gitlab_title)

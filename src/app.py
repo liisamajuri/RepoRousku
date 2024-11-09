@@ -1,5 +1,6 @@
 import streamlit as st
 import altair as alt
+import os
 
 # Kielikäännökset
 app_title = "RepoRousku"
@@ -37,16 +38,27 @@ def create_navigation_panel():
     Luo navigointivalikon sivustorakenteesta
     """
     # Navigointivalikko
-    app_pages = {
-        connections: [
-            st.Page("app_pages/start.py", title=change_project, icon = "📁", default=True),
-            st.Page("app_pages/gitlab_link.py", title=open_gitlab, icon = "🔗"),
-        ],
-        reports: [
-            st.Page("app_pages/project.py", title=project, icon = "📊"),
-            st.Page("app_pages/members.py", title=member, icon = "👤")
-        ],
-    }
+    if os.path.exists("/.dockerenv"):
+        app_pages = {
+            connections: [
+                st.Page("app_pages/start.py", title=change_project, icon = "📁", default=True),
+            ],
+            reports: [
+                st.Page("app_pages/project.py", title=project, icon = "📊"),
+                st.Page("app_pages/members.py", title=member, icon = "👤")
+            ],
+        }
+    else:
+        app_pages = {
+            connections: [
+                st.Page("app_pages/start.py", title=change_project, icon = "📁", default=True),
+                st.Page("app_pages/gitlab_link.py", title=open_gitlab, icon = "🔗"),
+            ],
+            reports: [
+                st.Page("app_pages/project.py", title=project, icon = "📊"),
+                st.Page("app_pages/members.py", title=member, icon = "👤")
+            ],
+        }
 
     pg = st.navigation(app_pages)
     pg.run()
