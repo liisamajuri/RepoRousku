@@ -52,7 +52,7 @@ def project_page():
         with col1_1:
             st.metric(milestones, st.session_state[proj_data].count_milestones())
             st.write("")
-            if False: # TODO: Jos clockify liitetty, näytetään työtunnit branchien sijaan
+            if cl.clockify_available():
                 st.metric(work_hours, 125)
             else:
                 st.metric(branches, st.session_state[proj_data].count_branches())
@@ -82,49 +82,46 @@ def project_page():
         # Projektiryhmä
         members = cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
 
-        # Datavalitsin palkkikaavioon
-        if False:
-            options = (closed_issues, commits, work_hours)
-        else:
-            options = (closed_issues, commits)
+        # Välilehdet palkkikaavioon
+        tabs = [closed_issues, commits]
+        if cl.clockify_available():
+            tabs.append(work_hours)
 
-        # Datatyypin valinta palkkikaavioon
-        col3_1, col3_2 = col3.columns([1, 5])
-        with col3_1:
-            option_bar = st.selectbox(" ", options, label_visibility="hidden", key="datatype1")
+        tab_objects_b = st.tabs(tabs)
+        tab_b1, tab_b2 = tab_objects_b[:2]
+        if cl.clockify_available():
+            tab_b3 = tab_objects_b[2]
 
-        # Palkkikaavio
-
-        if option_bar == closed_issues:
+        # Palkkikaaviot
+        with tab_b1:
             data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_closed_issues_bar_chart(members)
-
-        elif option_bar == commits:
+            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+        with tab_b2:
             data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_commits_bar_chart(members)
+            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
 
-        else:
-            # TODO: Clockify-tunnit
-            pass
+        if cl.clockify_available():
+            with tab_b3:
+                pass # TODO: Clockify
 
-        st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+        # Välilehdet viivakaavioon
+        tab_objects_l = st.tabs(tabs)
+        tab_l1, tab_l2 = tab_objects_l[:2]
+        if cl.clockify_available():
+            tab_l3 = tab_objects_l[2]
 
-        # Datatyypin valinta viivakaavioon
-        col3_1, col3_2 = col3.columns([1, 5])
-        with col3_1:
-            option_line = st.selectbox(" ",options, label_visibility="hidden", key="datatype2", index=1)
-
-        # Viivakaavio
-
-        if option_line == closed_issues:
+        # Viivakaaviot
+        with tab_l1:
             data = st.session_state[proj_data].get_data_for_closed_issues_line_chart(members)
             st.line_chart(data)
-
-        elif option_line == commits:
+        with tab_l2:
             data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_commits_line_chart(members)
             st.line_chart(data, x=x_field, y=y_field, color=color_field)
 
-        else:
-            # TODO: Clockify-tunnit
-            pass
+        if cl.clockify_available():
+            with tab_l3:
+                pass # TODO: Clockify
+
 
 if not st.session_state[proj_data]:
     cl.make_page_title(project_title)

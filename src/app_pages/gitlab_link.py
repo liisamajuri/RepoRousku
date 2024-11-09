@@ -14,7 +14,7 @@ def gitlab_link_page():
     """
     Sivu, joka avaa projetin GitLab-repositorion sivun
     """
-    if os.path.exists("/.dockerenv"):
+    if cl.in_docker():
         st.write(st.session_state[proj_data].get_project_url())
     else:
         webbrowser.open(st.session_state[proj_data].get_project_url())
