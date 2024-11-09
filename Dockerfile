@@ -13,6 +13,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Kopioi src- ja tests-kansiot
 COPY src /app/src
 COPY tests /app/tests
-
-# Aseta oletuskomento, joka suorittaa Streamlit-sovelluksen (Ei tarvita, jos käytetään docker-composea)
-# CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.enableCORS=false"]

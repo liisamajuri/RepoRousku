@@ -13,8 +13,8 @@ services:
     command: >
       sh -c "
       ruff check src -v &&
-      pytest -v -s --tb=short --html=tests/reports/report.html --self-contained-html tests/test_project_data.py &&
-      echo 'Raportti saatavilla: http://localhost:8010/report.html'
+      pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
+      echo 'Raportti saatavilla: http://localhost:8010/unit_test_report.html'
       "
 
   reports:
