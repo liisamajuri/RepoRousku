@@ -16,7 +16,6 @@ key_closed_at = "closed_at"
 key_namespace = "namespace"
 key_visibility = "visibility"
 key_updated = "last_activity_at"
-
 key_milestone = "milestone"
 key_milestones = "milestones"
 key_issues = "issues"
@@ -25,7 +24,6 @@ key_branches = "branches"
 key_merge_requests = "merge_requests"
 key_labels = "labels"
 key_pipelines = "pipelines"
-
 key_expired = "expired"
 key_state = "state"
 key_assignees = "assignees"
@@ -33,6 +31,12 @@ key_start_date = "start_date"
 key_due_date = "due_date"
 key_iid = "iid"
 key_title = "title"
+key_author_name = "author_name"
+key_committed_date = "committed_date"
+
+key_pcs = "kpl"
+key_member = "jäsen"
+key_date = "pvm"
 
 value_opened = "opened"
 value_closed = "closed"
@@ -151,9 +155,6 @@ class ProjectData:
         # Muutetaan json dataframeksi
         df = pd.DataFrame(issues)
         
-        # Pelkistetään päiväys
-        #df[key_closed_at] = pd.to_datetime(df[key_closed_at]).dt.date
-
         # Pelkistetään assignees listaksi nimistä, jos se ei ole tyhjä
         df[key_assignees] = df[key_assignees].apply(lambda x: [assignee[key_name] for assignee in x] if isinstance(x, list) and x else None)
 
@@ -174,13 +175,13 @@ class ProjectData:
         df = pd.DataFrame(commits)
 
         # Vain päivämäärä
-        df["committed_date"] = df["committed_date"].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
+        df[key_committed_date] = df[key_committed_date].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
         df["created_at"] = df["created_at"].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
-        df["committed_date"] = pd.to_datetime(df["committed_date"]).dt.date
+        df[key_committed_date] = pd.to_datetime(df[key_committed_date]).dt.date
         df["created_at"] = pd.to_datetime(df["created_at"]).dt.date
    
         # Valitaan sarakkeet
-        df = df[["created_at", key_title, "message", "author_name", "committed_date"]]
+        df = df[["created_at", key_title, "message", key_author_name, key_committed_date]]
 
         return df
 
@@ -467,14 +468,104 @@ class ProjectData:
             json.dump(self.project_meta_data, f, indent=4)
 
 
-# Testing
-if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
-    load_dotenv()
-    env_gitlab_token = os.getenv("GITLAB_TOKEN")
+    def get_data_for_closed_issues_line_chart(self, members):
+        """
+        Palauttaa pivot-taulukon suljettujen issueiden datasta viivakaaviota varten
+        """
+        df = self.get_closed_issues()
 
-    #data = ProjectData("https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut", env_gitlab_token)
-    data = ProjectData("https://gitlab.dclabra.fi/lmajuri/palikkatesti-large-private", env_gitlab_token)
-    
-    data.save_data_to_file()
+        # Formatoidaan aikaleima päivämääräksi
+        df[key_date] = pd.to_datetime(df[key_closed_at]).dt.strftime('%Y-%m-%d')
+
+        # Assigneet omille riveilleen
+        df = df.explode(key_assignees)
+
+        # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
+        df = df[df[key_assignees].isin(members)]
+
+        # Lasketaan rivien määrä kunkin henkilön ja päivämäärän osalta
+        grouped_data = df.groupby([key_date, key_assignees]).size().reset_index(name=key_pcs)
+
+        # Ryhmitellään data siten, että henkilöt sarakkeissa ja päivämäärät riveillä
+        pivot_data = grouped_data.pivot(index=key_date, columns=key_assignees, values=key_pcs).fillna(0)
+
+        return pivot_data
+
+
+    def get_data_for_commits_line_chart(self, members):
+        """
+        Palauttaa dataframen commiteista viivakaaviota varten
+        """
+        df = self.get_commits()
+
+        # Suodatetaan jäsenet
+        df = df[df[key_author_name].isin(members)]
+
+        # Formatoidaan aikaleima päivämääräksi
+        df[key_date] = pd.to_datetime(df[key_committed_date]).dt.strftime('%Y-%m-%d')
+
+        # Lasketaan commitit päivämäärän ja jäsenen mukaan
+        grouped_data = df.groupby([key_date, key_author_name]).size().reset_index(name=key_pcs)
+        grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+
+        # Uudelleennimetään sarake
+        grouped_data = grouped_data.rename(columns={key_author_name: key_member})
+
+        return grouped_data, key_date, key_pcs, key_member
+
+
+    def get_data_for_closed_issues_bar_chart(self, members):
+        """
+        Palauttaa dataframen suljettujen issueiden datasta palkkikaaviota varten
+        """
+        df = self.get_issues()
+
+        # Assigneet omille riveilleen
+        df_exploded = df.explode(key_assignees)
+
+        # Suodatetaan jäsenet
+        df_filtered = df_exploded[df_exploded[key_assignees].isin(members)]
+
+        # Lasketaan issueiden määrä kullekin milestone ja assignees -yhdistelmälle
+        grouped_data = df_filtered.groupby([key_milestone, key_assignees]).size().reset_index(name=key_pcs)
+
+        # Uudelleennimetään sarake
+        grouped_data = grouped_data.rename(columns={key_assignees: key_member})
+
+        # Lukumäärä kokonaisluvuksi
+        grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+
+        return grouped_data, key_milestone, key_pcs, key_member
+
+
+    def get_data_for_commits_bar_chart(self, members):
+        """
+        Palauttaa dataframen committien datasta palkkikaaviota varten
+        """
+        df_commits = self.get_commits()
+        df_milestones = self.get_milestones()
+
+        # Liitetään milestone commit-päivämäärän perusteella
+        def get_milestone_for_commit(commit_date):
+            milestone = df_milestones[(df_milestones[key_start_date] <= commit_date) & (df_milestones[key_due_date] >= commit_date)]
+            return milestone[key_title].iloc[0] if not milestone.empty else None
+
+        # Lisätään tieto milestonesta committien dataframeen
+        df_commits[key_milestone] = df_commits[key_committed_date].apply(get_milestone_for_commit)
+
+        # Suodatetaan pois commitit, joille ei löytynyt milestonea
+        df_commits = df_commits.dropna(subset=[key_milestone])
+
+        # Suodatetaan jäsenet
+        df_commits = df_commits[df_commits[key_author_name].isin(members)]
+
+        # Lasketaan commit-määrät per milestone ja jäsen
+        grouped_data = df_commits.groupby([key_milestone, key_author_name]).size().reset_index(name=key_pcs)
+
+        # Varmistetaan, että data on oikeassa muodossa kaaviota varten
+        grouped_data.columns = [key_milestone, key_member, key_pcs]
+
+        # Lukumäärät kokonaisluvuksi
+        grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+
+        return grouped_data, key_milestone, key_pcs, key_member
