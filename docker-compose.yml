@@ -4,14 +4,23 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8501:8501"
+      - "8501:8501"  # Streamlit-portti
     environment:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
       PYTHONPATH: "/app/src"
     volumes:
-      - ./tests/reports:/app/tests/reports
+      - ./tests/reports:/app/tests/reports 
     command: >
       sh -c "
       ruff check src -v &&
-      pytest -v -s --tb=short --html=tests/reports/report.html --self-contained-html tests/test_project_data.py
+      pytest -v -s --tb=short --html=tests/reports/report.html --self-contained-html tests/test_project_data.py &&
+      echo 'Raportti saatavilla: http://localhost:8010/report.html'
       "
+
+  reports:
+    image: python:3.9-slim
+    command: python3 -m http.server 8010 -d /app/tests/reports
+    volumes:
+      - ./tests/reports:/app/tests/reports
+    ports:
+      - "8010:8010"  # Testiraporttien portti
