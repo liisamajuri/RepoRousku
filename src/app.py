@@ -1,6 +1,5 @@
 import streamlit as st
 import altair as alt
-import os
 
 import libraries.components as cl
 

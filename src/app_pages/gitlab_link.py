@@ -1,6 +1,5 @@
 import streamlit as st
 import webbrowser
-import os
 import libraries.components as cl
 
 # Kielikäännökset
