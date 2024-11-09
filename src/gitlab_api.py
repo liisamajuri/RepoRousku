@@ -436,6 +436,9 @@ class ProjectData:
         """
         Hakee projektin yleistiedot oliolle
         """
+        if not self.project_url:
+            return None    
+        
         project_data = None
 
         match = re.search(r"^https://[^/]+/(.*)", self.project_url)
