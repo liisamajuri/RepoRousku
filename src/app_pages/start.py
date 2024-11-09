@@ -54,7 +54,7 @@ def start_page():
 
     col1, col2 = st.columns([1, 5])
     with col2:
-        st.image("images/logo.png", width=500)
+        st.image("src/images/logo.png", width=500)
 
     col1, col2, col3 = st.columns([1, 2, 1])
 
