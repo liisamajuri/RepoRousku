@@ -1,8 +1,5 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 import libraries.components as cl
-from collections import defaultdict
 
 # Kielikäännökset
 project_title = "Projekti"
@@ -136,7 +133,7 @@ def project_page():
         else: # work_hours
             # TODO: Clockify-tunnit
             import random
-            test_data = {
+            grouped_data = {
                 "milestones": ['Sprint 1'] * 5 + ['Sprint 2'] * 5 + ['Sprint 3'] * 5 + ['Sprint 4'] * 5 + ['Sprint 5'] * 5 + ['Sprint 6'] * 5,
                 "member": ['Aku', 'Hessu', 'Minni'] * 10,
                 "kpl": [random.randint(20, 100) for _ in range(30)],

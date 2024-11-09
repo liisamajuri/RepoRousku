@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import requests
 from dotenv import load_dotenv
 
 import libraries.components as cl
