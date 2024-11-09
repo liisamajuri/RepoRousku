@@ -1,5 +1,6 @@
 import streamlit as st
 import libraries.components as cl
+import pandas as pd
 
 # Kielikäännökset
 project_title = "Projekti"
@@ -15,7 +16,6 @@ completion_status = "Projektin valmiusaste"
 project_metrics = "Projektin metriikat"
 work_hours = "Työtunnit"
 opened_merge_requests = "Avoimet merge requestit"
-pcs = "Kpl"
 closed_issues = "Suljetut issuet"
 commits = "Commitit"
 branches = "Branchit"
@@ -52,7 +52,7 @@ def project_page():
         with col1_1:
             st.metric(milestones, st.session_state[proj_data].count_milestones())
             st.write("")
-            if False: # TODO: Jos clockify liitetty, näytetään työtunnit branchien sijaan
+            if cl.clockify_available():
                 st.metric(work_hours, 125)
             else:
                 st.metric(branches, st.session_state[proj_data].count_branches())
@@ -82,109 +82,45 @@ def project_page():
         # Projektiryhmä
         members = cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
 
-        # Datavalitsin palkkikaavioon
-        if False:
-            options = (closed_issues, commits, work_hours)
-        else:
-            options = (closed_issues, commits)
+        # Välilehdet palkkikaavioon
+        tabs = [closed_issues, commits]
+        if cl.clockify_available():
+            tabs.append(work_hours)
 
-        # Datatyypin valinta palkkikaavioon
-        col3_1, col3_2 = col3.columns([1, 5])
-        with col3_1:
-            option_bar = st.selectbox(" ", options, label_visibility="hidden", key="datatype1")
+        tab_objects_b = st.tabs(tabs)
+        tab_b1, tab_b2 = tab_objects_b[:2]
+        if cl.clockify_available():
+            tab_b3 = tab_objects_b[2]
 
-        # Palkkikaavio
-        if option_bar == closed_issues:
-            df = st.session_state[proj_data].get_issues()
+        # Palkkikaaviot
+        with tab_b1:
+            data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_closed_issues_bar_chart(members)
+            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+        with tab_b2:
+            data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_commits_bar_chart(members)
+            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
 
-            # Assigneet omille riveilleen
-            df_exploded = df.explode('assignees')
+        if cl.clockify_available():
+            with tab_b3:
+                pass # TODO: Clockify
 
-            # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
-            df_filtered = df_exploded[df_exploded['assignees'].isin(members)]
+        # Välilehdet viivakaavioon
+        tab_objects_l = st.tabs(tabs)
+        tab_l1, tab_l2 = tab_objects_l[:2]
+        if cl.clockify_available():
+            tab_l3 = tab_objects_l[2]
 
-            # Lasketaan issueiden määrä kullekin milestone ja assignees -yhdistelmälle
-            grouped_data = df_filtered.groupby(['milestone', 'assignees']).size().reset_index(name='kpl')
+        # Viivakaaviot
+        with tab_l1:
+            data = st.session_state[proj_data].get_data_for_closed_issues_line_chart(members)
+            st.line_chart(data)
+        with tab_l2:
+            data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_commits_line_chart(members)
+            st.line_chart(data, x=x_field, y=y_field, color=color_field)
 
-        elif option_bar == commits:
-            df_commits = st.session_state[proj_data].get_commits()
-            df_milestones = st.session_state[proj_data].get_milestones()
-
-            # Liitetään milestone commit-päivämäärän perusteella
-            def get_milestone_for_commit(commit_date):
-                milestone = df_milestones[(df_milestones["start_date"] <= commit_date) & (df_milestones["due_date"] >= commit_date)]
-                return milestone["title"].iloc[0] if not milestone.empty else None
-
-            # Lisätään milestone-tieto commits_df:ään
-            df_commits["milestone"] = df_commits["committed_date"].apply(get_milestone_for_commit)
-
-            # Suodatetaan pois commitit, joille ei löytynyt milestonea
-            df_commits = df_commits.dropna(subset=["milestone"])
-
-            # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
-            df_commits = df_commits[df_commits['author_name'].isin(members)]
-
-            # Lasketaan commit-määrät per milestone ja author
-            grouped_data = df_commits.groupby(["milestone", "author_name"]).size().reset_index(name="kpl")
-
-            # Varmistetaan, että data on oikeassa muodossa kaaviota varten
-            grouped_data.columns = ["milestone", "assignees", "kpl"]
-
-        else: # work_hours
-            # TODO: Clockify-tunnit
-            import random
-            grouped_data = {
-                "milestones": ['Sprint 1'] * 5 + ['Sprint 2'] * 5 + ['Sprint 3'] * 5 + ['Sprint 4'] * 5 + ['Sprint 5'] * 5 + ['Sprint 6'] * 5,
-                "member": ['Aku', 'Hessu', 'Minni'] * 10,
-                "kpl": [random.randint(20, 100) for _ in range(30)],
-            }
-
-        grouped_data['kpl'] = grouped_data['kpl'].astype(int)
-        st.bar_chart(grouped_data, x="milestone", y="kpl", color="assignees", horizontal=True)
-
-        # Viivakaavio
-
-        # Datatyypin valinta viivakaavioon
-        col3_1, col3_2 = col3.columns([1, 5])
-        with col3_1:
-            option_line = st.selectbox(" ",options, label_visibility="hidden", key="datatype2", index=1)
-
-        if option_line == closed_issues:
-            df = st.session_state[proj_data].get_closed_issues()
-
-            # Assigneet omille riveilleen
-            df_exploded = df.explode('assignees')
-
-            # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
-            df_exploded = df_exploded[df_exploded['assignees'].isin(members)]
-
-            grouped_data = df_exploded.groupby(['closed_at', 'assignees']).size().reset_index(name='value')
-
-            st.line_chart(grouped_data, x="closed_at", y="value", color="assignees")
-
-        elif option_line == commits:
-            df = st.session_state[proj_data].get_commits()
-
-            # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
-            df = df[df['author_name'].isin(members)]
-
-            # Lasketaan commits per päivämäärä ja author_name
-            grouped_data = df.groupby(['committed_date', 'author_name']).size().reset_index(name='value')
-            grouped_data['value'] = grouped_data['value'].astype(int)
-
-            st.line_chart(grouped_data, x="committed_date", y="value", color="author_name")
-
-        else: # work_hours
-            # TODO: Clockify-tunnit
-            from datetime import datetime, timedelta
-            import random
-            grouped_data = {
-                "committed_date": [datetime.today() + timedelta(days=i) for i in range(30)],
-                "author_name": ['Aku', 'Hessu', 'Minni'] * 10,
-                "value": [random.randint(20, 100) for _ in range(30)],
-            }
-
-            st.line_chart(grouped_data, x="committed_date", y="value", color="author_name")
+        if cl.clockify_available():
+            with tab_l3:
+                pass # TODO: Clockify
 
 
 if not st.session_state[proj_data]:
