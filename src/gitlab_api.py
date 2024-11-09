@@ -33,6 +33,7 @@ key_iid = "iid"
 key_title = "title"
 key_author_name = "author_name"
 key_committed_date = "committed_date"
+key_status = "status"
 
 key_pcs = "kpl"
 key_member = "jäsen"
@@ -119,31 +120,40 @@ class ProjectData:
         Palauttaa milestonetiedot dataframena
         """
         milestones = self.get_data(key_milestones)
-        df = pd.DataFrame(milestones)
+        if milestones:
+            df = pd.DataFrame(milestones)
 
-        df[key_start_date] = pd.to_datetime(df[key_start_date]).dt.date
-        df[key_due_date] = pd.to_datetime(df[key_due_date]).dt.date
+            if not df.empty:
+                df[key_start_date] = pd.to_datetime(df[key_start_date]).dt.date
+                df[key_due_date] = pd.to_datetime(df[key_due_date]).dt.date
 
-        # Järjestetään aikajärjestykseen
-        df = df.sort_values(by=key_start_date)
+                # Poistetaan rivit, joilla ei ole päivämäärätietoa
+                df = df.dropna(subset=[key_due_date, key_start_date])
 
-        # Lisätään status "Päättynyt", "Aktiivinen", tai "Tuleva"
-        today = datetime.now().date()
+                if len(df):
+                    # Järjestetään aikajärjestykseen
+                    df = df.sort_values(by=key_start_date)
 
-        def milestone_status(row):
-            if row[key_due_date] < today:
-                return "Päättynyt"
-            elif row[key_start_date] <= today <= row[key_due_date]:
-                return "Aktiivinen"
-            else:
-                return "Tuleva"
+                    # Lisätään status "Päättynyt", "Aktiivinen", tai "Tuleva"
+                    today = datetime.now().date()
 
-        df['status'] = df.apply(milestone_status, axis=1)
+                    def milestone_status(row):
+                        if row[key_state] == value_closed or row[key_due_date] < today:
+                            return "Päättynyt"
+                        elif row[key_start_date] <= today <= row[key_due_date]:
+                            return "Aktiivinen"
+                        elif row[key_due_date] > today:
+                            return "Tuleva"
+                        else:
+                            return "EOS"
 
-        # Valitaan sarakkeet
-        df = df[[key_iid, key_title, key_desc, key_state, key_due_date, key_start_date, "status"]]
+                    df[key_status] = df.apply(milestone_status, axis=1)
 
-        return df
+                    # Valitaan sarakkeet
+                    df = df[[key_iid, key_title, key_desc, key_state, key_due_date, key_start_date, key_status]]
+
+            return df
+        return pd.DataFrame()
 
 
     def get_issues(self):
@@ -151,20 +161,21 @@ class ProjectData:
         Palauttaa issuetiedot dataframena
         """
         issues = self.get_data(key_issues)
+        if issues:
+            df = pd.DataFrame(issues)
 
-        # Muutetaan json dataframeksi
-        df = pd.DataFrame(issues)
-        
-        # Pelkistetään assignees listaksi nimistä, jos se ei ole tyhjä
-        df[key_assignees] = df[key_assignees].apply(lambda x: [assignee[key_name] for assignee in x] if isinstance(x, list) and x else None)
+            if not df.empty:
+                # Pelkistetään assignees listaksi nimistä, jos se ei ole tyhjä
+                df[key_assignees] = df[key_assignees].apply(lambda x: [assignee[key_name] for assignee in x] if isinstance(x, list) and x else None)
 
-        # Pelkistetään milestone titleksi, jos milestone on sanakirja ja siinä on title-avaimen
-        df[key_milestone] = df[key_milestone].apply(lambda x: x.get(key_title) if isinstance(x, dict) and key_title in x else None)
+                # Pelkistetään milestone titleksi, jos milestone on sanakirja ja siinä on title-avaimen
+                df[key_milestone] = df[key_milestone].apply(lambda x: x.get(key_title) if isinstance(x, dict) and key_title in x else None)
 
-        # Valitaan sarakkeet
-        df = df[[key_iid, key_title, key_desc, key_state, key_assignees, key_milestone, key_closed_at]]
+                # Valitaan sarakkeet
+                df = df[[key_iid, key_title, key_desc, key_state, key_assignees, key_milestone, key_closed_at]]
 
-        return df
+            return df
+        return pd.DataFrame()
 
 
     def get_commits(self):
@@ -172,18 +183,21 @@ class ProjectData:
         Palauttaa committien tiedot dataframena
         """
         commits = self.get_data(key_commits)
-        df = pd.DataFrame(commits)
+        if commits:
+            df = pd.DataFrame(commits)
 
-        # Vain päivämäärä
-        df[key_committed_date] = df[key_committed_date].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
-        df["created_at"] = df["created_at"].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
-        df[key_committed_date] = pd.to_datetime(df[key_committed_date]).dt.date
-        df["created_at"] = pd.to_datetime(df["created_at"]).dt.date
-   
-        # Valitaan sarakkeet
-        df = df[["created_at", key_title, "message", key_author_name, key_committed_date]]
+            if not df.empty:
+                # Vain päivämäärä
+                df[key_committed_date] = df[key_committed_date].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
+                df[key_created_at] = df[key_created_at].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
+                df[key_committed_date] = pd.to_datetime(df[key_committed_date]).dt.date
+                df[key_created_at] = pd.to_datetime(df[key_created_at]).dt.date
 
-        return df
+                # Valitaan sarakkeet
+                df = df[[key_created_at, key_title, "message", key_author_name, key_committed_date]]
+
+            return df
+        return pd.DataFrame()
 
 
     def get_branches(self):
@@ -191,18 +205,18 @@ class ProjectData:
         Palauttaa branchien tiedot dataframena
         """
         branches = self.get_data(key_branches)
-        df = pd.DataFrame(branches)
-        return df
+        if branches:
+            df = pd.DataFrame(branches)
+            return df
+        return pd.DataFrame()
 
 
     def count_branches(self):
         """
         Palauttaa branchien lukumäärän
         """
-        branches = self.get_data(key_branches)
-        if branches is not None:
-            return len(pd.DataFrame(branches))
-        return 0
+        branches = self.get_branches()
+        return len(branches)
 
 
     def get_labels(self):
@@ -210,8 +224,10 @@ class ProjectData:
         Palauttaa labelien tiedot dataframena
         """
         labels = self.get_data(key_labels)
-        df = pd.DataFrame(labels)
-        return df
+        if labels:
+            df = pd.DataFrame(labels)
+            return df
+        return pd.DataFrame()
 
 
     def get_merge_requests(self):
@@ -219,8 +235,10 @@ class ProjectData:
         Palauttaa merge requestien tiedot dataframena
         """
         merge_requests = self.get_data(key_merge_requests)
-        df = pd.DataFrame(merge_requests)
-        return df
+        if merge_requests:
+            df = pd.DataFrame(merge_requests)
+            return df
+        return pd.DataFrame()
 
 
     def count_open_merge_requests(self):
@@ -236,11 +254,13 @@ class ProjectData:
 
     def get_pipelines(self):
         """
-        Palauttaa pipe linejen tiedot dataframena
+        Palauttaa pipelinejen tiedot dataframena
         """
         pipelines = self.get_data(key_pipelines)
-        df = pd.DataFrame(pipelines)
-        return df
+        if pipelines:
+            df = pd.DataFrame(pipelines)
+            return df
+        return pd.DataFrame()
 
 
     def get_expired_milestones(self):
@@ -248,7 +268,9 @@ class ProjectData:
         Palauttaa päättyneiden milestonejen lukumäärän
         """
         milestones = self.get_data(key_milestones)
-        return sum(1 for milestone in milestones if milestone[key_expired])
+        if milestones:
+            return sum(1 for milestone in milestones if milestone[key_expired])
+        return 0
 
 
     def get_active_milestones(self):
@@ -256,9 +278,13 @@ class ProjectData:
         Palauttaa aktiivisten milestonejen lukumäärän
         """
         milestones = self.get_data(key_milestones)
-        today = datetime.now().date()
-        active_milestones = [milestone for milestone in milestones if (datetime.fromisoformat(milestone[key_start_date]).date() <= today and datetime.fromisoformat(milestone[key_due_date]).date() >= today)]
-        return len(active_milestones)
+        if milestones:
+            df = pd.DataFrame(milestones)
+            if not df.empty:
+                today = datetime.now().date()
+                active_milestones = [milestone for milestone in milestones if (datetime.fromisoformat(milestone[key_start_date]).date() <= today and datetime.fromisoformat(milestone[key_due_date]).date() >= today)]
+                return len(active_milestones)
+        return 0
 
 
     def get_upcoming_milestones(self):
@@ -266,9 +292,11 @@ class ProjectData:
         Palauttaa tulevien milestonejen lukumäärän
         """
         milestones = self.get_data(key_milestones)
-        today = datetime.now().date()
-        upcoming_milestones = [milestone for milestone in milestones if datetime.fromisoformat(milestone[key_start_date]).date() > today]
-        return len(upcoming_milestones) if upcoming_milestones else 0
+        if milestones and not milestones.empty:
+            today = datetime.now().date()
+            upcoming_milestones = [milestone for milestone in milestones if datetime.fromisoformat(milestone[key_start_date]).date() > today]
+            return len(upcoming_milestones) if upcoming_milestones else 0
+        return 0
 
 
     def get_readiness_ml(self):
@@ -277,7 +305,7 @@ class ProjectData:
         """
         expired = self.get_expired_milestones()
         all = self.count_milestones()
-        if all:
+        if expired is not None and all is not None and all:
             return round((expired / all) * 100)
         return 0
 
@@ -287,7 +315,9 @@ class ProjectData:
         Palauttaa milestonejen kokonaislukumäärän
         """
         milestones = self.get_data(key_milestones)
-        return len(milestones)
+        if milestones:
+            return len(milestones)
+        return 0
 
 
     def get_open_issues(self):
@@ -295,9 +325,12 @@ class ProjectData:
         Palauttaa avoimet issuet
         """
         issues = self.get_issues()
-        df = pd.DataFrame(issues)
-        df = df[df[key_state] == value_opened]
-        return df
+        if issues is not None and not issues.empty:
+            df = pd.DataFrame(issues)
+            if not df.empty:
+                df = df[df[key_state] == value_opened]
+                return df
+        return pd.DataFrame()
 
 
     def get_closed_issues(self):
@@ -305,19 +338,25 @@ class ProjectData:
         Palauttaa suljetut issuet
         """
         issues = self.get_issues()
-        df = pd.DataFrame(issues)
-        df = df[df[key_state] == value_closed]
-        return df
+        if issues is not None and not issues.empty:
+            df = pd.DataFrame(issues)
+            if not df.empty:
+                df = df[df[key_state] == value_closed]
+            return df
+        return pd.DataFrame()
 
 
     def get_readiness_issues(self):
         """
         Palauttaa projektin valmiusasteen milestonejen mukaan
         """
-        closed = len(self.get_closed_issues())
-        all = len(self.get_issues())
-        readiness = round((closed / all) * 100)
-        return readiness
+        all_issues = self.get_issues()
+        if all_issues is not None and not all_issues.empty:
+            closed = self.get_closed_issues()
+            if closed is not None:
+                readiness = round((len(closed) / len(all_issues)) * 100)
+                return readiness
+        return 0
 
 
     def get_assignees(self):
@@ -327,18 +366,20 @@ class ProjectData:
         assignees_list = []
         issues = self.get_data(key_issues)
 
-        for issue in issues:
-            for assignee in issue[key_assignees]:
-                assignees_list.append({
-                    key_id: assignee[key_id],
-                    key_name: assignee[key_name]
-                })
+        if issues:
+            for issue in issues:
+                for assignee in issue[key_assignees]:
+                    assignees_list.append({
+                        key_id: assignee[key_id],
+                        key_name: assignee[key_name]
+                    })
 
-        df_assignees = pd.DataFrame(assignees_list)
-        df_unique_assignees = df_assignees.drop_duplicates().reset_index(drop=True)
-        name_list = df_unique_assignees[key_name].tolist()
+            df_assignees = pd.DataFrame(assignees_list)
+            df_unique_assignees = df_assignees.drop_duplicates().reset_index(drop=True)
+            name_list = df_unique_assignees[key_name].tolist()
 
-        return  name_list  
+            return  name_list
+        return []
 
 
     def reset(self):
@@ -545,27 +586,30 @@ class ProjectData:
         df_commits = self.get_commits()
         df_milestones = self.get_milestones()
 
-        # Liitetään milestone commit-päivämäärän perusteella
-        def get_milestone_for_commit(commit_date):
-            milestone = df_milestones[(df_milestones[key_start_date] <= commit_date) & (df_milestones[key_due_date] >= commit_date)]
-            return milestone[key_title].iloc[0] if not milestone.empty else None
+        if len(df_commits) and len(df_milestones):
+            # Liitetään milestone commit-päivämäärän perusteella
+            def get_milestone_for_commit(commit_date):
+                milestone = df_milestones[(df_milestones[key_start_date] <= commit_date) & (df_milestones[key_due_date] >= commit_date)]
+                return milestone[key_title].iloc[0] if not milestone.empty else None
 
-        # Lisätään tieto milestonesta committien dataframeen
-        df_commits[key_milestone] = df_commits[key_committed_date].apply(get_milestone_for_commit)
+            # Lisätään tieto milestonesta committien dataframeen
+            df_commits[key_milestone] = df_commits[key_committed_date].apply(get_milestone_for_commit)
 
-        # Suodatetaan pois commitit, joille ei löytynyt milestonea
-        df_commits = df_commits.dropna(subset=[key_milestone])
+            # Suodatetaan pois commitit, joille ei löytynyt milestonea
+            df_commits = df_commits.dropna(subset=[key_milestone])
 
-        # Suodatetaan jäsenet
-        df_commits = df_commits[df_commits[key_author_name].isin(members)]
+            # Suodatetaan jäsenet
+            df_commits = df_commits[df_commits[key_author_name].isin(members)]
 
-        # Lasketaan commit-määrät per milestone ja jäsen
-        grouped_data = df_commits.groupby([key_milestone, key_author_name]).size().reset_index(name=key_pcs)
+            # Lasketaan commit-määrät per milestone ja jäsen
+            grouped_data = df_commits.groupby([key_milestone, key_author_name]).size().reset_index(name=key_pcs)
 
-        # Varmistetaan, että data on oikeassa muodossa kaaviota varten
-        grouped_data.columns = [key_milestone, key_member, key_pcs]
+            # Varmistetaan, että data on oikeassa muodossa kaaviota varten
+            grouped_data.columns = [key_milestone, key_member, key_pcs]
 
-        # Lukumäärät kokonaisluvuksi
-        grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+            # Lukumäärät kokonaisluvuksi
+            grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
 
-        return grouped_data, key_milestone, key_pcs, key_member
+            return grouped_data, key_milestone, key_pcs, key_member
+
+        return pd.DataFrame(columns=[key_milestone, key_pcs, key_member]), key_milestone, key_pcs, key_member
