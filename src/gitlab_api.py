@@ -56,7 +56,7 @@ class ProjectData:
         self.project_meta_data = None   # projektin yleistiedot
 
         self.access_token = gitlab_token
-        self.headers = {"PRIVATE-TOKEN": self.access_token}
+        self.headers = {"Private-Token": self.access_token}
         self.output_file_name = 'gitlab_data.json'
         self.output_file_name2 = 'gitlab_meta_data.json'
 
