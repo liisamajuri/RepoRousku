@@ -139,7 +139,7 @@ Etsitään tälle järkevämpi paikka README:ssä, nyt vain kirjattu komennot ta
 
 **Yksikkötestit** funktioiden ja luokkien yms. testaukseen:
 - Asennetaan  ja suoritetaan automaattisesti kontin pystytyksessä (`docker compose up`)
-- Yksikkötestien suorittaminen kontin käynnistyksen jälkeen (`docker-compose run --rm palikka pytest -v -s --tb=short --html=tests/reports/report.html --self-contained-html tests/test_project_data.py`)
+- Yksikkötestien suorittaminen kontin käynnistyksen jälkeen (`docker-compose run --rm palikka pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py`)
 
 
 ***
