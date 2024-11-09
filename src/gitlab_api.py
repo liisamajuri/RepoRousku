@@ -127,7 +127,6 @@ class ProjectData:
         today = datetime.now().date()
 
         def milestone_status(row):
-            print(row[key_due_date])
             if row[key_due_date] < today:
                 return "Päättynyt"
             elif row[key_start_date] <= today <= row[key_due_date]:
@@ -365,7 +364,7 @@ class ProjectData:
             return None
 
 
-    def fetch_data_NOT_WORKING(self, url, params={}):
+    def fetch_data_with_pagination(self, url, params={}):
         """
         Suorittaa hakupyynnön GitLabin REST APIin
         """
@@ -384,20 +383,8 @@ class ProjectData:
                 return None
             all_items.extend(items)
             page += 1
-            print(f'page: {page}')
 
         return all_items
-
-
-    def fetch_api_data(self, data_type):
-        """
-        Suorittaa hakupyynnön GitLabin REST APIin
-        """
-        if data_type == key_commits or data_type == key_branches:
-            url = f"{self.api_url}/{self.get_id()}/repository/{data_type}"
-        else:
-            url = f"{self.api_url}/{self.get_id()}/{data_type}"
-        return self.fetch_data(url)
 
 
     def generate_api_url(self, project_url):
@@ -426,8 +413,12 @@ class ProjectData:
         """
         all_data = {}
 
-        for part in project_data:
-            all_data[part] = self.fetch_api_data(part)
+        for data_type in project_data:
+            if data_type == key_commits or data_type == key_branches:
+                url = f"{self.api_url}/{self.get_id()}/repository/{data_type}"
+            else:
+                url = f"{self.api_url}/{self.get_id()}/{data_type}"
+            all_data[data_type] = self.fetch_data_with_pagination(url)
 
         return all_data
 
