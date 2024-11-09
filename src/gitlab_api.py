@@ -127,7 +127,7 @@ class ProjectData:
         today = datetime.now().date()
 
         def milestone_status(row):
-            print(row[key_due_date])
+            #print(row[key_due_date])
             if row[key_due_date] < today:
                 return "Päättynyt"
             elif row[key_start_date] <= today <= row[key_due_date]:
