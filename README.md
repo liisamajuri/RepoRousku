@@ -127,10 +127,19 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 <!-- KÄYTTÖ -->
 ## KÄYTTÖ
 
-**Ruff**-linterin käyttö koodin tyyli- ja syntaksivirheiden tunnistamiseen ja korjaamiseen:
-- Asennetaan automaattisesti kontin pystytyksessä (`docker compose up`)
-- *src*-kansion koodien tarkistus (`docker-compose run --rm ruff`)
+**TESTAUS**
 
+==HUOM!== 
+
+Etsitään tälle järkevämpi paikka README:ssä, nyt vain kirjattu komennot talteen.
+
+**Ruff**-linterin käyttö koodin tyyli- ja syntaksivirheiden tunnistamiseen ja korjaamiseen:
+- Asennetaan  ja suoritetaan automaattisesti kontin käynnistyksen yhteydessä (`docker compose up`)
+- Ruff-testin suorittaminen kontin pystytyksen jälkeen *src*-kansion koodien tarkistukseen (`docker-compose run --rm palikka ruff check src -v`)
+
+**Yksikkötestit** funktioiden ja luokkien yms. testaukseen:
+- Asennetaan  ja suoritetaan automaattisesti kontin pystytyksessä (`docker compose up`)
+- Yksikkötestien suorittaminen kontin käynnistyksen jälkeen (`docker-compose run --rm palikka pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py`)
 
 
 ***

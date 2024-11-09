@@ -2,18 +2,25 @@ services:
   palikka:
     build:
       context: .
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     ports:
-      - "8501:8501"
+      - "8501:8501"  # Streamlit-portti
     environment:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
+      PYTHONPATH: "/app/src"
+    volumes:
+      - ./tests/reports:/app/tests/reports 
+    command: >
+      sh -c "
+      ruff check src -v &&
+      pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
+      echo 'Raportti saatavilla: http://localhost:8010/unit_test_report.html'
+      "
+
+  reports:
+    image: python:3.9-slim
+    command: python3 -m http.server 8010 -d /app/tests/reports
     volumes:
       - ./tests/reports:/app/tests/reports
-
-  # Staattinen analyysi `ruff`-lintterillä
-  ruff:
-    image: python:3.9-slim
-    working_dir: /app
-    volumes:
-      - .:/app
-    command: ["ruff", "check", "src"]
+    ports:
+      - "8010:8010"  # Testiraporttien portti
