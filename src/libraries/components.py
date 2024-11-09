@@ -108,9 +108,8 @@ def make_team_member_selector(member_list):
 def validate_url(url):
     """
     Tarkastaa, onko annettu url validi
-    TODO: ei toimi oikein
     """
-    if not url.startswith("https://"):
+    if not url.startswith("https://") or url == "https://":
         return False
 
     try:
