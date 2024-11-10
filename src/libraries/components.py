@@ -47,7 +47,7 @@ def make_donut(input_response, input_text, input_color):
     if input_color == 'green':
         chart_color = ['#27AE60', '#12783D']
     if input_color == 'orange':
-        chart_color = ['#F49E25', '#FAEBC8'] # RepoRouskun väriteema: #DB4128, #F46A25, #F49E25, #F9B049, #FAEBC8
+        chart_color = ['#F49E25', '#FAEBC8'] # RepoRousku
     if input_color == 'red':
         chart_color = ['#E74C3C', '#781F16']
         
