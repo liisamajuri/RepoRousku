@@ -1,5 +1,4 @@
 import streamlit as st
-import altair as alt
 
 import libraries.components as cl
 
@@ -31,7 +30,6 @@ def set_appearance():
         layout = 'wide',
         initial_sidebar_state = "collapsed"
     )
-    alt.themes.enable("dark")
 
 
 def create_navigation_panel():

@@ -17,5 +17,6 @@ __pycache__/
 .venv/
 venv/
 
-# Streamlitin tilapäistiedostot
+# Streamlitin tilapäistiedostot, poikkeus: config.toml
 .streamlit/
+!src/.streamlit/config.toml
