@@ -19,4 +19,4 @@ venv/
 
 # Streamlitin tilapäistiedostot, poikkeus: config.toml
 .streamlit/
-!.streamlit/config.toml
+!src/.streamlit/config.toml

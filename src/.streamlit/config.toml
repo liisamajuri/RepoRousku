@@ -1,0 +1,9 @@
+[theme]
+base = "dark"  # Vaihtoehdot: "dark" tai "light"
+primaryColor = "#F46A25"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#262730"
+textColor = "#FAFAFA"
+font = "sans serif"  # Vaihtoehdot: "sans serif", "serif", tai "monospace"
+
+# RepoRouskun väriteema: #DB4128, #F46A25, #F49E25, #F9B049, #FAEBC8
