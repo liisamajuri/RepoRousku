@@ -169,6 +169,7 @@ Etsitään tälle järkevämpi paikka README:ssä, nyt vain kirjattu komennot ta
 - Projektikurssin Reppu-ympäristö: [_Projektiopinnot 4 - Digitaaliset palvelut_](https://reppu.kamk.fi/course/view.php?id=1451)
 - Ohjelman vaatimukset: [_Vaatimukset-dokumentaatio_](Tähän linkki)
 - Ohjelman testaus: [_Testausdokumentaatio_](Tähän linkki)
+- 
 
 ***
 

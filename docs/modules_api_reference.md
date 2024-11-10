@@ -1,31 +1,39 @@
-
-
-# API Reference
+# RepoRouskun Moduulit ja API-dokumentaatio
 
 
 Tässä dokumentaatiossa kuvataan RepoRouskun Python-koodin eri moduulien toiminnot ja funktiot.
 
-## GitLab Link Page
+---
 
+## Projektin tietojen avaus -sivu
 
 ::: src.app_pages.gitlab_link
 
-## Members Page
+---
+
+## Käyttäjät -sivu
 
 Dokumentaatio `members.py` -moduulista, joka sisältää funktiot projektiryhmän jäsenten tietojen käsittelyyn.
 
 ::: src.app_pages.members
 
+---
 
-## Project Page
+## Projektin tiedot -sivu
 
-Dokumentaatio `project.py` -moduulista, joka näyttää projektin keskeiset tiedot ja visualisoi ne.
+Dokumentaatio `project.py` -moduulista, joka näyttää projektin keskeiset tiedot ja visualisoi ne käyttäjälleen.
 
-## Start Page
+::: src.app_pages.project
+
+---
+
+## Aloitussivu
 
 Dokumentaatio `start.py` -moduulista, joka käsittelee projektin aloitussivun ja tokenien syötön.
 
 ::: src.app_pages.start
+
+---
 
 ## Components
 
@@ -33,8 +41,24 @@ Dokumentaatio `components.py` -moduulista, joka sisältää useita erilaisia kom
 
 ::: src.libraries.components
 
+---
+
 ## Main Application
 
 Dokumentaatio `app.py` -moduulista, joka sisältää sovelluksen päätoiminnot ja navigaation.
 
 ::: src.app
+
+---
+
+## API-testaus
+
+Dokumentaatio `api_tests.py` modulista.
+
+::: tests.api_tests
+
+## Yksikkötestaus
+
+Dokumentaatio `unit_tests.py` modulista.
+
+::: tests.unit_tests

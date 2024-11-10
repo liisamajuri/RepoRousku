@@ -1,11 +1,45 @@
 site_name: RepoRouskun koodidokumentaatio
 theme:
   name: material
+  language: fi
+  #logo: /docs/image-1.png
+  palette:
+    scheme: slate
+    primary: 'black'
+    accent: 'deep orange'
+  font: 
+    text: 'Roboto'
+    code: 'Source Code Pro'
 nav:
-  - Home: index.md
-  - Usage: usage.md
-  - API Reference: api_reference.md
-  - Configuration: configuration.md
+  - Aloitus: index.md
+  - Käyttö-ohjeet: usage.md
+  - Koodidokumentaatio: modules_api_reference.md
+  - Konfiguraatioista: configuration.md
+
+markdown_extensions:
+  # Footnotes
+  - footnotes
+  # Code blocks
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  # Emojis
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  # Checkboxes
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  # Admonitions
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
 plugins:
   - search
   - mkdocstrings:
@@ -13,3 +47,5 @@ plugins:
         python:
           rendering:
             show_root_toc_entry: false
+copyright: |
+  PalikkaPalvelut in 2024.
