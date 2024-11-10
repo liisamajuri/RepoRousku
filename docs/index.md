@@ -3,6 +3,8 @@
 
 RepoRousku on mikropalvelu, joka tarjoaa kattavan näkymän GitLab-repositorioprojektiin. Tämä ohjelma on rakennettu Streamlitillä, Pythonilla ja sillä noudetaan dataa GitLabista ja Clockifystä REST API -rajapintojen avulla. 
 
+!!!tip testitekstiä
+
 _Olitpa projektitiimin jäsen tai opettaja, RepoRousku antaa sinulle hyvän käsityksen projektin tilasta visualisoiden kaiken tarvittavan käyttäjäystävälliseen käyttöliittymään._
 
 ## Ominaisuudet
@@ -21,7 +23,7 @@ _Olitpa projektitiimin jäsen tai opettaja, RepoRousku antaa sinulle hyvän käs
 
 * **Docker:** Mikropalvelu on kontitettu Dockerilla, mikä mahdollistaa helpon käyttöönoton ja skaalautuvuuden.
 
-* **GitLab CI/CD:** Dokumentaation ja sovelluksen automatisoitu testaus tapahtuu GitLabin CI/CD-putkien avulla.
+* **GitLab CI/CD:** Sovelluksen automatisoitu testaus tapahtuu GitLabin CI/CD-putkien avulla.
 
 ## Aloitus
 
@@ -34,13 +36,17 @@ git clone https://gitlab.com/your-repo/repo-rouska.git
 
 **Käynnistä sovellus:** Käytä Dockeria RepoRousku-kontin rakentamiseen ja ajamiseen.
 ```python
-docker-compose up
+docker-compose up --build
 ```
+
+## Riippuvuudet
+
+Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tiedostoon. Kirjastot asennetaan Docker-kontin pystytyksen yhteydessä automaattisesti.
 
 ## Dokumentaation yleiskatsaus
 
 * **[Käyttöohje](http://127.0.0.1:8000/usage/):** Yksityiskohtaiset ohjeet RepoRouskun käyttämiseen, mukaan lukien ominaisuuksien kuvaukset ja käyttöliittymän toiminnot.
-* **[API-dokumentaatio](http://127.0.0.1:8000/api_reference/):** Kattava sepostus RepoRouskussa käytetyistä funktioista ja moduuleista, sisältäen automaattisesti generoituja dokumentaatioita.
+* **[Moduulit ja API-dokumentaatio](http://127.0.0.1:8000/modules_api_reference/):** Kattava sepostus RepoRouskussa käytetyistä funktioista ja moduuleista, sisältäen automaattisesti generoituja dokumentaatioita.
 
 * **[Konfiguraatio](http://127.0.0.1:8000/configuration/):** Ohjeet mikropalvelun konfigurointiin, mukaan lukien Dockerin ja CI/CD asetukset.
 

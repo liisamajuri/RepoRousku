@@ -1,7 +1,7 @@
 # Konfiguraatio
 
 ## Yleiskuvaus
-Tämä konfiguraatiodokumentti auttaa ymmärtämään RepoRouskun käyttämät konfiguraatiot, kuten Dockerin, Docker Composen ja GitLab CI/CD -putken asetukset. äiden konfiguraatioiden avulla RepoRousku saadaan helposti käyttöön ja dokumentaatio julkaistaan sekä testaukset suoritetaan automaattisesti.
+Tämä konfiguraatiodokumentti auttaa ymmärtämään RepoRouskun käyttämät konfiguraatiot, kuten Dockerin, Docker Composen ja GitLab CI/CD -putken asetukset. Näiden konfiguraatioiden avulla RepoRousku saadaan helposti käyttöön ja testaukset suoritetaan automaattisesti.
 
 ## Dockerfile-konfiguraatio
 
