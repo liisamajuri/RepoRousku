@@ -14,7 +14,9 @@ services:
       sh -c "
       ruff check src -v &&
       pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
-      echo 'Raportti saatavilla: http://localhost:8010/unit_test_report.html' &&
+      pytest -v -s --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
+      echo 'Unit-testiraportti saatavilla: http://localhost:8010/unit_test_report.html' &&
+      echo 'API-testiraportti saatavilla: http://localhost:8010/api_test_report.html' &&
       streamlit run src/app.py --server.port=8501 --server.enableCORS=false
       "
 
