@@ -3,7 +3,7 @@
 # Tarkista, että MkDocs on asennettu
 if ! command -v mkdocs &> /dev/null
 then
-    echo "MkDocs ei ole asennettu. Asenna se ensin komennolla: pip install mkdocs mkdocs-material mkdocstrings"
+    echo "MkDocs ei ole asennettu. Asenna se ensin komennolla: pip install mkdocs mkdocs-material mkdocstrings tai käynnistä docker-kontti"
     exit
 fi
 

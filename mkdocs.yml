@@ -1,15 +1,20 @@
 site_name: RepoRouskun koodidokumentaatio
 theme:
   name: material
+  hljs_style_dark: 'red'
   language: fi
-  #logo: /docs/image-1.png
+  logo: images/logo.png
+  favicon: images/logo.png
   palette:
     scheme: slate
-    primary: 'black'
-    accent: 'deep orange'
+    primary: black
+    accent: deep orange
+
   font: 
-    text: 'Roboto'
+    text: Roboto
     code: 'Source Code Pro'
+  features:
+    - content.tooltips
 nav:
   - Aloitus: index.md
   - Käyttö-ohjeet: usage.md
