@@ -1,4 +1,4 @@
-![reporousku_logo1](image-1.png)
+![reporousku_logo1](images/logotext.png)
 # Tervetuloa RepoRouskuun!
 
 RepoRousku on mikropalvelu, joka tarjoaa kattavan näkymän GitLab-repositorioprojektiin. Tämä ohjelma on rakennettu Streamlitillä, Pythonilla ja sillä noudetaan dataa GitLabista ja Clockifystä REST API -rajapintojen avulla. 
