@@ -12,7 +12,7 @@ theme:
 
   font: 
     text: Roboto
-    code: 'Source Code Pro'
+    code: Source Code Pro
   features:
     - content.tooltips
 nav:

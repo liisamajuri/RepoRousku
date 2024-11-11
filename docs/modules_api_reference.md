@@ -35,7 +35,7 @@ Dokumentaatio `start.py` -moduulista, joka käsittelee projektin aloitussivun ja
 
 ---
 
-## Components
+## Komponentit
 
 Dokumentaatio `components.py` -moduulista, joka sisältää useita erilaisia komponentteja, kuten sivun otsikon ja graafisten esitysten luomisen, joita käytetään useissa eri näkymissä.
 
@@ -43,7 +43,7 @@ Dokumentaatio `components.py` -moduulista, joka sisältää useita erilaisia kom
 
 ---
 
-## Main Application
+## Main -sovellus
 
 Dokumentaatio `app.py` -moduulista, joka sisältää sovelluksen päätoiminnot ja navigaation.
 
