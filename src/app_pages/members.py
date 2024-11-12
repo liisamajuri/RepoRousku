@@ -1,3 +1,9 @@
+"""
+Dashboard projektin datan tarkasteluun projektiryhmän jäsenen/jäsenten näkökulmasta. 
+Dashboardin avulla yksittäinen jäsen voi koostaa tiedot issueistaan ja työtunneistaan 
+projektikurssin raportointia varten.
+"""
+
 import streamlit as st
 import libraries.components as cl
 

@@ -1,3 +1,12 @@
+"""
+RepoRouskun rajapinta, joka hakee projektin tiedot GitLabin APIsta.
+Sisältää ProjectData-luokan, joka kapseloi projektin tiedot ja tarjoaa 
+palveluinaan pureskeltua dataa käyttöliittymää varten.
+
+Pääsääntönä on, että RepoRouskun tiedostoista vain tässä tiedostossa
+esiintyy GitLabista saadun json-muotoisen datan avaimia.
+"""
+
 import requests
 import json
 import re

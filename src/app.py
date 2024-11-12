@@ -1,3 +1,7 @@
+"""
+RepoRouskun pääohjelma, joka luo sovelluksen toimintovalikon ja avaa etusivun.
+"""
+
 import streamlit as st
 
 import libraries.components as cl

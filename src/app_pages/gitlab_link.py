@@ -1,3 +1,8 @@
+"""
+Sovelluksessa piilossa oleva sivu, joka avulla generoidaan projektin 
+GitLab-repositorion avaava valikkotoiminto. Toiminto ei ole käytössä 
+Docker-kontin sisällä ajettavassa sovellusversiossa.
+"""
 import streamlit as st
 import webbrowser
 import libraries.components as cl
@@ -11,7 +16,7 @@ proj_data = "proj_data"
 
 def gitlab_link_page():
     """
-    Sivu, joka avaa projetin GitLab-repositorion sivun
+    Avaa projetin GitLab-repositorion sivun
     """
     if cl.in_docker():
         st.write(st.session_state[proj_data].get_project_url())

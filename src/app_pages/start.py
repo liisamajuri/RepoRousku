@@ -1,3 +1,10 @@
+"""
+RepoRouskun etusivu, jonka avulla käyttäjä määrittelee tarkasteltavan projektin ja tarvittavat pääsyoikeudet projektin dataan.
+Käyttäjän tulee antaa vähintään projektin GitLab-repositorion URL ja Access Token. Jos käyttäjä määrittää lisäksi 
+GitLab-projektiin liittyvän Clockify-projektin ja sen Access Tokenin, on sovelluksessa mahdollista tarkastella myös 
+projektin ajankäyttöä.
+"""
+
 import streamlit as st
 import os
 from dotenv import load_dotenv
