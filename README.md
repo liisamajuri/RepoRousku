@@ -22,7 +22,7 @@
 <!-- YLEISET TIEDOT -->
 ## YLEISET TIEDOT
 - **Nimi:** [Palikkapalvelut](https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut)
-- **Tekijät:** Hakkarainen, Nadina; Majuri, Liisa; Mikkola, Henna; Tishchenko, Vladimir
+- **Tekijät:** Hakkarainen, Nadina; Majuri, Liisa; Mikkonen, Henna; Tishchenko, Vladimir
 - **Ryhmätunnus:** TTM22SAI
 - **Organisaatio:** Kajaanin ammattikorkeakoulu (KAMK)
 - **Projektiin käytetyt tunnit:** XXX
