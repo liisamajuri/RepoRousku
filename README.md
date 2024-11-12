@@ -11,7 +11,7 @@
 - [ALOITTAMINEN](#aloittaminen)
   - [KÄYTTÖYMPÄRISTÖ](#käyttöympäristö)
   - [RIIPPUVUUDET](#riippuvuudet)
-- [KÄYTTÖ](#käyttö)
+- [KÄYTTÖ](#käyttöohjeita)
   - [MODUULIT](#moduulit)
   - [OHJELMAKOKONAISUUDET](#ohjelmakokonaisuudet)
   - [MODUULIEN KUVAUKSET](#moduulien-kuvaukset)
@@ -32,7 +32,9 @@
 <!-- PROJEKTIN KUVAUS -->
 ## PROJEKTIN KUVAUS
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+RepoRousku on mikropalvelupohjainen sovellus, joka tarjoaa yhdellä silmäyksellä GitLab-repositorioprojektin tilan, koostaen projektihallinnan näkökulmasta projektin keskeisimmät tunnusluvut sekä projektitiimiläisten tuntitiedot yhteen näkymään. 
+
+Tämä ohjelma on rakennettu Streamlitillä, Pythonilla ja sillä noudetaan dataa GitLabista ja Clockifystä REST API -rajapintojen avulla. Dockerilla kontitettu ympäristö mahdollistaa sovelluksen helpon käyttöönoton.
 
 ***
 
@@ -40,11 +42,91 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 ## REPOSITORION SISÄLTÖ
 
 #### Repositorion hakemistorakenne:
+```
+Palikkapalvelut/
+|-- docs/
+|   |-- images/
+|   |-- configuration.md
+|   |-- index.md
+|   |-- modules_api_reference.md
+|   |-- usage.md
+|-- site/
+|-- src/
+|   |-- .streamlit/
+|   |   |-- config.toml
+|   |-- app_pages/
+|   |   |-- gitlab_link.py
+|   |   |-- members.py
+|   |   |-- project.py
+|   |   |-- start.py
+|   |-- libraries/
+|   |   |-- components.py
+|   |-- images/
+|   |-- app.py
+|   |-- gitlab_api.py
+|-- tests/
+|   |-- reports/
+|   |-- api_tests.py
+|   |-- unit_tests.py
+|-- Dockerfile
+|-- docker-compose.yml
+|-- mkdocs.yml
+|-- README.md
+|-- requirements.txt
+```
+
+Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaation, sovelluksen lähdekoodin, testit ja Docker-konfiguraatiotiedostot.
 
 ***
 
 <!-- ALOITTAMINEN -->
 ## ALOITTAMINEN
+
+1. **Kloonaa repo komennolla:** 
+```bash
+git clone git@gitlab.dclabra.fi:projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut.git
+```
+2. **Jos haluat ensin tarkastella tarkempaa käyttöliittymäohjetta tai koodidokumentaatiota, aja projektin juurikansiossa komennot:**
+
+```bash
+chmod +x docs/serve_docs.sh
+./docs/serve_docs.sh
+```
+
+***
+
+<!-- KÄYTTÖYMPÄRISTÖ -->
+### KÄYTTÖYMPÄRISTÖ
+
+**YMPÄRISTÖN PYSTYTTÄMINEN:**
+
+- **Aja projektin juurikansiossa komento:**
+
+```shell=
+docker-compose up
+```
+
+**YMPÄRISTÖN ALASAJO:**
+
+* **Aja projektin juurikansiossa komento:**
+
+```shell=
+docker-compose down
+```
+
+
+***
+
+<!-- RIIPPUVUUDET -->
+### RIIPPUVUUDET
+
+Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tiedostoon. Kirjastot asennetaan Docker-kontin pystytyksen yhteydessä automaattisesti.
+
+
+***
+
+<!-- KÄYTTÖ -->
+## KÄYTTÖOHJEITA
 
 ### Personal Access Tokenin lisääminen ympäristömuuttujaan
 - Bash-terminaali:
@@ -84,50 +166,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
       ```
 
 
-***
 
-<!-- KÄYTTÖYMPÄRISTÖ -->
-### KÄYTTÖYMPÄRISTÖ
-
-
-
-##### **YMPÄRISTÖN PYSTYTTÄMINEN:**
-
-- Aja projektin juurikansiossa komento
-
-```shell=
-docker-compose up
-```
-
-
-##### **YMPÄRISTÖN ALASAJO _(tarvittaessa)_ :**
-
-- Aja projektin juurikansiossa komento
-
-```shell=
-docker-compose down
-```
-
-
-***
-
-<!-- RIIPPUVUUDET -->
-### RIIPPUVUUDET
-
-Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tiedostoon. Kirjastot asennetaan Docker-kontin pystytyksen yhteydessä automaattisesti.
-
-***
-
-<!-- ETL -->
-### ETL
-
-
-***
-
-<!-- KÄYTTÖ -->
-## KÄYTTÖ
-
-**TESTAUS**
+### TESTAUS
 
 ==HUOM!== 
 
@@ -150,6 +190,14 @@ Etsitään tälle järkevämpi paikka README:ssä, nyt vain kirjattu komennot ta
 
 
 ### OHJELMAKOKONAISUUDET
+
+* **gitlab_link.py:** Vastaa GitLab-linkkien avaamisesta ja navigoinnista.
+* **members.py:** Näyttää projektiryhmän jäsenten tiedot ja tilastot.
+* **project.py:** Esittää projektin keskeiset tiedot ja metriikat visuaalisesti.
+* **start.py:** Projektin aloitussivu, joka sisältää pääsytietojen syötön.
+* **components.py:** Erilaisia visuaalisia komponentteja, kuten donitsikaavioita ja otsikoita, jotka käytetään eri näkymissä.
+* **app.py:** Sovelluksen pääohjelma, joka yhdistää eri ohjelmakokonaisuudet ja mahdollistaa käyttöliittymän toiminnan Streamlitissä.
+
 
 
 ***
