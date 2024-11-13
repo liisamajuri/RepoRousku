@@ -8,7 +8,6 @@ import streamlit as st
 import libraries.components as cl
 
 # Kielikäännökset
-project_title = st.session_state[proj_data].get_name() if proj_data in st.session_state else "Projekti"
 member_title = "Jäsenet"
 closed_issues_title = "Suljetut issuet"
 open_issues_title = "Avoimet issuet"
@@ -29,13 +28,16 @@ def member_page():
     """
     Sivu projektiryhmän jäseten statistiikan tarkasteluun 
     """
+    # Tarkista, että proj_data on määritelty sessiossa ennen projektin nimen näyttämistä
+    project_title = st.session_state[proj_data].get_name() if proj_data in st.session_state else "Projekti"
+
+    # Näytä projektin nimi ja jäsenet-osio
     st.markdown(f"## {project_title}")
     st.markdown(f"### {member_title}")
 
     # Käyttäjävalinta
     selected_member = st.selectbox(select_member, [all_members] + st.session_state[proj_data].get_assignees())
 
-    # Kolumnirakenne
     col1, col2, col3 = st.columns([4, 1, 2])
 
     # Ensimmäinen kolumni: suljetut/avoimet issuet välilehtinä
@@ -86,7 +88,7 @@ def member_page():
         else:
             st.write(f"{total_issues}: {len(commits)}")
 
-    # Kolmas kolumni: tuntitiedot (myöhemmin piirakkadiagrammi)
+    # TODO: Kolmas kolumni: tuntitiedot (myöhemmin piirakkadiagrammi)
     with col3:
         if cl.clockify_available():
             st.markdown(f"### {work_hours_title}")
@@ -97,7 +99,7 @@ def member_page():
             st.write(clockify_not_available)
 
 # Sivun otsikko ja mahdollinen navigaatio aloitussivulle
-cl.make_page_title(project_title)
+cl.make_page_title(member_title) 
 if not st.session_state[proj_data]:
     cl.make_start_page_button()
 else:
