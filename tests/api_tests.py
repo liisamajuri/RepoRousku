@@ -92,3 +92,12 @@ def test_private_project_no_access(private_project_no_access):
     print("Testataan yksityisen projektin hakua ilman jäsenyyttä")
     meta_data = private_project_no_access.get_project_meta_data()
     assert meta_data is None, "Yksityisen projektin tietojen haku pitäisi epäonnistua ilman jäsenyyttä"
+    
+
+def test_report_exists():
+    """
+    Testaa, että testiraportti on luotu ja tulostaa linkin raportin avaamiseksi selaimessa.
+    """
+    report_path = "tests/reports/api_test_report.html"
+    assert os.path.isfile(report_path), "Testiraporttia ei löytynyt!"
+    print(f"Avaa testiraportti selaimessa osoitteessa: http://localhost:8010/api_test_report.html")
