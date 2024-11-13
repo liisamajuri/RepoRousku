@@ -17,9 +17,11 @@ app_title = "RepoRousku"
 repo_address = "GitLab-repositorion osoite"
 text_gitlab_token = "GitLab Access Token"
 text_clockify_token = "Clockify Access Token"
-save = "Tallenna"
+save_tokens = "Tallenna tokenit"
+remove_tokens = "Poista tallennetut tokenit"
 crunch = "Rouskuta"
-save_help = "Tallenna access tokenit. Aiemmin tallennetut access tokenit poistetaan."
+save_tokens_help = "Tallenna access tokenit. Aiemmin tallennetut access tokenit poistetaan."
+remove_tokens_help = "Poista tallennetut access tokenit."
 help_required = "Pakollinen. Projektitietojen haku GitLabista edellyttää GitLabin access tokenia."
 help_optional = "Valinnainen. Jos Clockifyn access tokenia ei määritetä, tietoja ei haeta Clockifystä."
 help_repo_address = "Anna projektin päätason url"
@@ -36,6 +38,7 @@ key_clockify_token = "CLOCKIFY_TOKEN"
 
 # Muuttujat
 proj_data = "proj_data"
+token_file= ".env"
 
 
 def get_project_data(gitlab_url, gitlab_token):
@@ -56,10 +59,11 @@ def get_project_data(gitlab_url, gitlab_token):
 
 def start_page():
     """
-    Sivu sisältää syöttökentät GitLabin ja Clockifyn access tokenien sekä analysoitavan GitLab-projektin url-osoitteen määrittämiseen
+    Sivu sisältää syöttökentät GitLabin ja Clockifyn -projektien ja niiden access tokenien määrittämiseen
     """
 
-    col1, col2 = st.columns([1, 5])
+    # Otsikkorivi
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         if os.path.exists("/.dockerenv"):
             image_path = "src/images/logo.png"
@@ -67,10 +71,24 @@ def start_page():
             image_path = "images/logo.png"
 
         st.image(image_path, width=500)
+    st.write("")
+    st.write("")
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3, col4 = st.columns([1, 2, 1, 1]) # col1 ja col4 marginaaleja
 
+    # Projektit
     with col2:
+        act_proj_url = ""
+        if st.session_state[proj_data]:
+            act_proj_url = st.session_state[proj_data].get_project_url()
+
+        gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url, placeholder = "https://")
+
+        clockify1 = st.text_input("Clockify-kenttä 1", help = "testi")
+        clockify2 = st.text_input("Clockify-kenttä 2", help = "testi")
+
+    # Access tokenit
+    with col3:
         load_dotenv(override=True)
         env_gitlab_token = os.getenv(key_gitlab_token,"")
         env_clockify_token = os.getenv(key_clockify_token,"")
@@ -80,39 +98,15 @@ def start_page():
         gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=env_gitlab_token, type = "password", help = help_required, key = "g1")
         clockify_token_value = placeholder_c.text_input(text_clockify_token, value = env_clockify_token, type = "password", help = help_optional, key = "c1")
 
-        if st.button(save, help = save_help):
-            if gitlab_token_value or clockify_token_value:
+    st.write("")
+    st.write("")
+    st.write("")
 
-                # Poistetaan tiedosto, jos se on olemassa
-                if os.path.exists(".env"):
-                    os.remove(".env")
-
-                # Arvot tiedostoon
-                with open(".env", "w") as f:
-                    if gitlab_token_value:
-                        f.write(f"{key_gitlab_token}={gitlab_token_value}\n")
-     
-                    if clockify_token_value:
-                        f.write(f"{key_clockify_token}={clockify_token_value}\n")
-
-                load_dotenv(override=True)
-                env_gitlab_token = gitlab_token_value
-                env_clockify_token = clockify_token_value
-
-            else:
-                st.error(missing_token_values, icon="❗")
-
-        st.write("")
-        st.write("")
-
-        act_proj_url = ""
-        if st.session_state[proj_data]:
-            act_proj_url = st.session_state[proj_data].get_project_url()
-
-        gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url, placeholder = "https://")
-
-        # Painettu Rouskuta-painiketta
-        if st.button(crunch, help = help_crunch):
+    # Painikkeet
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
+    with col2:
+        # Rouskuta-painike
+        if st.button(crunch, use_container_width = True, help = help_crunch):
             
             # Jos käyttäjä ei ole antanut access tokenia, otetaan se uudestaan ympäristöstä, jos mahdollista
             if not gitlab_token_value and env_gitlab_token:
@@ -136,5 +130,38 @@ def start_page():
                         st.switch_page("app_pages/project.py")
                     else:
                         st.error(error_msg, icon="❗")
+    with col3:
+        # Tallenna tokenit
+        if st.button(save_tokens, use_container_width = True, help = save_tokens_help):
+            if gitlab_token_value or clockify_token_value:
+
+                # Poistetaan tiedosto, jos se on olemassa
+                if os.path.exists(token_file):
+                    os.remove(token_file)
+
+                # Arvot tiedostoon
+                with open(token_file, "w") as f:
+                    if gitlab_token_value:
+                        f.write(f"{key_gitlab_token}={gitlab_token_value}\n")
+
+                    if clockify_token_value:
+                        f.write(f"{key_clockify_token}={clockify_token_value}\n")
+
+                load_dotenv(override=True)
+                env_gitlab_token = gitlab_token_value
+                env_clockify_token = clockify_token_value
+
+            else:
+                st.error(missing_token_values, icon="❗")
+    with col4:
+        # Poista tallennetut tokenit
+        if st.button(remove_tokens, use_container_width = True, help = remove_tokens_help):
+            # Poistetaan tiedosto, jos se on olemassa
+            if os.path.exists(token_file):
+                os.remove(token_file)
+                env_gitlab_token = gitlab_token_value = ""
+                env_clockify_token = clockify_token_value = ""
+
+
 
 start_page()
