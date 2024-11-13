@@ -117,4 +117,6 @@ def start_page():
                     else:
                         st.error(error_msg, icon="❗")
 
-start_page()
+# Suoritetaan `start_page()` vain, jos tiedosto suoritetaan pääohjelmana
+if __name__ == "__main__":
+    start_page()
