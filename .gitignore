@@ -20,3 +20,6 @@ venv/
 # Streamlitin tilapäistiedostot, poikkeus: config.toml
 .streamlit/
 !src/.streamlit/config.toml
+
+# Testiraportit HTML-muodossa reports-kansiossa
+tests/reports/*.html
