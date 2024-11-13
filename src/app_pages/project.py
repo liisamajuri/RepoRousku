@@ -1,3 +1,8 @@
+"""
+Projektitietojen dashboard, jonka avulla käyttäjä voi tarkastella projektin valmiusastetta, keskeisiä metriikoita, 
+projektiryhmän jäseniä sekä issueita ja committeja jaoteltuina milestonejen ja jäsenten mukaan.
+"""
+
 import streamlit as st
 import libraries.components as cl
 

@@ -1,6 +1,5 @@
 """
 RepoRouskun komponenttikirjasto, joka sisältää sovelluksen sivuilla yhteisesti käytettävät komponentit ja toiminnallisuudet.
-
 """
 
 import streamlit as st
