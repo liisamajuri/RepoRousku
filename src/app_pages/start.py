@@ -31,8 +31,8 @@ invalid_url = "Virheellinen GitLab-projektin osoite!"
 error_msg = "Tarkista GitLab-osoite ja Access Token!"
 missing_token_values = "Access Token(it) puuttuu!"
 
-gitlab_token = "GITLAB_TOKEN"
-clockify_token = "CLOCKIFY_TOKEN"
+key_gitlab_token = "GITLAB_TOKEN"
+key_clockify_token = "CLOCKIFY_TOKEN"
 
 # Muuttujat
 proj_data = "proj_data"
@@ -71,23 +71,34 @@ def start_page():
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        load_dotenv()
-        env_gitlab_token = os.getenv(gitlab_token,"")
-        env_clockify_token = os.getenv(clockify_token,"")
+        load_dotenv(override=True)
+        env_gitlab_token = os.getenv(key_gitlab_token,"")
+        env_clockify_token = os.getenv(key_clockify_token,"")
 
-        gitlab_token_value = st.text_input(text_gitlab_token, value = env_gitlab_token, type = "password", help = help_required)
-        clockify_token_value = st.text_input(text_clockify_token, value = env_clockify_token, type = "password", help = help_optional)
+        placeholder_g = st.empty()
+        placeholder_c = st.empty()
+        gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=env_gitlab_token, type = "password", help = help_required, key = "g1")
+        clockify_token_value = placeholder_c.text_input(text_clockify_token, value = env_clockify_token, type = "password", help = help_optional, key = "c1")
+
         if st.button(save, help = save_help):
             if gitlab_token_value or clockify_token_value:
+
                 # Poistetaan tiedosto, jos se on olemassa
                 if os.path.exists(".env"):
                     os.remove(".env")
+
                 # Arvot tiedostoon
                 with open(".env", "w") as f:
                     if gitlab_token_value:
-                        f.write(f"{gitlab_token}={gitlab_token_value}\n")
+                        f.write(f"{key_gitlab_token}={gitlab_token_value}\n")
+     
                     if clockify_token_value:
-                        f.write(f"{clockify_token}={clockify_token_value}\n")
+                        f.write(f"{key_clockify_token}={clockify_token_value}\n")
+
+                load_dotenv(override=True)
+                env_gitlab_token = gitlab_token_value
+                env_clockify_token = clockify_token_value
+
             else:
                 st.error(missing_token_values, icon="❗")
 
@@ -100,9 +111,16 @@ def start_page():
 
         gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url)
 
-        # Painettu Rouskuta-painiketta tai vaihdetaan projektia enteriä painamalla
-        if st.button(crunch, help = help_crunch) or \
-           (gitlab_url and st.session_state[proj_data] and gitlab_url != st.session_state[proj_data].get_project_url()):
+        # Painettu Rouskuta-painiketta
+        if st.button(crunch, help = help_crunch):
+            
+            # Jos käyttäjä ei ole antanut access tokenia, otetaan se uudestaan ympäristöstä, jos mahdollista
+            if not gitlab_token_value and env_gitlab_token:
+                    gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=env_gitlab_token, type = "password", help = help_required, key = "g2")
+            if not clockify_token_value and env_clockify_token:
+                    clockify_token_value = placeholder_c.text_input(text_clockify_token, value=env_clockify_token, type = "password", help = help_optional, key = "c2")
+
+            # Tarkistetaan, että tarvittavat syötteet on annettu
             if not gitlab_url:
                 st.error(missing_url, icon="❗")
             elif not gitlab_token_value:
@@ -112,6 +130,8 @@ def start_page():
             else:                
                 with st.spinner(fetching_data):
                     # TODO: Clockify-datan haku
+
+                    # GitLab-projektin tietojen haku
                     if get_project_data(gitlab_url, gitlab_token_value):
                         st.switch_page("app_pages/project.py")
                     else:
