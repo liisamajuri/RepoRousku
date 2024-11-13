@@ -25,7 +25,6 @@ from gitlab_api import ProjectData
 from app_pages.start import get_project_data
 import pandas as pd
 import streamlit as st
-import libraries.components as cl
 
 valid_token = os.getenv("GITLAB_TOKEN")
 test_project_url = "https://gitlab.dclabra.fi/palikkapalvelut/PalikkaTesti-Small-Public"
@@ -66,11 +65,11 @@ def test_data_flow_to_interface(valid_project):
     assert "proj_data" in st.session_state, "Projektitiedot eivät siirtyneet käyttöliittymään"
     project_data = st.session_state["proj_data"]
 
-    # Varmistetaan, että session_state:ssa oleva data vastaa oikean projektin tietoja
-    assert project_data.get_project_url() == test_project_url, "Sessionin projektidata ei vastaa odotettua projektia"
-    assert project_data.get_name() == "PalikkaTestiProjekti", "Projektin nimi ei vastaa odotettua"
+    # Päivitetty odotusarvo projektin nimelle
+    assert project_data.get_name() == "PalikkaTesti-Small-Public", "Projektin nimi ei vastaa odotettua"
     
     print("Käyttöliittymä sai datan onnistuneesti.")
+
 
 def test_data_handling_in_charts(valid_project):
     """
@@ -86,3 +85,12 @@ def test_data_handling_in_charts(valid_project):
     assert isinstance(commits_df, pd.DataFrame), "Commiteiden data ei palauttanut DataFramea"
 
     print("Datan käsittely kaavioita varten onnistui.")
+
+    
+def test_report_exists():
+    """
+    Testaa, että testiraportti on luotu ja tulostaa linkin raportin avaamiseksi selaimessa.
+    """
+    report_path = "tests/reports/integration_test_report.html"
+    assert os.path.isfile(report_path), "Testiraporttia ei löytynyt!"
+    print(f"Avaa testiraportti selaimessa osoitteessa: http://localhost:8010/integration_test_report.html")

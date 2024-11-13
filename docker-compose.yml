@@ -9,14 +9,17 @@ services:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
       PYTHONPATH: "/app/src"
     volumes:
+      - ./tests:/app/tests   # Kiinnitetään koko tests-kansio
       - ./tests/reports:/app/tests/reports 
     command: >
       sh -c "
       ruff check src -v &&
       pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
       pytest -v -s --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
+      pytest -v -s --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py &&
       echo 'Unit-testiraportti saatavilla: http://localhost:8010/unit_test_report.html' &&
       echo 'API-testiraportti saatavilla: http://localhost:8010/api_test_report.html' &&
+      echo 'Integraatiotestiraportti saatavilla: http://localhost:8010/integration_test_report.html' &&
       streamlit run src/app.py --server.port=8501 --server.enableCORS=false
       "
 
