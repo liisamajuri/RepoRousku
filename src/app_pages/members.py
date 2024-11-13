@@ -33,8 +33,7 @@ def member_page():
 
     # Näytä projektin nimi ja jäsenet-osio
     st.markdown(f"## {project_title}")
-    st.markdown(f"### {member_title}")
-
+    
     # Käyttäjävalinta
     selected_member = st.selectbox(select_member, [all_members] + st.session_state[proj_data].get_assignees())
 

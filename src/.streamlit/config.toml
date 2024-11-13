@@ -6,6 +6,5 @@ secondaryBackgroundColor = "#262730"
 textColor = "#FAFAFA"
 font = "sans serif"  # Vaihtoehdot: "sans serif", "serif", tai "monospace"
 
-# RepoRouskun väriteema: #DB4128, #F46A25, #F49E25, #F9B049, #FAEBC8
+# HUOM! Päivitettävä (kts. streamlit-doku) RepoRouskun väriteema: #DB4128, #F46A25, #F49E25, #F9B049, #FAEBC8
 
-# mkdocs-sivuston taustaväri (tummanharmaa) #1E2129
