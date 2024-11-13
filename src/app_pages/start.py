@@ -105,11 +105,11 @@ def start_page():
         st.write("")
         st.write("")
 
-        act_proj_url = "https://"
+        act_proj_url = ""
         if st.session_state[proj_data]:
             act_proj_url = st.session_state[proj_data].get_project_url()
 
-        gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url)
+        gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url, placeholder = "https://")
 
         # Painettu Rouskuta-painiketta
         if st.button(crunch, help = help_crunch):
