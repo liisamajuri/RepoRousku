@@ -3,6 +3,8 @@ Moduuli tarjoaa apufunktioita ympäristömuuttujatiedoston käsittelyyn.
 Se sisältää toiminnallisuudet access tokenien tallentamiseen, poistamiseen ja noutamiseen
 ympäristötiedostosta.
 """
+import os
+from dotenv import load_dotenv
 
 token_file= ".env"
 key_gitlab_token = "GITLAB_TOKEN"
