@@ -7,7 +7,6 @@ projektin ajankäyttöä.
 
 import streamlit as st
 import os
-from dotenv import load_dotenv
 
 import libraries.components as cl
 from gitlab_api import ProjectData
@@ -33,12 +32,9 @@ invalid_url = "Virheellinen GitLab-projektin osoite!"
 error_msg = "Tarkista GitLab-osoite ja Access Token!"
 missing_token_values = "Access Token(it) puuttuu!"
 
-key_gitlab_token = "GITLAB_TOKEN"
-key_clockify_token = "CLOCKIFY_TOKEN"
 
 # Muuttujat
 proj_data = "proj_data"
-token_file= ".env"
 
 
 def get_project_data(gitlab_url, gitlab_token):
@@ -89,9 +85,7 @@ def start_page():
 
     # Access tokenit
     with col3:
-        load_dotenv(override=True)
-        env_gitlab_token = os.getenv(key_gitlab_token,"")
-        env_clockify_token = os.getenv(key_clockify_token,"")
+        env_gitlab_token, env_clockify_token = cl.get_env_tokens()
 
         placeholder_g = st.empty()
         placeholder_c = st.empty()
@@ -134,34 +128,16 @@ def start_page():
         # Tallenna tokenit
         if st.button(save_tokens, use_container_width = True, help = save_tokens_help):
             if gitlab_token_value or clockify_token_value:
-
-                # Poistetaan tiedosto, jos se on olemassa
-                if os.path.exists(token_file):
-                    os.remove(token_file)
-
-                # Arvot tiedostoon
-                with open(token_file, "w") as f:
-                    if gitlab_token_value:
-                        f.write(f"{key_gitlab_token}={gitlab_token_value}\n")
-
-                    if clockify_token_value:
-                        f.write(f"{key_clockify_token}={clockify_token_value}\n")
-
-                load_dotenv(override=True)
-                env_gitlab_token = gitlab_token_value
-                env_clockify_token = clockify_token_value
+                cl.save_tokens_to_env(gitlab_token_value, clockify_token_value)
+                env_gitlab_token, env_clockify_token = cl.get_env_tokens()
 
             else:
                 st.error(missing_token_values, icon="❗")
     with col4:
         # Poista tallennetut tokenit
         if st.button(remove_tokens, use_container_width = True, help = remove_tokens_help):
-            # Poistetaan tiedosto, jos se on olemassa
-            if os.path.exists(token_file):
-                os.remove(token_file)
-                env_gitlab_token = gitlab_token_value = ""
-                env_clockify_token = clockify_token_value = ""
-
+            cl.remove_tokens_from_env_file()
+            env_gitlab_token, env_clockify_token = cl.get_env_tokens()
 
 
 start_page()
