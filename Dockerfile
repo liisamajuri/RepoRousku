@@ -10,6 +10,6 @@ COPY requirements.txt .
 # Asenna riippuvuudet
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Kopioi src- ja tests-kansiot
+# Kopioi src-kansiot
 COPY src /app/src
 COPY tests /app/tests

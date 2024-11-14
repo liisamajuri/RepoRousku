@@ -1,5 +1,5 @@
 services:
-  palikka:
+  streamlit:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,22 +9,36 @@ services:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
       PYTHONPATH: "/app/src"
     volumes:
-      - ./tests:/app/tests   # Kiinnitetään koko tests-kansio
-      - ./tests/reports:/app/tests/reports 
+      - ./tests/reports:/app/tests/reports
     command: >
       sh -c "
-      ruff check src -v &&
-      pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
-      pytest -v -s --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
-      echo 'Unit-testiraportti saatavilla: http://localhost:8010/unit_test_report.html' &&
-      echo 'API-testiraportti saatavilla: http://localhost:8010/api_test_report.html' &&
+      pip install -r requirements.txt &&
       streamlit run src/app.py --server.port=8501 --server.enableCORS=false
       "
 
-  reports:
-    image: python:3.9-slim
-    command: python3 -m http.server 8010 -d /app/tests/reports
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      GITLAB_TOKEN: "${GITLAB_TOKEN}"
+      PYTHONPATH: "/app/src"
     volumes:
+      - ./tests:/app/tests
       - ./tests/reports:/app/tests/reports
-    ports:
-      - "8010:8010"  # Testiraporttien portti
+    command: >
+      sh -c "
+      pip install -r requirements.txt &&
+      ruff check src -v &&
+      pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
+      pytest -v -s --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
+      pytest -v -s --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py
+      "
+
+    reports:
+      image: python:3.9-slim
+      command: sh -c "rm -f /app/tests/reports/.gitkeep && python3 -m http.server 8010 -d /app/tests/reports"
+      volumes:
+        - ./tests/reports:/app/tests/reports
+      ports:
+        - "8010:8010"  # Testiraporttien portti
