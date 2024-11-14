@@ -13,7 +13,8 @@ services:
     command: >
       sh -c "
       pip install -r requirements.txt &&
-      streamlit run src/app.py --server.port=8501 --server.enableCORS=false
+      streamlit run src/app.py --server.port=8501 --server.enableCORS=false &&
+      echo 'PalikkaPalvelut-sovellus saatavilla: http://localhost:8501' 
       "
 
   tests:
@@ -35,10 +36,17 @@ services:
       pytest -v -s --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py
       "
 
-    reports:
-      image: python:3.9-slim
-      command: sh -c "rm -f /app/tests/reports/.gitkeep && python3 -m http.server 8010 -d /app/tests/reports"
-      volumes:
-        - ./tests/reports:/app/tests/reports
-      ports:
-        - "8010:8010"  # Testiraporttien portti
+  reports:
+    image: python:3.9-slim
+    command: >
+      sh -c "
+      rm -f /app/tests/reports/.gitkeep &&
+      python3 -m http.server 8010 -d /app/tests/reports &&
+      echo 'Yksikkötestiraportti saatavilla: http://localhost:8010/unit_test_report.html' &&
+      echo 'API-testiraportti saatavilla: http://localhost:8010/api_test_report.html' &&
+      echo 'Integraatiotestiraportti saatavilla: http://localhost:8010/integration_test_report.html'
+      "
+    volumes:
+      - ./tests/reports:/app/tests/reports
+    ports:
+      - "8010:8010"  # Testiraporttien portti
