@@ -81,8 +81,8 @@ def start_page():
 
         gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url, placeholder = "https://")
 
-        clockify1 = st.text_input("Clockify-kenttä 1", help = "testi")
-        clockify2 = st.text_input("Clockify-kenttä 2", help = "testi")
+        st.text_input("Clockify-kenttä 1", help = "testi")
+        st.text_input("Clockify-kenttä 2", help = "testi")
 
     # Access tokenit
     with col3:
