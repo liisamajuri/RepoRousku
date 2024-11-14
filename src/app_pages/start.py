@@ -9,6 +9,7 @@ import streamlit as st
 import os
 
 import libraries.components as cl
+import libraries.env_tokens as et
 from gitlab_api import ProjectData
 
 # Kielikäännökset
@@ -85,7 +86,7 @@ def start_page():
 
     # Access tokenit
     with col3:
-        env_gitlab_token, env_clockify_token = cl.get_env_tokens()
+        env_gitlab_token, env_clockify_token = et.get_env_tokens()
 
         placeholder_g = st.empty()
         placeholder_c = st.empty()
@@ -113,7 +114,7 @@ def start_page():
                 st.error(missing_url, icon="❗")
             elif not gitlab_token_value:
                 st.error(missing_g_token, icon="❗")
-            elif not cl.validate_url(gitlab_url):
+            elif not et.validate_url(gitlab_url):
                 st.error(invalid_url, icon="❗")
             else:                
                 with st.spinner(fetching_data):
@@ -128,16 +129,16 @@ def start_page():
         # Tallenna tokenit
         if st.button(save_tokens, use_container_width = True, help = save_tokens_help):
             if gitlab_token_value or clockify_token_value:
-                cl.save_tokens_to_env(gitlab_token_value, clockify_token_value)
-                env_gitlab_token, env_clockify_token = cl.get_env_tokens()
+                et.save_tokens_to_env(gitlab_token_value, clockify_token_value)
+                env_gitlab_token, env_clockify_token = et.get_env_tokens()
 
             else:
                 st.error(missing_token_values, icon="❗")
     with col4:
         # Poista tallennetut tokenit
         if st.button(remove_tokens, use_container_width = True, help = remove_tokens_help):
-            cl.remove_tokens_from_env_file()
-            env_gitlab_token, env_clockify_token = cl.get_env_tokens()
+            et.remove_tokens_from_env_file()
+            env_gitlab_token, env_clockify_token = et.get_env_tokens()
 
 
 start_page()
