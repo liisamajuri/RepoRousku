@@ -125,7 +125,7 @@ docker compose up tests
 ```
 
 
-- **Pelkän testikontin käynnistys:**
+- **Pelkän testiraporttikontin käynnistys:**
 
 ```shell=
 docker compose up reports
