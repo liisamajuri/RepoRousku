@@ -100,10 +100,35 @@ chmod +x docs/serve_docs.sh
 
 **YMPÄRISTÖN PYSTYTTÄMINEN:**
 
-- **Aja projektin juurikansiossa komento:**
+- **Docker imagen buildaus:**
 
 ```shell=
-docker-compose up
+docker compose build
+```
+
+- **Kaikkien konttien käynnistys:**
+
+```shell=
+docker compose up
+```
+
+- **Pelkän Streamlit-sovellus -kontin käynnistys:**
+
+```shell=
+docker compose up streamlit
+```
+
+- **Pelkän testikontin käynnistys:**
+
+```shell=
+docker compose up tests
+```
+
+
+- **Pelkän testiraporttikontin käynnistys:**
+
+```shell=
+docker compose up reports
 ```
 
 **YMPÄRISTÖN ALASAJO:**
@@ -111,7 +136,7 @@ docker-compose up
 * **Aja projektin juurikansiossa komento:**
 
 ```shell=
-docker-compose down
+docker compose down
 ```
 
 
