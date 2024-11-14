@@ -114,7 +114,7 @@ def start_page():
                 st.error(missing_url, icon="❗")
             elif not gitlab_token_value:
                 st.error(missing_g_token, icon="❗")
-            elif not et.validate_url(gitlab_url):
+            elif not cl.validate_url(gitlab_url):
                 st.error(invalid_url, icon="❗")
             else:                
                 with st.spinner(fetching_data):
