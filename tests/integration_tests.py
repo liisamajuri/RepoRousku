@@ -1,31 +1,14 @@
-"""
-Integraatiotestit (PalikkaPalvelut)
-
-Tämä moduuli sisältää integraatiotestit GitLab-projektille. Näissä testeissä tarkastellaan sovelluksen eri 
-moduulien välistä yhteistoimintaa ja tiedonsiirtoa, erityisesti käyttöliittymän ja `gitlab_api.py`:n 
-välillä. Tavoitteena on varmistaa, että sovellus palauttaa ja käsittelee tiedot odotetulla tavalla, 
-mukaan lukien oikean datan siirto ja formaatti eri moduulien välillä.
-
-Huom: Integraatiotestien avulla varmistetaan, että sovelluksen eri osat toimivat saumattomasti yhdessä ja 
-että tiedot siirtyvät ja muotoutuvat oikein moduulien välillä.
-
-Testikohteet:
-- Projektitietojen haku `gitlab_api.py`:n kautta ja niiden siirto käyttöliittymään.
-- Kaavioiden vaatimusten mukainen tiedon käsittely.
-- Dataformaattien oikeellisuus moduulien yhteydessä.
-
-"""
-
 import sys
 sys.path.append('./src')
 
 import pytest
 import os
-from gitlab_api import ProjectData
-from app_pages.start import get_project_data
 import pandas as pd
 import streamlit as st
+from gitlab_api import ProjectData
+from app_pages.start import get_project_data
 
+# Aseta testimuuttujat
 valid_token = os.getenv("GITLAB_TOKEN")
 test_project_url = "https://gitlab.dclabra.fi/palikkapalvelut/PalikkaTesti-Small-Public"
 
@@ -58,18 +41,22 @@ def test_data_flow_to_interface(valid_project):
     """
     print("Testataan datan siirtymistä käyttöliittymälle.")
     
-    # Tarkistetaan, että käyttöliittymän kautta saadaan projektitiedot oikein
+    # Alusta session state
+    proj_data = "proj_data"
+
+    if proj_data not in st.session_state:
+        st.session_state[proj_data] = None
+
+    # Simuloi käyttöliittymän tietojen hakua
     assert get_project_data(test_project_url, valid_token) is True, "Käyttöliittymän kautta haetut projektitiedot eivät onnistuneet"
     
-    # Tarkistetaan, että session_state:ssa on nyt projektidata
-    assert "proj_data" in st.session_state, "Projektitiedot eivät siirtyneet käyttöliittymään"
-    project_data = st.session_state["proj_data"]
+    # Tarkista, että session state sisältää projektidatan
+    assert proj_data in st.session_state, "Projektitiedot eivät siirtyneet käyttöliittymään"
+    project_data = st.session_state[proj_data]
 
-    # Päivitetty odotusarvo projektin nimelle
+    # Varmista, että projektin nimi on odotettu
     assert project_data.get_name() == "PalikkaTesti-Small-Public", "Projektin nimi ei vastaa odotettua"
-    
     print("Käyttöliittymä sai datan onnistuneesti.")
-
 
 def test_data_handling_in_charts(valid_project):
     """
@@ -86,7 +73,6 @@ def test_data_handling_in_charts(valid_project):
 
     print("Datan käsittely kaavioita varten onnistui.")
 
-    
 def test_report_exists():
     """
     Testaa, että testiraportti on luotu ja tulostaa linkin raportin avaamiseksi selaimessa.
