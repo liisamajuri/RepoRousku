@@ -1,0 +1,35 @@
+image: python:3.9-slim
+
+stages:
+  - test
+
+variables:
+  PYTHONPATH: "/app/src"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+test:
+  stage: test
+  tags:
+    - docker
+  before_script:
+    - python --version
+    - pip install --no-cache-dir -r requirements.txt
+    - mkdir -p tests/reports
+    - mkdir -p tests/artefacts
+  script:
+    - echo "Suoritetaan testit ja luodaan raportit..."
+    - ruff check src -v
+    - pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py
+    - pytest -v -s --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py
+    - pytest -v -s --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py
+  artifacts:
+    paths:
+      - tests/reports/*.html
+      - tests/artefacts/
+    expire_in: 1 week
+  rules:
+    - when: always  # Testausvaiheessa pipeline suoritetaan kaikille commiteille ja pushauksille

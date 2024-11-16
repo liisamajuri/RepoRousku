@@ -59,6 +59,10 @@ def start_page():
     Sivu sisältää syöttökentät GitLabin ja Clockifyn -projektien ja niiden access tokenien määrittämiseen
     """
 
+    # Alustetaan session_state, jos proj_data puuttuu
+    if proj_data not in st.session_state:
+        st.session_state[proj_data] = None    
+    
     # Otsikkorivi
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
