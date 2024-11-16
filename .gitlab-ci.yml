@@ -33,3 +33,5 @@ test:
     expire_in: 1 week
   rules:
     - when: always  # Testausvaiheessa pipeline suoritetaan kaikille commiteille ja pushauksille
+
+    
