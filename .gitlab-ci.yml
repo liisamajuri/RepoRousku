@@ -1,7 +1,9 @@
 image: python:3.9-slim
 
 stages:
+  - lint
   - test
+  - coverage
 
 variables:
   PYTHONPATH: "/app/src"
@@ -11,30 +13,49 @@ cache:
   paths:
     - .cache/pip
 
-test:
-  stage: test
-  tags:
-    - tests
+.default_settings:
   before_script:
     - python --version
     - pip install --no-cache-dir -r requirements.txt
     - mkdir -p tests/reports
     - mkdir -p tests/artefacts
+
+lint:
+  stage: test
+  extends: .default_settings
+  tags:
+    - tests
+  allow_failure: true
   script:
-    - echo "Suoritetaan testit ja luodaan raportit..."
-    - ruff check src -v
-    # Suoritetaan testit ja luodaan raportit
+    - ruff check src -v    
+
+test:
+  stage: test
+  extends: .default_settings
+  tags:
+    - tests
+  allow_failure: true  
+  script:
     - coverage run -m pytest -v --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py
     - coverage run -m pytest -v --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py
     - coverage run -m pytest -v --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py
-    # Luodaan ja tulostetaan coverage-raportti
+  artifacts:
+    paths:
+      - .coverage
+      - tests/reports/*.html
+      - tests/artefacts/
+    expire_in: 1 week
+
+coverage:
+  stage: coverage
+  extends: .default_settings
+  tags:
+    - tests
+  allow_failure: true  
+  script:
     - coverage report -m
     - coverage html -d tests/reports/coverage_html
   artifacts:
     paths:
-      - tests/reports/*.html
       - tests/reports/coverage_html/
-      - tests/artefacts/
     expire_in: 1 week
-  rules:
-    - when: always
