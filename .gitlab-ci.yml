@@ -55,7 +55,6 @@ coverage:
   script:
     - if [ -f .coverage ]; then coverage report -m; fi
     - if [ -f .coverage ]; then coverage html -d tests/reports/coverage_html; fi
-    - echo "Coverage HTML -raportti saatavilla: tests/reports/coverage_html/index.html"
   artifacts:
     paths:
       - tests/reports/coverage_html/
