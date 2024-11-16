@@ -21,7 +21,7 @@ cache:
     - mkdir -p tests/artefacts
 
 lint:
-  stage: test
+  stage: lint
   extends: .default_settings
   tags:
     - tests
