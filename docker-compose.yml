@@ -32,9 +32,12 @@ services:
       sh -c "
       pip install -r requirements.txt &&
       ruff check src -v &&
-      pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
-      pytest -v -s --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
-      pytest -v -s --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py
+      coverage run -m pytest -v --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
+      coverage run -m pytest -v --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
+      coverage run -m pytest -v --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py &&
+      coverage report -m &&
+      coverage html -d tests/reports/coverage_html &&
+      echo 'Testiraportit saatavilla: http://localhost:8010'
       "
 
   reports:
@@ -45,7 +48,8 @@ services:
       python3 -m http.server 8010 -d /app/tests/reports &&
       echo 'Yksikkötestiraportti saatavilla: http://localhost:8010/unit_test_report.html' &&
       echo 'API-testiraportti saatavilla: http://localhost:8010/api_test_report.html' &&
-      echo 'Integraatiotestiraportti saatavilla: http://localhost:8010/integration_test_report.html'
+      echo 'Integraatiotestiraportti saatavilla: http://localhost:8010/integration_test_report.html' &&
+      echo 'Kattavuusraportti saatavilla: http://localhost:8010/coverage_html/index.html'
       "
     volumes:
       - ./tests/reports:/app/tests/reports
