@@ -2,9 +2,11 @@ streamlit
 requests
 pandas
 python-dotenv
+
 ruff
 pytest
 pytest-html
+coverage
 
 
 mkdocs
