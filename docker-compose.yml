@@ -44,7 +44,6 @@ services:
     image: python:3.9-slim
     command: >
       sh -c "
-      rm -f /app/tests/reports/.gitkeep &&
       python3 -m http.server 8010 -d /app/tests/reports &&
       echo 'Yksikkötestiraportti saatavilla: http://localhost:8010/unit_test_report.html' &&
       echo 'API-testiraportti saatavilla: http://localhost:8010/api_test_report.html' &&
