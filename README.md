@@ -131,6 +131,14 @@ docker compose up tests
 docker compose up reports
 ```
 
+
+- **Pelkän dokumentaatiokontin käynnistys:**
+
+```shell=
+docker compose up docs
+```
+
+
 **YMPÄRISTÖN ALASAJO:**
 
 * **Aja projektin juurikansiossa komento:**
