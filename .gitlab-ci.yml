@@ -62,17 +62,17 @@ coverage:
       - tests/reports/coverage_html/
     expire_in: 1 week
 
-docs:
-  stage: docs
-  tags:
-    - docker
-  before_script:
-    - pip install --no-cache-dir mkdocs-material mkdocstrings
-  script:
-    - mkdocs build
-  artifacts:
-    paths:
-      - public/
-    expire_in: 1 week
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"' # dokumentaatio generoidaan vain päähaaran muutoksissa
+# docs:
+#   stage: docs
+#   tags:
+#     - docker
+#   before_script:
+#     - pip install --no-cache-dir mkdocs-material mkdocstrings
+#   script:
+#     - mkdocs build
+#   artifacts:
+#     paths:
+#       - public/
+#     expire_in: 1 week
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"' # dokumentaatio generoidaan vain päähaaran muutoksissa

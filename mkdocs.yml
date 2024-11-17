@@ -1,5 +1,4 @@
 site_name: RepoRouskun koodidokumentaatio
-site_dir: public
 theme:
   name: material
   hljs_style_dark: 'red'
