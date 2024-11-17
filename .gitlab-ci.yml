@@ -6,7 +6,7 @@ stages:
   - coverage
 
 variables:
-  PYTHONPATH: "/app/src"
+  PYTHONPATH: "$CI_PROJECT_DIR/src"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 cache:
@@ -21,6 +21,7 @@ cache:
     - pip install --no-cache-dir -r requirements.txt
     - mkdir -p tests/reports
     - mkdir -p tests/artefacts
+    - export PYTHONPATH=$CI_PROJECT_DIR/src
 
 lint:
   stage: lint
