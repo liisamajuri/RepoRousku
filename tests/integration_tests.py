@@ -65,7 +65,7 @@ def test_data_handling_in_charts(valid_project):
     print("Testataan datan käsittelyä kaavioiden osalta.")
 
     members = ["Liisa Majuri", "Henna Mikkonen"]
-    closed_issues_df = valid_project.get_closed_issues_by_date(members)
+    closed_issues_df, dummy1, dummy2 = valid_project.get_closed_issues_by_date(members)
     commits_df, date_column, pcs_column, member_column = valid_project.get_commits_by_date(members)
 
     assert isinstance(closed_issues_df, pd.DataFrame), "Suljettujen issueiden data ei palauttanut DataFramea"
