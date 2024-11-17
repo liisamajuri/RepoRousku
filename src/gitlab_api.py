@@ -521,9 +521,9 @@ class ProjectData:
             json.dump(self.project_meta_data, f, indent=4)
 
 
-    def get_data_for_closed_issues_line_chart(self, members):
+    def get_closed_issues_by_date(self, members):
         """
-        Palauttaa pivot-taulukon suljettujen issueiden datasta viivakaaviota varten
+        Palauttaa pivot-taulukon suljetuista issueista päivämäärän mukaan
         """
         df = self.get_closed_issues()
 
@@ -542,12 +542,12 @@ class ProjectData:
         # Ryhmitellään data siten, että henkilöt sarakkeissa ja päivämäärät riveillä
         pivot_data = grouped_data.pivot(index=key_date, columns=key_assignees, values=key_pcs).fillna(0)
 
-        return pivot_data
+        return pivot_data, key_date, key_pcs
 
 
-    def get_data_for_commits_line_chart(self, members):
+    def get_commits_by_date(self, members):
         """
-        Palauttaa dataframen commiteista viivakaaviota varten
+        Palauttaa dataframen commiteista päivämäärän mukaan
         """
         df = self.get_commits()
 
@@ -567,9 +567,9 @@ class ProjectData:
         return grouped_data, key_date, key_pcs, key_member
 
 
-    def get_data_for_closed_issues_bar_chart(self, members):
+    def get_closed_issues_by_milestone(self, members):
         """
-        Palauttaa dataframen suljettujen issueiden datasta palkkikaaviota varten
+        Palauttaa dataframen suljetuista issueista milestonejen mukaan
         """
         df = self.get_issues()
 
@@ -591,9 +591,9 @@ class ProjectData:
         return grouped_data, key_milestone, key_pcs, key_member
 
 
-    def get_data_for_commits_bar_chart(self, members):
+    def get_commits_by_milestone(self, members):
         """
-        Palauttaa dataframen committien datasta palkkikaaviota varten
+        Palauttaa dataframen commiteista milestonejen mukaan
         """
         df_commits = self.get_commits()
         df_milestones = self.get_milestones()
