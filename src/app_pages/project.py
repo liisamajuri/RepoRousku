@@ -89,7 +89,7 @@ def project_page():
         # Projektiryhmä
         members = cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
 
-        # Välilehdet palkkikaavioon
+        # Välilehdet milestonekaavioihin
         tabs = [closed_issues, commits]
         if cl.clockify_available():
             tabs.append(work_hours)
@@ -99,31 +99,31 @@ def project_page():
         if cl.clockify_available():
             tab_b3 = tab_objects_b[2]
 
-        # Palkkikaaviot
+        # Suljetut issuet ja commitit milestoneittain
         with tab_b1:
-            data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_closed_issues_bar_chart(members)
+            data, x_field, y_field, color_field = st.session_state[proj_data].get_closed_issues_by_milestone(members)
             st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
         with tab_b2:
-            data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_commits_bar_chart(members)
+            data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
             st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
 
         if cl.clockify_available():
             with tab_b3:
                 pass # TODO: Clockify
 
-        # Välilehdet viivakaavioon
+        # Välilehdet aikasarjakaavioihin
         tab_objects_l = st.tabs(tabs)
         tab_l1, tab_l2 = tab_objects_l[:2]
         if cl.clockify_available():
             tab_l3 = tab_objects_l[2]
 
-        # Viivakaaviot
+        # Aikasarjat suljetuista issueista ja commiteista
         with tab_l1:
-            data = st.session_state[proj_data].get_data_for_closed_issues_line_chart(members)
-            st.line_chart(data)
+            data, x_label, y_label = st.session_state[proj_data].get_closed_issues_by_date(members)
+            st.bar_chart(data, x_label=x_label, y_label=y_label)
         with tab_l2:
-            data, x_field, y_field, color_field = st.session_state[proj_data].get_data_for_commits_line_chart(members)
-            st.line_chart(data, x=x_field, y=y_field, color=color_field)
+            data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_date(members)
+            st.bar_chart(data, x=x_field, y=y_field, color=color_field)
 
         if cl.clockify_available():
             with tab_l3:

@@ -521,9 +521,9 @@ class ProjectData:
             json.dump(self.project_meta_data, f, indent=4)
 
 
-    def get_data_for_closed_issues_line_chart(self, members):
+    def get_closed_issues_by_date(self, members):
         """
-        Palauttaa pivot-taulukon suljettujen issueiden datasta viivakaaviota varten
+        Palauttaa pivot-taulukon suljetuista issueista päivämäärän mukaan
         """
         df = self.get_closed_issues()
 
@@ -542,12 +542,21 @@ class ProjectData:
         # Ryhmitellään data siten, että henkilöt sarakkeissa ja päivämäärät riveillä
         pivot_data = grouped_data.pivot(index=key_date, columns=key_assignees, values=key_pcs).fillna(0)
 
-        return pivot_data
+        # Luodaan aikajakso, joka kattaa kaikki päivämäärät
+        date_range = pd.date_range(start=pivot_data.index.min(), end=pivot_data.index.max(), freq='D')
+
+        # Varmistetaan, että päivämäärät ovat oikeassa muodossa (YYYY-MM-DD)
+        date_range = date_range.strftime('%Y-%m-%d')
+
+        # Täydennetään dataframe issuettomilla päivämäärillä
+        pivot_data = pivot_data.reindex(date_range, fill_value=0)
+
+        return pivot_data, key_date, key_pcs
 
 
-    def get_data_for_commits_line_chart(self, members):
+    def get_commits_by_date(self, members):
         """
-        Palauttaa dataframen commiteista viivakaaviota varten
+        Palauttaa dataframen commiteista päivämäärän mukaan
         """
         df = self.get_commits()
 
@@ -564,12 +573,26 @@ class ProjectData:
         # Uudelleennimetään sarake
         grouped_data = grouped_data.rename(columns={key_author_name: key_member})
 
-        return grouped_data, key_date, key_pcs, key_member
+        # Luodaan aikajakso, joka kattaa kaikki päivämäärät
+        date_range = pd.date_range(start=grouped_data[key_date].min(), end=grouped_data[key_date].max(), freq='D')
+
+        # Varmistetaan, että päivämäärät ovat oikeassa muodossa (YYYY-MM-DD)
+        date_range = date_range.strftime('%Y-%m-%d')
+
+        # Täydennetään committomat päivämäärät
+        members_list = grouped_data[key_member].unique()
+        all_combinations = pd.MultiIndex.from_product([date_range, members_list], names=[key_date, key_member])
+        full_data = pd.DataFrame(index=all_combinations).reset_index()
+
+        # Yhdistetään täydennetty data alkuperäiseen
+        full_data = full_data.merge(grouped_data, on=[key_date, key_member], how='left').fillna({key_pcs: 0})
+
+        return full_data, key_date, key_pcs, key_member
 
 
-    def get_data_for_closed_issues_bar_chart(self, members):
+    def get_closed_issues_by_milestone(self, members):
         """
-        Palauttaa dataframen suljettujen issueiden datasta palkkikaaviota varten
+        Palauttaa dataframen suljetuista issueista milestonejen mukaan
         """
         df = self.get_issues()
 
@@ -591,9 +614,9 @@ class ProjectData:
         return grouped_data, key_milestone, key_pcs, key_member
 
 
-    def get_data_for_commits_bar_chart(self, members):
+    def get_commits_by_milestone(self, members):
         """
-        Palauttaa dataframen committien datasta palkkikaaviota varten
+        Palauttaa dataframen commiteista milestonejen mukaan
         """
         df_commits = self.get_commits()
         df_milestones = self.get_milestones()
