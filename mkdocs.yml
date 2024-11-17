@@ -1,4 +1,5 @@
 site_name: RepoRouskun koodidokumentaatio
+site_dir: public
 theme:
   name: material
   hljs_style_dark: 'red'
@@ -9,12 +10,12 @@ theme:
     scheme: slate
     primary: black
     accent: deep orange
-
   font: 
     text: Roboto
     code: Source Code Pro
   features:
     - content.tooltips
+  
 nav:
   - Aloitus: index.md
   - Käyttö-ohjeet: usage.md
@@ -52,5 +53,6 @@ plugins:
         python:
           rendering:
             show_root_toc_entry: false
+            
 copyright: |
   PalikkaPalvelut in 2024.
