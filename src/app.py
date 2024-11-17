@@ -51,6 +51,17 @@ def create_navigation_panel():
         ],
     }
 
+    project_url = None
+    if proj_data in st.session_state and st.session_state[proj_data] is not None:
+        project_url = st.session_state[proj_data].get_project_url()
+
+    if project_url:
+        with st.sidebar:
+            st.markdown(
+                f"🔗 [{open_gitlab}]({project_url})",
+                unsafe_allow_html=True
+            )
+
     if not cl.in_docker():
         app_pages[connections].append(st.Page("app_pages/gitlab_link.py", title=open_gitlab, icon="🔗"))
 
