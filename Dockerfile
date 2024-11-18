@@ -13,3 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Kopioi src-kansiot
 COPY src /app/src
 COPY tests /app/tests
+
+# Kopioi dokumentaatiotiedostot
+COPY mkdocs.yml .
+COPY docs /app/docs

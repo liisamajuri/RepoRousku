@@ -61,12 +61,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"  # MkDocs-dokumentaation portti
-    volumes:
-      - ./mkdocs.yml:/app/mkdocs.yml
-      - ./docs:/app/docs
-      - ./site:/app/site
     command: >
       sh -c "
-      echo 'Projektidokumentaatio saatavilla: http://localhost:8000' &&
-      mkdocs serve -a 0.0.0.0:8000
+      mkdocs serve -a 0.0.0.0:8000 &&
+      echo 'Projektidokumentaatio saatavilla: http://localhost:8000'
       "
