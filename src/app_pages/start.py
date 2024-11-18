@@ -11,6 +11,7 @@ import os
 import libraries.components as cl
 import libraries.env_tokens as et
 from gitlab_api import ProjectData
+from clockify_api import ClockifyData
 
 # Kielikäännökset
 app_title = "RepoRousku"
@@ -36,6 +37,40 @@ missing_token_values = "Access Token(it) puuttuu!"
 
 # Muuttujat
 proj_data = "proj_data"
+clockify_workspace = "clockify_workspace"
+clockify_project = "clockify_project"
+
+
+def get_clockify_data(clockify_token):
+    # Hakee työtilat ja projektit Clockify API:sta
+    if not clockify_token:
+        st.error("Clockify Token puuttuu!")
+        return None, None
+
+    clockify = ClockifyData("https://api.clockify.me/api/v1", api_key=clockify_token)
+
+    # Hae työtilat
+    workspaces = clockify.get_workspaces()
+    if not workspaces:
+        return None, None
+
+    workspace_options = [ws["name"] for ws in workspaces]
+    selected_workspace = st.selectbox("Valitse työtila", workspace_options)
+
+    # Hae valitun työtilan projekti
+    selected_workspace_id = next(ws["id"] for ws in workspaces if ws["name"] == selected_workspace)
+    clockify.workspace_id = selected_workspace_id  # Asetetaan työtilan ID ClockifyData-luokkaan
+
+    # Hae projektit ilman workspace_id-parametria
+    projects = clockify.get_projects()
+
+    if projects:
+        project_options = [project["name"] for project in projects]
+        selected_project = st.selectbox("Valitse projekti", project_options)
+        return selected_workspace_id, selected_project
+    else:
+        st.warning("Ei löytynyt projekteja valitusta työtilasta.")
+        return None, None
 
 
 def get_project_data(gitlab_url, gitlab_token):
@@ -61,7 +96,11 @@ def start_page():
 
     # Alustetaan session_state, jos proj_data puuttuu
     if proj_data not in st.session_state:
-        st.session_state[proj_data] = None    
+        st.session_state[proj_data] = None
+    if clockify_workspace not in st.session_state:
+        st.session_state[clockify_workspace] = None
+    if clockify_project not in st.session_state:
+        st.session_state[clockify_project] = None
     
     # Otsikkorivi
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -85,8 +124,6 @@ def start_page():
 
         gitlab_url = st.text_input(repo_address, help = help_repo_address, value = act_proj_url, placeholder = "https://")
 
-        st.text_input("Clockify-kenttä 1", help = "testi")
-        st.text_input("Clockify-kenttä 2", help = "testi")
 
     # Access tokenit
     with col3:
@@ -100,6 +137,15 @@ def start_page():
     st.write("")
     st.write("")
     st.write("")
+
+    if clockify_token_value:
+        with col2:
+            selected_workspace_id, selected_project = get_clockify_data(clockify_token_value)
+            if selected_workspace_id and selected_project:
+                st.session_state[clockify_workspace] = selected_workspace_id
+                st.session_state[clockify_project] = selected_project
+            else:
+                st.warning("Ei löytynyt työtiloja tai projekteja Clockifystä")
 
     # Painikkeet
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
@@ -122,10 +168,27 @@ def start_page():
                 st.error(invalid_url, icon="❗")
             else:                
                 with st.spinner(fetching_data):
-                    # TODO: Clockify-datan haku
+                    
 
                     # GitLab-projektin tietojen haku
                     if get_project_data(gitlab_url, gitlab_token_value):
+                        # Clockify-datan haku
+                        try:
+                            if clockify_token_value:
+                                selected_workspace_id, selected_project = get_clockify_data(clockify_token_value)
+                                if selected_workspace_id and selected_project:
+                                    clockify = ClockifyData("https://api.clockify.me/api/v1")
+                                    clockify.api_key = clockify_token_value
+                                    all_user_hours_df = clockify.get_all_user_hours_df(selected_project)
+                                    if not all_user_hours_df.empty:
+                                        st.success("Clockify-data haettu onnistuneesti!")
+                                    else:
+                                        st.warning("Ei löytynyt työtunteja projektista.")
+                                else:
+                                    st.warning("Clockify-tietoja ei voitu ladata.")
+                        except Exception as e:
+                            st.error(f"Virhe Clockify-datan hakemisessa: {str(e)}", icon="❗")
+
                         st.switch_page("app_pages/project.py")
                     else:
                         st.error(error_msg, icon="❗")
