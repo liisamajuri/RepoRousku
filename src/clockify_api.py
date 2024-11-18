@@ -4,12 +4,12 @@ import re
 import pandas as pd
 
 class ClockifyData:
-    def __init__(self, clockify_url):
+    def __init__(self, clockify_url, api_key=None):
         self.clockify_url = clockify_url
         self.workspace_id = None
         self.project_id = None
         self.user_id = None
-        self.api_key = os.getenv("CLOCKIFY_TOKEN")
+        self.api_key = api_key or os.getenv("CLOCKIFY_TOKEN")
         self.headers = {"X-Api-Key": self.api_key}
 
         if not self.api_key:
