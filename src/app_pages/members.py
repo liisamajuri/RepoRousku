@@ -37,7 +37,7 @@ def member_page():
     # Käyttäjävalinta
     selected_member = st.selectbox(select_member, [all_members] + st.session_state[proj_data].get_assignees())
 
-    col1, col2, col3 = st.columns([3, 1, 2])
+    col1, col2, col3 = st.columns([2, 1, 1.5])
 
     # Ensimmäinen kolumni: suljetut/avoimet issuet välilehtinä
     with col1:
