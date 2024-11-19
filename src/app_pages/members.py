@@ -11,7 +11,7 @@ import libraries.components as cl
 member_title = "Jäsenet"
 closed_issues_title = "Suljetut issuet"
 open_issues_title = "Avoimet issuet"
-commits_title = "Commitit"
+metrics_title = "Metriikat"
 work_hours_title = "Työtunnit"
 no_issues = "Ei issueita."
 no_commits = "Ei committeja."
@@ -79,26 +79,35 @@ def member_page():
                     height=400
                 )
 
-    # Toinen kolumni: kommittien ja issueiden tietolaatikot
+    # Toinen kolumni: kommittien ja issueiden lukumäärät laatikossa
     with col2:
-        st.markdown(f"### {commits_title}")
+        st.markdown(f"### {metrics_title}")
+
+
         commits = st.session_state[proj_data].get_commits()
 
         # Suodata valitun jäsenen mukaan
         if selected_member != all_members:
             commits = commits[commits["author_name"] == selected_member]
 
-        if commits.empty:
-            st.metric("Commitit", 0)
-        else:
-            st.metric("Commitit", len(commits))
+        # Näytä commit-määrä
+        st.metric("Commitit", len(commits))
 
-        # Suljetut ja avoimet issuet
-        closed_count = len(st.session_state[proj_data].get_closed_issues())
-        open_count = len(st.session_state[proj_data].get_open_issues())
+        # Suljetut issuet valitun jäsenen mukaan
+        closed_issues = st.session_state[proj_data].get_closed_issues()
+        if selected_member != all_members:
+            closed_issues = closed_issues[closed_issues["assignees"].apply(lambda assignees: selected_member in assignees)]
+        
+        # Näytä suljettujen issueiden määrä
+        st.metric("Suljetut issuet", len(closed_issues))
 
-        st.metric("Suljetut issuet", closed_count)
-        st.metric("Avoimet issuet", open_count)
+        # Avoimet issuet valitun jäsenen mukaan
+        open_issues = st.session_state[proj_data].get_open_issues()
+        if selected_member != all_members:
+            open_issues = open_issues[open_issues["assignees"].apply(lambda assignees: selected_member in assignees)]
+
+        # Näytä avointen issueiden määrä
+        st.metric("Avoimet issuet", len(open_issues))
 
     # Kolmas kolumni: tuntitiedot ja piirakkadiagrammi (myöhemmin)
     with col3:
