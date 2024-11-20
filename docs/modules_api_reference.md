@@ -5,12 +5,6 @@ Tässä dokumentaatiossa kuvataan RepoRouskun Python-koodin eri moduulien toimin
 
 ---
 
-## Projektin tietojen avaus -sivu
-
-::: src.app_pages.gitlab_link
-
----
-
 ## Käyttäjät -sivu
 
 Dokumentaatio `members.py` -moduulista, joka sisältää funktiot projektiryhmän jäsenten tietojen käsittelyyn.
