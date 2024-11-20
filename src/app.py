@@ -62,9 +62,6 @@ def create_navigation_panel():
                 unsafe_allow_html=True
             )
 
-    if not cl.in_docker():
-        app_pages[connections].append(st.Page("app_pages/gitlab_link.py", title=open_gitlab, icon="🔗"))
-
     pg = st.navigation(app_pages)
     pg.run()
 

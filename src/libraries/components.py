@@ -135,10 +135,3 @@ def clockify_available():
     TODO: Toteuta funktio
     """
     return False
-
-
-def in_docker():
-    """
-    Palauttaa True, jos ohjelmaa ajetaan Docker-kontissa
-    """
-    return os.path.exists("/.dockerenv")
