@@ -43,6 +43,7 @@ key_title = "title"
 key_author_name = "author_name"
 key_committed_date = "committed_date"
 key_status = "status"
+key_message = "message"
 
 key_pcs = "kpl"
 key_member = "jäsen"
@@ -73,14 +74,10 @@ class ProjectData:
         self.init(gitlab_url)
 
 
-    ### Getterit
+    ### Projektin metatietojen getterit
 
     def get_meta_data(self, data_type):
         return self.project_meta_data[data_type] if self.project_meta_data else None
-
-
-    def get_data(self, data_type):
-        return self.project_data[data_type] if self.project_data else None
 
 
     def get_name(self):
@@ -93,6 +90,16 @@ class ProjectData:
 
     def get_description(self):
         return self.get_meta_data(key_desc)
+
+
+    def get_visibility(self):
+        return self.get_meta_data(key_visibility)
+
+
+    ### Projektin tietojen getterit
+
+    def get_data(self, data_type):
+        return self.project_data[data_type] if self.project_data else None
 
 
     def get_project_url(self):
@@ -114,14 +121,13 @@ class ProjectData:
 
 
     def get_namespace_name(self):
+        """
+        Palauttaa projektin nimiavaruuden nimen
+        """
         namespace = self.get_meta_data(key_namespace)
         if namespace:
             return namespace[key_name]
         return None
-
-
-    def get_visibility(self):
-        return self.get_meta_data(key_visibility)
 
 
     def get_milestones(self):
@@ -133,8 +139,8 @@ class ProjectData:
             df = pd.DataFrame(milestones)
 
             if not df.empty:
-                df[key_start_date] = pd.to_datetime(df[key_start_date]).dt.date
-                df[key_due_date] = pd.to_datetime(df[key_due_date]).dt.date
+                # Päivämääräformaatti
+                df = cl.format_time_columns(df, [key_start_date, key_due_date])
 
                 # Poistetaan rivit, joilla ei ole päivämäärätietoa
                 df = df.dropna(subset=[key_due_date, key_start_date])
@@ -147,11 +153,11 @@ class ProjectData:
                     today = datetime.now().date()
 
                     def milestone_status(row):
-                        if row[key_state] == value_closed or row[key_due_date] < today:
+                        if row[key_state] == value_closed or row[key_due_date].date() < today:
                             return "Päättynyt"
-                        elif row[key_start_date] <= today <= row[key_due_date]:
+                        elif row[key_start_date].date() <= today <= row[key_due_date].date():
                             return "Aktiivinen"
-                        elif row[key_due_date] > today:
+                        elif row[key_due_date].date() > today:
                             return "Tuleva"
                         else:
                             return "EOS"
@@ -174,10 +180,13 @@ class ProjectData:
             df = pd.DataFrame(issues)
 
             if not df.empty:
+                # Päivämääräformaatti
+                df = cl.format_time_columns(df, [key_closed_at])
+
                 # Pelkistetään assignees listaksi nimistä, jos se ei ole tyhjä
                 df[key_assignees] = df[key_assignees].apply(lambda x: [assignee[key_name] for assignee in x] if isinstance(x, list) and x else None)
 
-                # Pelkistetään milestone titleksi, jos milestone on sanakirja ja siinä on title-avaimen
+                # Pelkistetään milestone titleksi, jos milestone on sanakirja ja siinä on title-avain
                 df[key_milestone] = df[key_milestone].apply(lambda x: x.get(key_title) if isinstance(x, dict) and key_title in x else None)
 
                 # Valitaan sarakkeet
@@ -196,14 +205,11 @@ class ProjectData:
             df = pd.DataFrame(commits)
 
             if not df.empty:
-                # Vain päivämäärä
-                df[key_committed_date] = df[key_committed_date].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
-                df[key_created_at] = df[key_created_at].apply(lambda x: datetime.strptime(x[:10], "%Y-%m-%d").strftime('%Y-%m-%d'))
-                df[key_committed_date] = pd.to_datetime(df[key_committed_date]).dt.date
-                df[key_created_at] = pd.to_datetime(df[key_created_at]).dt.date
+                # Päivämääräformaatti
+                df = cl.format_time_columns(df, [key_committed_date, key_created_at])
 
                 # Valitaan sarakkeet
-                df = df[[key_created_at, key_title, "message", key_author_name, key_committed_date]]
+                df = df[[key_created_at, key_title, key_message, key_author_name, key_committed_date]]
 
             return df
         return pd.DataFrame()
@@ -521,14 +527,11 @@ class ProjectData:
             json.dump(self.project_meta_data, f, indent=4)
 
 
-    def get_closed_issues_by_date(self, members):
+    def get_date_limits_for_closed_issues(self, members):
         """
-        Palauttaa pivot-taulukon suljetuista issueista päivämäärän mukaan
+        Palauttaa aikajakson, jolloin parametrin members jäsenien issueita on suljettu
         """
         df = self.get_closed_issues()
-
-        # Formatoidaan aikaleima päivämääräksi
-        df[key_date] = pd.to_datetime(df[key_closed_at]).dt.strftime('%Y-%m-%d')
 
         # Assigneet omille riveilleen
         df = df.explode(key_assignees)
@@ -536,25 +539,77 @@ class ProjectData:
         # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
         df = df[df[key_assignees].isin(members)]
 
-        # Lasketaan rivien määrä kunkin henkilön ja päivämäärän osalta
-        grouped_data = df.groupby([key_date, key_assignees]).size().reset_index(name=key_pcs)
-
-        # Ryhmitellään data siten, että henkilöt sarakkeissa ja päivämäärät riveillä
-        pivot_data = grouped_data.pivot(index=key_date, columns=key_assignees, values=key_pcs).fillna(0)
-
-        # Luodaan aikajakso, joka kattaa kaikki päivämäärät
-        date_range = pd.date_range(start=pivot_data.index.min(), end=pivot_data.index.max(), freq='D')
-
-        # Varmistetaan, että päivämäärät ovat oikeassa muodossa (YYYY-MM-DD)
-        date_range = date_range.strftime('%Y-%m-%d')
-
-        # Täydennetään dataframe issuettomilla päivämäärillä
-        pivot_data = pivot_data.reindex(date_range, fill_value=0)
-
-        return pivot_data, key_date, key_pcs
+        if len(df):
+            # Päivämäärärajat liukusäädintä varten
+            min_date = df[key_closed_at].min().date()
+            max_date = df[key_closed_at].max().date()
+            return min_date, max_date
+        else:
+            return 0,0
 
 
-    def get_commits_by_date(self, members):
+    def get_date_limits_for_commits(self, members):
+        """
+        Palauttaa aikajakson, jolloin parametrin members jäsenet ovat tehneet committeja
+        """
+        df = self.get_commits()
+
+        # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
+        df = df[df[key_author_name].isin(members)]
+
+        if len(df):
+            # Päivämäärärajat liukusäädintä varten
+            min_date = df[key_committed_date].min().date()
+            max_date = df[key_committed_date].max().date()
+            return min_date, max_date
+        else:
+            return 0,0
+
+
+    def get_closed_issues_by_date(self, members, min_date, max_date):
+        """
+        Palauttaa dataframen suljetuista issueista päivämäärän mukaan
+        """
+        df = self.get_closed_issues()
+
+        # Assigneet omille riveilleen
+        df = df.explode(key_assignees)
+
+        # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
+        df = df[df[key_assignees].isin(members)]
+
+        # Suodatetaan ajanjakson mukaan, jos se on määritelty
+        start_date = end_date = 0
+        if min_date != 0 and max_date != 0:
+            start_date = pd.to_datetime(min_date)
+            end_date = pd.to_datetime(max_date)
+            df = df[(df[key_closed_at] >= start_date) & (df[key_closed_at] <= end_date)]
+        elif min_date != max_date:
+            start_date = df[key_closed_at].min()
+            end_date = df[key_closed_at].max()
+
+        # Ryhmitellään data päivämäärän ja jäsenen mukaan
+        df = df.groupby([df[key_closed_at].dt.date, key_assignees]).size().unstack(fill_value=0)
+
+        if start_date and end_date:
+            # Täydennetään dataframe, että kaikki päivämäärät ajanjaksolta ovat mukana
+            date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+
+            # Varmistetaan, että indeksi on päivämäärä
+            df.index = pd.to_datetime(df.index)
+
+            # Täydennetään dataframe issuettomilla päivämäärillä (puuttuvat päivämäärät saavat arvon 0)
+            df = df.reindex(date_range, fill_value=0)
+        else:
+            df.index = pd.to_datetime(df.index)
+
+        # Asetetaan päivämäärä indekseiksi ja jäsenet sarakkeiksi
+        df.index = df.index.strftime('%Y-%m-%d')
+
+        return df, key_date, key_pcs
+
+
+    def get_commits_by_date(self, members, min_date, max_date):
         """
         Palauttaa dataframen commiteista päivämäärän mukaan
         """
@@ -563,31 +618,38 @@ class ProjectData:
         # Suodatetaan jäsenet
         df = df[df[key_author_name].isin(members)]
 
-        # Formatoidaan aikaleima päivämääräksi
-        df[key_date] = pd.to_datetime(df[key_committed_date]).dt.strftime('%Y-%m-%d')
+        # Suodatetaan ajanjakson mukaan, jos se on määritelty
+        start_date = end_date = 0
+        if min_date != 0 and max_date != 0:
+            start_date = pd.to_datetime(min_date)
+            end_date = pd.to_datetime(max_date)
+            df = df[(df[key_committed_date] >= start_date) & (df[key_committed_date] <= end_date)]
+        elif min_date != max_date:
+            start_date = df[key_committed_date].min()
+            end_date = df[key_committed_date].max()
 
-        # Lasketaan commitit päivämäärän ja jäsenen mukaan
-        grouped_data = df.groupby([key_date, key_author_name]).size().reset_index(name=key_pcs)
-        grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+        # Uudelleennimetään sarakkeita kaaviota varten
+        df = df.rename(columns={key_author_name: key_member, key_committed_date: key_date})
 
-        # Uudelleennimetään sarake
-        grouped_data = grouped_data.rename(columns={key_author_name: key_member})
+        # Ryhmitellään data päivämäärän ja jäsenen mukaan
+        df = df.groupby([df[key_date].dt.date, key_member]).size().unstack(fill_value=0)
 
-        # Luodaan aikajakso, joka kattaa kaikki päivämäärät
-        date_range = pd.date_range(start=grouped_data[key_date].min(), end=grouped_data[key_date].max(), freq='D')
+        if start_date and end_date:
+            # Täydennetään dataframe, että kaikki päivämäärät ajanjaksolta ovat mukana
+            date_range = pd.date_range(start=start_date, end=end_date, freq='D')
 
-        # Varmistetaan, että päivämäärät ovat oikeassa muodossa (YYYY-MM-DD)
-        date_range = date_range.strftime('%Y-%m-%d')
+            # Varmistetaan, että indeksi on päivämäärä
+            df.index = pd.to_datetime(df.index)
 
-        # Täydennetään committomat päivämäärät
-        members_list = grouped_data[key_member].unique()
-        all_combinations = pd.MultiIndex.from_product([date_range, members_list], names=[key_date, key_member])
-        full_data = pd.DataFrame(index=all_combinations).reset_index()
+            # Täydennetään dataframe issuettomilla päivämäärillä (puuttuvat päivämäärät saavat arvon 0)
+            df = df.reindex(date_range, fill_value=0)
+        else:
+            df.index = pd.to_datetime(df.index)
 
-        # Yhdistetään täydennetty data alkuperäiseen
-        full_data = full_data.merge(grouped_data, on=[key_date, key_member], how='left').fillna({key_pcs: 0})
+        # Asetetaan päivämäärä indekseiksi ja jäsenet sarakkeiksi
+        df.index = df.index.strftime('%Y-%m-%d')
 
-        return full_data, key_date, key_pcs, key_member
+        return df, key_date, key_pcs
 
 
     def get_closed_issues_by_milestone(self, members):

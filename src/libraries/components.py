@@ -134,3 +134,15 @@ def clockify_available():
     TODO: Toteuta funktio
     """
     return False
+
+
+def format_time_columns(df, column_list):
+    """
+    Muuttaa parametrina annettujen aikaleimasarakkeiden formaatin
+    ja poistaa aikavyöhykkeen.
+    """
+    for column in column_list:
+        # Muutetaan aikaleima datetime-objektiksi ja poistetaan aikavyöhyke
+        df[column] = pd.to_datetime(df[column], utc=True).dt.tz_localize(None)
+
+    return df
