@@ -6,7 +6,6 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import requests
-import os
 
 
 # Kielikäännökset
@@ -135,10 +134,3 @@ def clockify_available():
     TODO: Toteuta funktio
     """
     return False
-
-
-def in_docker():
-    """
-    Palauttaa True, jos ohjelmaa ajetaan Docker-kontissa
-    """
-    return os.path.exists("/.dockerenv")
