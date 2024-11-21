@@ -109,7 +109,7 @@ def member_page():
         # Näytä avointen issueiden määrä
         st.metric("Avoimet issuet", len(open_issues))
 
-    # Kolmas kolumni: tuntitiedot ja piirakkadiagrammi (myöhemmin)
+    # Kolmas kolumni: tuntitiedot ja piirakkadiagrammi (tulee myöhemmin)
     with col3:
         if cl.clockify_available():
             st.markdown(f"### {work_hours_title}")
@@ -117,9 +117,9 @@ def member_page():
             st.metric("Työtunnit", f"{total_hours:.2f} h")
             # TODO: Lisää piirakkadiagrammi myöhemmin
         else:
-            st.write(clockify_not_available)
+            st.write(clockify_not_available) #TODO: Tähän RepoRouskun logo jos ei näytettävää dataa
 
-# Sivun otsikko ja mahdollinen navigaatio aloitussivulle
+# Sivun otsikko 
 cl.make_page_title(member_title)
 if not st.session_state[proj_data]:
     cl.make_start_page_button()
