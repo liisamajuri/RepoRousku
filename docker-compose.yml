@@ -60,9 +60,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"  # MkDocs-dokumentaation portti
+      - "8502:8502"  # MkDocs-dokumentaation portti
     command: >
       sh -c "
-      mkdocs serve -a 0.0.0.0:8000 &&
-      echo 'Projektidokumentaatio saatavilla: http://localhost:8000'
+      mkdocs serve -a 0.0.0.0:8502 &&
+      echo 'Projektidokumentaatio saatavilla: http://localhost:8502'
       "
