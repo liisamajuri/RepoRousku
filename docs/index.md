@@ -9,9 +9,9 @@ _Olitpa projektitiimin jäsen tai opettaja, RepoRousku antaa sinulle hyvän käs
 
 ## Ominaisuudet
 
-* **GitLab-integraatio:** Yhdistä GitLabiin sekä Clockifyihin ja hae projektitietoja, kuten issueiden lukumäärä, projektitiimin jäsenet ja heidän projektiin käyttämänsä aika. 
+* **GitLab & Clockify integraatiot:** Yhdistä GitLabiin sekä Clockifyihin ja hae projektitietoja, kuten issueiden lukumäärä, projektitiimin jäsenet ja heidän projektiin käyttämänsä aika. 
 
-* **Tiimin jäsenien tilastot:** Näe ja analysoi tiimin jäseniin liittyviä tilastoja, kuten avoimia tehtäviä ja kontribuutioita.
+* **Tiimin jäsenien tilastot:** Näe ja analysoi tiimin jäseniin liittyviä tilastoja, kuten avoimia tehtäviä ja tuntikertymää.
 
 * **Mukautettavat hallintapaneelit:** Luo visuaalisia esityksiä projektin mittareista, kuten palkkikaavioita ja donitsikaavioita, ja hahmota projektin eteneminen yhdellä silmäyksellä.
 
