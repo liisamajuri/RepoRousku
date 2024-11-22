@@ -74,6 +74,8 @@ services:
       - "8088:8088"  # API:n ulkoinen portti
     environment:
       PYTHONPATH: "/app/src:/app/api"
+    env_file:
+      - .env
     volumes:
       - ./api:/app/api
       - ./src:/app/src

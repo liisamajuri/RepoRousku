@@ -163,23 +163,9 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 
 ### Personal Access Tokenin lisääminen ympäristömuuttujaan
 - Bash-terminaali:
-  ```
-  # Varmista, että olet kotihakemistossa:
-  cd ~
-  
-  # Avaa .bashrc-tiedosto muokattavaksi:
-  nano .bashrc
-  
+  ``` 
   # Lisää tiedoston loppuun seuraava rivi (vaihda "YOUR_GITLAB_TOKEN" token-arvoon):
   export GITLAB_TOKEN="YOUR_GITLAB_TOKEN"
-  
-  # Tallenna ja sulje tiedosto:
-  Paina Ctrl + O
-  Paina Enter
-  Paina Ctrl + X
-  
-  # Lataa päivitetty .bashrc-tiedosto: 
-  source ~/.bashrc
   
   # Varmista ympäristömuuttujan tallentuminen:
   echo $GITLAB_TOKEN
@@ -200,7 +186,29 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 
 
 
-### TESTAUS
+## API-rajapinnan testaamiseen käytettävän REST Clientin asennusohje:
+
+Tässä projektissa käytetään **REST Client** -laajennusta API-pyyntöjen testaamiseen. Seuraavilla ohjeilla voit asentaa REST Clientin ja käyttää sitä helposti.
+
+### Asennusohjeet
+
+1. Avaa **Visual Studio Code**.
+2. Siirry **Extensions**-näkymään:
+   - Klikkaa vasemmassa reunassa olevaa **laajennusten kuvaketta** (ikonissa on neliö, jossa on pieni neliö sisällä).
+   - Vaihtoehtoisesti voit painaa näppäinyhdistelmää `Ctrl+Shift+X`.
+3. Kirjoita hakukenttään **"REST Client"** ja paina `Enter`.
+4. Valitse **REST Client** ja klikkaa **Install**-painiketta.
+
+### Käyttöohjeet
+
+1. Varmista, että olet asettanut ympäristömuuttujat, kuten `GITLAB_TOKEN`, `.env`-tiedostoon tai VS Code -asetuksiin. 
+   - Katso lisätietoa ympäristömuuttujien asettamisesta projektin dokumentaatiosta.
+2. Avaa projektin juurihakemistosta **`gitlab_requests.rest`**-tiedosto.
+3. Klikkaa haluamasi HTTP-pyynnön vieressä näkyvää **Send Request** -painiketta.
+4. REST Client suorittaa pyynnön ja näyttää vastauksen erillisessä paneelissa.
+
+
+## TESTAUS
 
 ==HUOM!== 
 
@@ -213,6 +221,7 @@ Etsitään tälle järkevämpi paikka README:ssä, nyt vain kirjattu komennot ta
 **Yksikkötestit** funktioiden ja luokkien yms. testaukseen:
 - Asennetaan  ja suoritetaan automaattisesti kontin pystytyksessä (`docker compose up`)
 - Yksikkötestien suorittaminen kontin käynnistyksen jälkeen (`docker-compose run --rm palikka pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py`)
+
 
 
 ***
