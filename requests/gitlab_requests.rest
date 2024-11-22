@@ -1,0 +1,19 @@
+# Tämä tiedosto sisältää REST-pyynnöt GitLab-integraation testaamiseksi RepoRouskun API:ssa.
+
+# Määrittele ympäristömuuttujat käyttämällä `@name` tai `{{variable_name}}`-muotoa.
+# Voit määrittää nämä VS Code REST Client -laajennuksella tai erillisessä .env-tiedostossa.
+
+@baseUrl = http://localhost:8088/api/v1
+@apiToken = {{GITLAB_TOKEN}}
+@projectUrl = https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
+@memberName = Liisa Majuri
+
+### Hae GitLab-projektin yleiset tiedot
+GET {{baseUrl}}/gitlab/project-summary?project_url={{projectUrl}}
+Authorization: Bearer {{apiToken}}
+
+###
+
+### Hae GitLab-projektin jäsenen tilastot
+GET {{baseUrl}}/gitlab/member-summary?project_url={{projectUrl}}&member={{memberName}}
+Authorization: Bearer {{apiToken}}

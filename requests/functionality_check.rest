@@ -1,0 +1,7 @@
+# Tämä tiedosto sisältää REST-pyynnöt API-rajapinnan yleisen toimivuuden testaamiseksi RepoRouskun API:ssa.
+
+### Tarkista API:n toimivuus
+GET http://localhost:8088/health
+
+### Tarkista API:n status
+GET http://localhost:8088/status

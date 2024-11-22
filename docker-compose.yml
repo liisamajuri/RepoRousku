@@ -30,7 +30,6 @@ services:
       - ./tests/reports:/app/tests/reports
     command: >
       sh -c "
-      pip install -r requirements.txt &&
       ruff check src -v &&
       coverage run -m pytest -v --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
       coverage run -m pytest -v --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
@@ -65,4 +64,24 @@ services:
       sh -c "
       mkdocs serve -a 0.0.0.0:8502 &&
       echo 'Projektidokumentaatio saatavilla: http://localhost:8502'
+      "
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"  # API:n ulkoinen portti
+    environment:
+      PYTHONPATH: "/app/src:/app/api"
+    env_file:
+      - .env
+    volumes:
+      - ./api:/app/api
+      - ./src:/app/src
+    command: >
+      sh -c "
+      pip install -r requirements.txt &&
+      uvicorn api.main:app --host 0.0.0.0 --port 8088 &&
+      echo 'API-rajapinta saatavilla: http://localhost:8088'
       "
