@@ -1,0 +1,7 @@
+[theme]
+base = "light"  # Vaihtoehdot: "dark" tai "light"
+font = "sans serif"  # Vaihtoehdot: "sans serif", "serif", tai "monospace"
+backgroundColor = "#0E1117" # Default musta (Bunker)
+secondaryBackgroundColor = "#262730" # Default tummanharmaa
+primaryColor = "#2CA0DA" # Curious blue
+textColor = "#FAFAFA" # Default valkoinen

@@ -11,7 +11,7 @@ services:
     volumes:
       - ./tests/reports:/app/tests/reports
       - ./.env:/app/.env
-      - ./src/.streamlit:/app/.streamlit
+      - ./.streamlit:/app/.streamlit
     command: >
       sh -c "
       pip install -r requirements.txt &&
