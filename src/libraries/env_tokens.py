@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # .env-tiedostoon polku
-env_path = Path(__file__).parent.parent / '.env'
+env_path = Path(__file__).parent.parent.parent / '.env'
 
 key_gitlab_token = "GITLAB_TOKEN"
 key_clockify_token = "CLOCKIFY_TOKEN"
