@@ -4,8 +4,9 @@ RepoRousku API -rajapinta toteutettuna FastAPI-sovelluksena, joka tarjoaa pääs
 Tässä tiedostossa määritellään API:n perustoiminnot ja reitit.
 """
 
-from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi import FastAPI, Depends, HTTPException, Header, Query
 from src.gitlab_api import ProjectData
+from src.clockify_api import ClockifyData
 import os
 from dotenv import load_dotenv
 
@@ -62,6 +63,9 @@ async def api_status():
         "version": "1.0.0",
         "description": "RepoRousku API toimii oikein ja on valmis vastaanottamaan pyyntöjä."
     }
+
+
+### GITLAB-RAJAPINTA ###
 
 def get_gitlab_token():
     """
@@ -201,3 +205,92 @@ async def get_member_summary(project_url: str, member: str, token: str = Depends
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=f"Jäsenen tilastojen haku epäonnistui: {str(e)}")
+    
+    
+### CLOCKIFY-RAJAPINTA ###
+
+CLOCKIFY_URL = "https://api.clockify.me/api/v1"
+
+@app.get("/api/v1/clockify/project-timelogs")
+async def get_project_timelogs(
+    workspace_id: str = Query(..., description="Clockify-työtilan ID"),
+    project_id: str = Query(..., description="Clockify-projektin ID"),
+    group_by_member: bool = Query(False, description="Ryhmittele jäsenittäin (oletuksena ei)"),
+):
+    """
+    Hakee projektin aikakirjaukset.
+
+    Args:
+        workspace_id (str): Työtilan ID.
+        project_id (str): Projektin ID.
+        group_by_member (bool): Ryhmittely jäsenittäin (valinnainen).
+
+    Returns:
+        dict: Projektin aikakirjaukset.
+    """
+    try:
+        clockify = ClockifyData(CLOCKIFY_URL)
+        clockify.workspace_id = workspace_id
+
+        if group_by_member:
+            user_hours_df = clockify.get_all_user_hours_df(project_id)
+            timelogs = user_hours_df.to_dict(orient="records") if not user_hours_df.empty else []
+        else:
+            total_hours = 0
+            user_hours_df = clockify.get_all_user_hours_df(project_id)
+            if not user_hours_df.empty:
+                total_hours = user_hours_df["Työtunnit"].sum()
+            timelogs = [{"total": total_hours}]
+
+        return {
+            "workspace_id": workspace_id,
+            "project_id": project_id,
+            "timelogs": timelogs
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Projektin aikakirjausten haku epäonnistui: {str(e)}")
+
+
+@app.get("/api/v1/clockify/member-timelogs")
+async def get_member_timelogs(
+    workspace_id: str = Query(..., description="Clockify-työtilan ID"),
+    project_id: str = Query(..., description="Clockify-projektin ID"),
+    user_id: str = Query(..., description="Clockify-käyttäjän ID"),
+):
+    """
+    Hakee käyttäjän aikakirjaukset.
+
+    Args:
+        workspace_id (str): Työtilan ID.
+        project_id (str): Projektin ID.
+        user_id (str): Käyttäjän ID.
+
+    Returns:
+        dict: Käyttäjän aikakirjaukset.
+    """
+    try:
+        clockify = ClockifyData(CLOCKIFY_URL)
+        clockify.workspace_id = workspace_id
+
+        time_entries_df = clockify.get_time_entries_df(user_id, project_id)
+        if time_entries_df.empty:
+            return {
+                "workspace_id": workspace_id,
+                "project_id": project_id,
+                "user_id": user_id,
+                "timelogs": []
+            }
+
+        timelogs = time_entries_df.to_dict(orient="records")
+        total_hours = time_entries_df["duration_hours"].sum()
+
+        return {
+            "workspace_id": workspace_id,
+            "project_id": project_id,
+            "user_id": user_id,
+            "timelogs": [{"total": total_hours}] + timelogs
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Käyttäjän aikakirjausten haku epäonnistui: {str(e)}")
