@@ -18,8 +18,8 @@ __pycache__/
 venv/
 
 # Streamlitin tilapäistiedostot, poikkeus: config.toml
-.streamlit/
-!src/.streamlit/config.toml
+.streamlit/*
+!.streamlit/config.toml
 
 # Testien raportit
 src/tests/reports/
