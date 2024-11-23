@@ -76,7 +76,6 @@ def project_page():
 
         with st.expander(info):
             space = st.session_state[proj_data].get_namespace_name()
-            project_url = st.session_state[proj_data].get_project_url()
             st.write(f'''
                 {creation_date}: {st.session_state[proj_data].get_creation_date()}\n
                 {update_date}: {st.session_state[proj_data].get_update_date()}\n
