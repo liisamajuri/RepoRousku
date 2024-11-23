@@ -44,6 +44,7 @@ key_author_name = "author_name"
 key_committed_date = "committed_date"
 key_status = "status"
 key_message = "message"
+key_avatar = "avatar_url"
 
 key_pcs = "kpl"
 key_member = "jäsen"
@@ -94,6 +95,11 @@ class ProjectData:
 
     def get_visibility(self):
         return self.get_meta_data(key_visibility)
+
+
+    def get_avatar(self):
+        url = self.get_meta_data(key_avatar)
+        return url if url else None
 
 
     ### Projektin tietojen getterit
