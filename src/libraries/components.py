@@ -15,16 +15,27 @@ specify_proj = "Määritä GitLab-projekti"
 info_specify_proj = "Anna ensin tarkasteltavan projektin GitLab-osoite!"
 
 
-def make_page_title(title):
+def make_page_title(title, avatar_url=None):
     """
-    Sivun otsikko alleviivauksella
+    Sivun otsikko alleviivauksella ja mahdollisella avattarella
     """
-    # Otsikko
-    st.markdown(
-        f'<h2 style="margin-top: 0px; margin-bottom: 5px; padding-top: 0px; color: #FAEBC8">{title}</h2>',
-        unsafe_allow_html=True
-    )
-    # Viiva
+    # Otsikko avattarella, jos kuva määritelty ja oikeudet riittävät sen saamiseen
+    if avatar_url and requests.get(avatar_url).status_code == 200:
+        st.markdown(
+            f'<div style="display: flex; align-items: center;">'
+            f'<img src="{avatar_url}" width="50" style="margin-right: 10px;">'
+            f'<h2 style="color: #FAEBC8; margin-top: 0px; margin-bottom: 5px;">{title}</h2>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    # Pelkkä otsikko
+    else:
+        st.markdown(
+            f'<h2 style="color: #FAEBC8; margin-top: 0px; margin-bottom: 5px;">{title}</h2>',
+            unsafe_allow_html=True
+        )
+
+    # Viiva otsikon alapuolelle
     st.markdown(
         "<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid #F49E25;'>",
         unsafe_allow_html=True
