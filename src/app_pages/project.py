@@ -83,8 +83,6 @@ def project_page():
                 {namespace}: {space if space else "-"}\n
                 {visibility}: {st.session_state[proj_data].get_visibility()}\n
             ''')
-            if project_url:
-                st.markdown(f"**GitLab:** [Avaa projekti]({project_url})", unsafe_allow_html=True)
 
     with col3:
         # Projektiryhmä
