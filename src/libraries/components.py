@@ -14,6 +14,9 @@ help_project_member = "Projektiryhmän jäsen on projektin member, jolle on assi
 specify_proj = "Määritä GitLab-projekti"
 info_specify_proj = "Anna ensin tarkasteltavan projektin GitLab-osoite!"
 
+light_primary_color = "#2C9FD8" # Curious Blue
+dark_primary_color = "#126C96" # Matisse
+title_color = "#FAFAFA"
 
 def make_page_title(title, avatar_url=None):
     """
@@ -24,20 +27,20 @@ def make_page_title(title, avatar_url=None):
         st.markdown(
             f'<div style="display: flex; align-items: center;">'
             f'<img src="{avatar_url}" width="50" style="margin-right: 10px;">'
-            f'<h2 style="color: #FAEBC8; margin-top: 0px; margin-bottom: 5px;">{title}</h2>'
+            f'<h2 style="color: {title_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>'
             f'</div>',
             unsafe_allow_html=True
         )
     # Pelkkä otsikko
     else:
         st.markdown(
-            f'<h2 style="color: #FAEBC8; margin-top: 0px; margin-bottom: 5px;">{title}</h2>',
+            f'<h2 style="color: {title_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>',
             unsafe_allow_html=True
         )
 
     # Viiva otsikon alapuolelle
     st.markdown(
-        "<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid #F49E25;'>",
+        f"<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid {light_primary_color};'>",
         unsafe_allow_html=True
     )
 
@@ -57,7 +60,7 @@ def make_donut(input_response, input_text, input_color):
     Koodin lähde: https://github.com/dataprofessor/population-dashboard/blob/master/streamlit_app.py
     """
     if input_color == 'blue':
-        chart_color = ['#29b5e8', '#155F7A']
+        chart_color = [light_primary_color, dark_primary_color] # RepoRousku
     if input_color == 'green':
         chart_color = ['#27AE60', '#12783D']
     if input_color == 'orange':

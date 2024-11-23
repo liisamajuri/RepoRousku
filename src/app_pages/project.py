@@ -41,11 +41,11 @@ def project_page():
         col1_1, col1_2 = col1.columns([1, 1])
         with col1_1:
             st.write(milestones)
-            milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'orange')
+            milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'blue')
             st.altair_chart(milestone_donut)
         with col1_2:
             st.write(issues)
-            issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'orange')
+            issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'blue')
             st.altair_chart(issue_donut)
 
     with col1:

@@ -28,7 +28,7 @@ def set_appearance():
     """
     st.set_page_config(
         page_title = app_title,
-        page_icon = "✨",
+        page_icon = "🍄",
         layout = 'wide',
         initial_sidebar_state = "collapsed"
     )
@@ -41,11 +41,11 @@ def create_navigation_panel():
     # Navigointivalikko
     app_pages = {
         connections: [
-            st.Page("app_pages/start.py", title=change_project, icon = "📁", default=True),
+            st.Page("app_pages/start.py", title=change_project, icon = "🔄", default=True),
         ],
         reports: [
-            st.Page("app_pages/project.py", title=project, icon = "📊"),
-            st.Page("app_pages/members.py", title=member, icon = "👤")
+            st.Page("app_pages/project.py", title=project, icon = "📈"),
+            st.Page("app_pages/members.py", title=member, icon = "🙋🏻‍♂️")
         ],
     }
 
