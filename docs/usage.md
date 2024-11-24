@@ -20,13 +20,16 @@ RepoRousku on kehitetty tukemaan projektitiimien toimintaa GitLabin ja Clockifyn
     * **Avaa selain ja siirry osoitteeseen:**
     http://localhost:8501
 
-## Käyttöliittymän käyttäminen
+## Käyttöliittymän ohjeet
 
 Kun käynnistät RepoRouskun ensimmäistä kertaa, sivu pyytää sinua syöttämään GitLab sekä Clockify Access tokenit. 
-![aloitus_app](images/aloitus_app.png)
 
 !!!Tip 
     **Miten löydän GitLab tai Clockify Access tokenin?** Kurkkaa [täältä](https://gitlab.dclabra.fi/wiki/MOpevPu-QrClH4_ouAV04A?view)
+
+![aloitus_app](images/aloitus_app.png)
+
+
 
 Tokenit kannattaa tallentaa **Tallenna tokenit** -napukalla, jos tarkoituksenasi on tarkastella myöhemmin esim. toisen projektin tietoja.
 
@@ -40,3 +43,20 @@ Kun tarvittavat tiedot on lisätty, paina **Rouskuta** -painiketta.
 
 Sivuston vasemmasta laidasta pääset navigoitumaan sivujen välillä. **Jäsenet** -sivu koostaa jäsenkohtaiset tiedot projekteista ja siihen käytetyistä tunneista sekä **Avaa GitLab**-painikkeella päääset kätevästi suoraan projektin GitLab-repositorioon. 
 ![navigaatio_app](images/navigaatio_app.png)
+
+Jäsenet-sivusto voi olla hyödyllinen etenkin, jos sinun on tarpeen raportoida projektikurssin aikana suorittamasi issuet ja projektiin käytetty työaika. 
+
+![jasenkohtainen_app](images/jasenet1_app.png)
+
+
+## Tuki ja ongelmanratkaisu
+
+1. **Sovellus ei käynnisty?** 
+    * Varmista, että Docker toimii oikein
+    * Käytä komentoa docker-compose logs (tai ChatGPT:tä) ongelmien ratkaisemiseksi
+2. **GitLab -yhteys ei toimi?** 
+    * Varmista, että GitLab Access Token on oikein määritetlty
+    * Varmista, että repon linkki on projektin "juuresta"
+3. **Clockify-tiedot eivät näy?**
+    * Varmista, että Clockify Access Token on oikein määritetty
+    * Tarkista, että sinulla on tarvittavat oikeudet
