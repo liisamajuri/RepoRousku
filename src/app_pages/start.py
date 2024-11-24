@@ -66,7 +66,11 @@ def start_page():
     # Otsikkorivi
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        image_path = Path(__file__).parent.parent / 'images' / 'title_dark.png'
+        bc = cl.get_background_color()
+        if bc and bc == '#ffffff':
+            image_path = Path(__file__).parent.parent / 'images' / 'title_light.png'
+        else:
+            image_path = Path(__file__).parent.parent / 'images' / 'title_dark.png'
         st.image(str(image_path), width=500)
 
     st.write("")

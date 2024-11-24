@@ -2,6 +2,7 @@ streamlit
 requests
 pandas
 python-dotenv
+st-theme
 
 ruff
 pytest
