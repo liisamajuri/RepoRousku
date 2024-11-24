@@ -3,8 +3,8 @@ theme:
   name: material
   hljs_style_dark: 'red'
   language: fi
-  logo: images/logo.png
-  favicon: images/logo.png
+  logo: images/logo_sieni_mkdocs.png
+  favicon: images/logo_sieni_mkdocs.png
   palette:
     scheme: slate
     primary: black
@@ -16,8 +16,8 @@ theme:
     - content.tooltips
   
 nav:
-  - Aloitus: index.md
-  - Käyttö-ohjeet: usage.md
+  - Tervehdys: index.md
+  - Käyttöohjeet: usage.md
   - Koodidokumentaatio: modules_api_reference.md
   - Konfiguraatioista: configuration.md
 

@@ -1,1 +1,40 @@
-# Reporouskun käyttöliittymän käyttöohjeet
+# RepoRouskun käyttöohjeet
+
+RepoRousku on kehitetty tukemaan projektitiimien toimintaa GitLabin ja Clockifyn avulla. Sen avulla käyttäjät voivat tarkastella projektidataa, kuten issueita, committeja ja työaikakirjauksia, ja luoda visuaalisia raportteja suoraan selaimessa. Tämä ohje auttaa sinua RepoRouskun käytössä. 
+
+## Asennus ja käyttöönotto
+1. **Vaaditut työkalut:**
+    * **Docker**: RepoRousku toimii Docker-kontissa, joten varmista, että Docker on asennettuna tietokoneellesi. 
+    * **GitLab** ja **Clockify**-tunnukset: Tarvitset pääsyn GitLab-projektiin ja mahdollisesti Clockify-tilin, jos haluat hyödyntää tuntidataa. 
+
+2. **Asennusohjeet:**
+    * Kloonaa RepoRouskun GitLab-repositorio: 
+    ```python
+    git clone git@gitlab.dclabra.fi:projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut.git
+    ```
+
+    * **Rakenna Docker-kontti:**
+    ```python
+    docker-compose up --build
+    ```
+    * **Avaa selain ja siirry osoitteeseen:**
+    http://localhost:8501
+
+## Käyttöliittymän käyttäminen
+
+Kun käynnistät RepoRouskun ensimmäistä kertaa, sivu pyytää sinua syöttämään GitLab sekä Clockify Access tokenit. 
+![aloitus_app](image-1.png)
+
+!!!Tip 
+    **Miten löydän GitLab tai Clockify Access tokenin?** Kurkkaa [täältä](https://gitlab.dclabra.fi/wiki/MOpevPu-QrClH4_ouAV04A?view)
+
+Tokenit kannattaa tallentaa **Tallenna tokenit** -napukalla, jos tarkoituksenasi on tarkastella myöhemmin esim. toisen projektin tietoja.
+
+Jotta pääset etusivusta pidemmälle, on sinun annettava Rouskuttimelle **GitLab-repositorion osoite** sekä **GitLab Access Token**. Clockifytä koskevat valinnat ovat vaihtoehtoisia. 
+
+Kun tarvittavat tiedot on lisätty, paina **Rouskuta** -painiketta. 
+
+**Projekti**-sivu koostaa projektin metriikat yhteen interaktiiviseen näkymään:
+
+![projekti_app](image-2.png)
+
