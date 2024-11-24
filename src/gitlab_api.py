@@ -358,11 +358,9 @@ class ProjectData:
         """
         Palauttaa suljetut issuet
         """
-        issues = self.get_issues()
-        if issues is not None and not issues.empty:
-            df = pd.DataFrame(issues)
-            if not df.empty:
-                df = df[df[key_state] == value_closed]
+        df = self.get_issues()
+        if not df.empty:
+            df = df[df[key_state] == value_closed]
             return df
         return pd.DataFrame()
 
@@ -662,7 +660,7 @@ class ProjectData:
         """
         Palauttaa dataframen suljetuista issueista milestonejen mukaan
         """
-        df = self.get_issues()
+        df = self.get_closed_issues()
 
         # Assigneet omille riveilleen
         df_exploded = df.explode(key_assignees)
