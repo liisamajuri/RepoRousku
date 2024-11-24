@@ -23,7 +23,7 @@ RepoRousku on kehitetty tukemaan projektitiimien toimintaa GitLabin ja Clockifyn
 ## Käyttöliittymän käyttäminen
 
 Kun käynnistät RepoRouskun ensimmäistä kertaa, sivu pyytää sinua syöttämään GitLab sekä Clockify Access tokenit. 
-![aloitus_app](image-1.png)
+![aloitus_app](images/aloitus_app.png)
 
 !!!Tip 
     **Miten löydän GitLab tai Clockify Access tokenin?** Kurkkaa [täältä](https://gitlab.dclabra.fi/wiki/MOpevPu-QrClH4_ouAV04A?view)
@@ -34,7 +34,9 @@ Jotta pääset etusivusta pidemmälle, on sinun annettava Rouskuttimelle **GitLa
 
 Kun tarvittavat tiedot on lisätty, paina **Rouskuta** -painiketta. 
 
-**Projekti**-sivu koostaa projektin metriikat yhteen interaktiiviseen näkymään:
+**Projekti**-sivu koostaa projektin metriikat yhteen interaktiiviseen näkymään.
 
-![projekti_app](image-2.png)
+![projekti_app](images/projekti_app.png)
 
+Sivuston vasemmasta laidasta pääset navigoitumaan sivujen välillä. **Jäsenet** -sivu koostaa jäsenkohtaiset tiedot projekteista ja siihen käytetyistä tunneista sekä **Avaa GitLab**-painikkeella päääset kätevästi suoraan projektin GitLab-repositorioon. 
+![navigaatio_app](images/navigaatio_app.png)
