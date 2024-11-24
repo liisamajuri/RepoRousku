@@ -36,6 +36,7 @@ missing_token_values = "Access Token(it) puuttuu!"
 
 # Muuttujat
 proj_data = "proj_data"
+white_color = "#ffffff"
 
 
 def get_project_data(gitlab_url, gitlab_token):
@@ -67,7 +68,7 @@ def start_page():
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         bc = cl.get_background_color()
-        if bc and bc == '#ffffff':
+        if bc and bc == white_color:
             image_path = Path(__file__).parent.parent / 'images' / 'title_light.png'
         else:
             image_path = Path(__file__).parent.parent / 'images' / 'title_dark.png'
