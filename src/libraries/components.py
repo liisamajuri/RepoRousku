@@ -7,16 +7,40 @@ import pandas as pd
 import altair as alt
 import requests
 
+from streamlit_theme import st_theme
+
 
 # Kielikäännökset
-members = "Projektiryhmän jäsenet"
+members = "Projektiryhmä"
 help_project_member = "Projektiryhmän jäsen on projektin member, jolle on assignattu issueita tai joka on tehnyt committeja."
 specify_proj = "Määritä GitLab-projekti"
 info_specify_proj = "Anna ensin tarkasteltavan projektin GitLab-osoite!"
 
 light_primary_color = "#2C9FD8" # Curious Blue
 dark_primary_color = "#126C96" # Matisse
-title_color = "#FAFAFA"
+dark_background = "#0e1117"
+white_color = "#FFFFFF"
+red_color = "#FF4B4B"
+
+
+def get_background_color():
+    """
+    Palauttaa aktiivisen taustavärin
+    """
+    theme = st_theme()
+    return theme['backgroundColor'].lower() if theme else None
+
+
+def get_title_color():
+    """
+    Otsikon väri valitun väriteeman mukaan
+    Ei kannata käyttää, koska hakemisessa on viivettä
+    """
+    bc = get_background_color()
+    if bc and bc.lower() == dark_background:
+        return white_color
+    return light_primary_color
+
 
 def make_page_title(title, avatar_url=None):
     """
@@ -27,20 +51,20 @@ def make_page_title(title, avatar_url=None):
         st.markdown(
             f'<div style="display: flex; align-items: center;">'
             f'<img src="{avatar_url}" width="50" style="margin-right: 10px;">'
-            f'<h2 style="color: {title_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>'
+            f'<h2 style="color: {light_primary_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>'
             f'</div>',
             unsafe_allow_html=True
         )
     # Pelkkä otsikko
     else:
         st.markdown(
-            f'<h2 style="color: {title_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>',
+            f'<h2 style="color: {light_primary_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>',
             unsafe_allow_html=True
         )
 
     # Viiva otsikon alapuolelle
     st.markdown(
-        f"<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid {light_primary_color};'>",
+        f"<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid {red_color};'>",
         unsafe_allow_html=True
     )
 
