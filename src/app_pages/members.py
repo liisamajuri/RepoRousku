@@ -17,7 +17,7 @@ no_issues = "Ei issueita."
 no_commits = "Ei committeja."
 total = "Kokonaismäärä"
 titles = "Issueiden otsikot"
-clockify_not_available = "Clockify-dataa ei ole käytössä."
+clockify_not_available = "Clockify-integraatio ei ole käytössä."
 select_member = "Valitse jäsen projektitiimistä"
 all_members = "Kaikki"
 
@@ -109,7 +109,7 @@ def member_page():
         # Näytä avointen issueiden määrä
         st.metric("Avoimet issuet", len(open_issues))
 
-    # Kolmas kolumni: tuntitiedot, logo jos tuntitiedot ei käytössä
+    # Kolmas kolumni: tuntitiedot ja piirakkadiagrammi (tulee myöhemmin)
     with col3:
         if cl.clockify_available():
             st.markdown(f"### {work_hours_title}")
