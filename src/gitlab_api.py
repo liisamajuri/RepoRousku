@@ -62,6 +62,9 @@ project_data = [key_milestones, key_issues, key_commits, key_branches, key_label
 
 
 class ProjectData:
+    """
+    Luokka GitLab-projektin tietojen hakemiseen ja käsittelyyn
+    """
     def __init__(self, gitlab_url, gitlab_token):
         """
         Konstruktori
