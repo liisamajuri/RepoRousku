@@ -622,6 +622,8 @@ class ProjectData:
         # Suodatetaan jäsenet
         df = df[df[key_author_name].isin(members)]
 
+        df[key_committed_date] = df[key_committed_date].dt.normalize()
+
         # Suodatetaan ajanjakson mukaan, jos se on määritelty
         start_date = end_date = 0
         if min_date != 0 and max_date != 0:
@@ -690,6 +692,7 @@ class ProjectData:
         if len(df_commits) and len(df_milestones):
             # Liitetään milestone commit-päivämäärän perusteella
             def get_milestone_for_commit(commit_date):
+                commit_date = commit_date.normalize()
                 milestone = df_milestones[(df_milestones[key_start_date] <= commit_date) & (df_milestones[key_due_date] >= commit_date)]
                 return milestone[key_title].iloc[0] if not milestone.empty else None
 
