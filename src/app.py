@@ -4,8 +4,6 @@ RepoRouskun pääohjelma, joka luo sovelluksen toimintovalikon ja avaa etusivun.
 
 import streamlit as st
 
-import libraries.components as cl
-
 # Kielikäännökset
 app_title = "RepoRousku"
 reports = "Raportit"
@@ -30,7 +28,7 @@ def set_appearance():
     """
     st.set_page_config(
         page_title = app_title,
-        page_icon = "✨",
+        page_icon = "🍄",
         layout = 'wide',
         initial_sidebar_state = "collapsed"
     )
@@ -43,11 +41,11 @@ def create_navigation_panel():
     # Navigointivalikko
     app_pages = {
         connections: [
-            st.Page("app_pages/start.py", title=change_project, icon = "📁", default=True),
+            st.Page("app_pages/start.py", title=change_project, icon = "🔄", default=True),
         ],
         reports: [
-            st.Page("app_pages/project.py", title=project, icon = "📊"),
-            st.Page("app_pages/members.py", title=member, icon = "👤")
+            st.Page("app_pages/project.py", title=project, icon = "📈"),
+            st.Page("app_pages/members.py", title=member, icon = "🙋🏻‍♂️")
         ],
     }
 
@@ -61,9 +59,6 @@ def create_navigation_panel():
                 f"🔗 [{open_gitlab}]({project_url})",
                 unsafe_allow_html=True
             )
-
-    if not cl.in_docker():
-        app_pages[connections].append(st.Page("app_pages/gitlab_link.py", title=open_gitlab, icon="🔗"))
 
     pg = st.navigation(app_pages)
     pg.run()

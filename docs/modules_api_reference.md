@@ -5,12 +5,6 @@ Tässä dokumentaatiossa kuvataan RepoRouskun Python-koodin eri moduulien toimin
 
 ---
 
-## Projektin tietojen avaus -sivu
-
-::: src.app_pages.gitlab_link
-
----
-
 ## Käyttäjät -sivu
 
 Dokumentaatio `members.py` -moduulista, joka sisältää funktiot projektiryhmän jäsenten tietojen käsittelyyn.
@@ -49,6 +43,14 @@ Dokumentaatio `app.py` -moduulista, joka sisältää sovelluksen päätoiminnot 
 
 ::: src.app
 
+## Clockify-integraatio
+
+::: src.clockify_api
+
+## GitLab-integraatio
+
+::: src.gitlab_api
+
 ---
 
 ## API-testaus
@@ -62,3 +64,5 @@ Dokumentaatio `api_tests.py` modulista.
 Dokumentaatio `unit_tests.py` modulista.
 
 ::: tests.unit_tests
+
+

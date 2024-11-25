@@ -6,7 +6,7 @@ projektin ajankäyttöä.
 """
 
 import streamlit as st
-import os
+from pathlib import Path
 
 import libraries.components as cl
 import libraries.env_tokens as et
@@ -37,40 +37,7 @@ missing_token_values = "Access Token(it) puuttuu!"
 
 # Muuttujat
 proj_data = "proj_data"
-clockify_workspace = "clockify_workspace"
-clockify_project = "clockify_project"
-
-
-def get_clockify_data(clockify_token):
-    # Hakee työtilat ja projektit Clockify API:sta
-    if not clockify_token:
-        st.error("Clockify Token puuttuu!")
-        return None, None
-
-    clockify = ClockifyData("https://api.clockify.me/api/v1", api_key=clockify_token)
-
-    # Hae työtilat
-    workspaces = clockify.get_workspaces()
-    if not workspaces:
-        return None, None
-
-    workspace_options = [ws["name"] for ws in workspaces]
-    selected_workspace = st.selectbox("Valitse työtila", workspace_options)
-
-    # Hae valitun työtilan projekti
-    selected_workspace_id = next(ws["id"] for ws in workspaces if ws["name"] == selected_workspace)
-    clockify.workspace_id = selected_workspace_id  # Asetetaan työtilan ID ClockifyData-luokkaan
-
-    # Hae projektit ilman workspace_id-parametria
-    projects = clockify.get_projects()
-
-    if projects:
-        project_options = [project["name"] for project in projects]
-        selected_project = st.selectbox("Valitse projekti", project_options)
-        return selected_workspace_id, selected_project
-    else:
-        st.warning("Ei löytynyt projekteja valitusta työtilasta.")
-        return None, None
+white_color = "#ffffff"
 
 
 def get_project_data(gitlab_url, gitlab_token):
@@ -105,12 +72,13 @@ def start_page():
     # Otsikkorivi
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        if os.path.exists("/.dockerenv"):
-            image_path = "src/images/logo.png"
+        bc = cl.get_background_color()
+        if bc and bc == white_color:
+            image_path = Path(__file__).parent.parent / 'images' / 'title_light.png'
         else:
-            image_path = "images/logo.png"
+            image_path = Path(__file__).parent.parent / 'images' / 'title_dark.png'
+        st.image(str(image_path), width=500)
 
-        st.image(image_path, width=500)
     st.write("")
     st.write("")
 

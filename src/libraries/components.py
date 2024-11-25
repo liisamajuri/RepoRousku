@@ -6,28 +6,65 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import requests
-import os
+
+from streamlit_theme import st_theme
 
 
 # Kielikäännökset
-members = "Projektiryhmän jäsenet"
+members = "Projektiryhmä"
 help_project_member = "Projektiryhmän jäsen on projektin member, jolle on assignattu issueita tai joka on tehnyt committeja."
 specify_proj = "Määritä GitLab-projekti"
 info_specify_proj = "Anna ensin tarkasteltavan projektin GitLab-osoite!"
 
+light_primary_color = "#2C9FD8" # Curious Blue
+dark_primary_color = "#126C96" # Matisse
+dark_background = "#0e1117"
+white_color = "#FFFFFF"
+red_color = "#FF4B4B"
 
-def make_page_title(title):
+
+def get_background_color():
     """
-    Sivun otsikko alleviivauksella
+    Palauttaa aktiivisen taustavärin
     """
-    # Otsikko
+    theme = st_theme()
+    return theme['backgroundColor'].lower() if theme else None
+
+
+def get_title_color():
+    """
+    Otsikon väri valitun väriteeman mukaan
+    Ei kannata käyttää, koska hakemisessa on viivettä
+    """
+    bc = get_background_color()
+    if bc and bc.lower() == dark_background:
+        return white_color
+    return light_primary_color
+
+
+def make_page_title(title, avatar_url=None):
+    """
+    Sivun otsikko alleviivauksella ja mahdollisella avattarella
+    """
+    # Otsikko avattarella, jos kuva määritelty ja oikeudet riittävät sen saamiseen
+    if avatar_url and requests.get(avatar_url).status_code == 200:
+        st.markdown(
+            f'<div style="display: flex; align-items: center;">'
+            f'<img src="{avatar_url}" width="50" style="margin-right: 10px;">'
+            f'<h2 style="color: {light_primary_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    # Pelkkä otsikko
+    else:
+        st.markdown(
+            f'<h2 style="color: {light_primary_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>',
+            unsafe_allow_html=True
+        )
+
+    # Viiva otsikon alapuolelle
     st.markdown(
-        f'<h2 style="margin-top: 0px; margin-bottom: 5px; padding-top: 0px; color: #FAEBC8">{title}</h2>',
-        unsafe_allow_html=True
-    )
-    # Viiva
-    st.markdown(
-        "<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid #F49E25;'>",
+        f"<hr style='margin-top: 0px; margin-bottom: 0px; border: 1px solid {red_color};'>",
         unsafe_allow_html=True
     )
 
@@ -47,7 +84,7 @@ def make_donut(input_response, input_text, input_color):
     Koodin lähde: https://github.com/dataprofessor/population-dashboard/blob/master/streamlit_app.py
     """
     if input_color == 'blue':
-        chart_color = ['#29b5e8', '#155F7A']
+        chart_color = [light_primary_color, dark_primary_color] # RepoRousku
     if input_color == 'green':
         chart_color = ['#27AE60', '#12783D']
     if input_color == 'orange':
@@ -137,8 +174,13 @@ def clockify_available():
     return False
 
 
-def in_docker():
+def format_time_columns(df, column_list):
     """
-    Palauttaa True, jos ohjelmaa ajetaan Docker-kontissa
+    Muuttaa parametrina annettujen aikaleimasarakkeiden formaatin
+    ja poistaa aikavyöhykkeen.
     """
-    return os.path.exists("/.dockerenv")
+    for column in column_list:
+        # Muutetaan aikaleima datetime-objektiksi ja poistetaan aikavyöhyke
+        df[column] = pd.to_datetime(df[column], utc=True).dt.tz_localize(None)
+
+    return df

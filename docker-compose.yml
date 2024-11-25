@@ -11,6 +11,7 @@ services:
     volumes:
       - ./tests/reports:/app/tests/reports
       - ./.env:/app/.env
+      - ./.streamlit:/app/.streamlit
     command: >
       sh -c "
       pip install -r requirements.txt &&
@@ -30,7 +31,6 @@ services:
       - ./tests/reports:/app/tests/reports
     command: >
       sh -c "
-      pip install -r requirements.txt &&
       ruff check src -v &&
       coverage run -m pytest -v --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
       coverage run -m pytest -v --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
@@ -60,13 +60,29 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"  # MkDocs-dokumentaation portti
-    volumes:
-      - ./mkdocs.yml:/app/mkdocs.yml
-      - ./docs:/app/docs
-      - ./site:/app/site
+      - "8502:8502"  # MkDocs-dokumentaation portti
     command: >
       sh -c "
-      echo 'Projektidokumentaatio saatavilla: http://localhost:8000' &&
-      mkdocs serve -a 0.0.0.0:8000
+      mkdocs serve -a 0.0.0.0:8502 &&
+      echo 'Projektidokumentaatio saatavilla: http://localhost:8502'
+      "
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"  # API:n ulkoinen portti
+    environment:
+      PYTHONPATH: "/app/src:/app/api"
+    env_file:
+      - .env
+    volumes:
+      - ./api:/app/api
+      - ./src:/app/src
+    command: >
+      sh -c "
+      pip install -r requirements.txt &&
+      uvicorn api.main:app --host 0.0.0.0 --port 8088 &&
+      echo 'API-rajapinta saatavilla: http://localhost:8088'
       "

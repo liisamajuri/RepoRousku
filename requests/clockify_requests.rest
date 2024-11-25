@@ -1,0 +1,42 @@
+# Tämä tiedosto sisältää REST-pyynnöt Clockify-integraation testaamiseksi RepoRouskun API:ssa.
+
+# Määrittele ympäristömuuttujat käyttämällä @name tai {{variable_name}}-muotoa.
+@baseUrl = http://localhost:8088/api/v1
+@apiToken = {{CLOCKIFY_TOKEN}}
+@workspaceId = Palikkapalvelut
+@projectId = Project-4
+@userId = Liisa Majuri
+
+### Hae työtilat
+GET {{baseUrl}}/clockify/workspaces
+Authorization: Bearer {{apiToken}}
+
+###
+
+### Hae työtilan projektit
+GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/projects
+Authorization: Bearer {{apiToken}}
+
+###
+
+### Hae työtilan käyttäjät
+GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/users
+Authorization: Bearer {{apiToken}}
+
+###
+
+### Hae projektin aikakirjaukset ilman jäsenryhmittelyä
+GET {{baseUrl}}/clockify/project-timelogs?workspace_id={{workspaceId}}&project_id={{projectId}}&group_by_member=false
+Authorization: Bearer {{apiToken}}
+
+###
+
+### Hae projektin aikakirjaukset jäsenittäin
+GET {{baseUrl}}/clockify/project-timelogs?workspace_id={{workspaceId}}&project_id={{projectId}}&group_by_member=true
+Authorization: Bearer {{apiToken}}
+
+###
+
+### Hae käyttäjän aikakirjaukset
+GET {{baseUrl}}/clockify/member-timelogs?workspace_id={{workspaceId}}&project_id={{projectId}}&user_id={{userId}}
+Authorization: Bearer {{apiToken}}

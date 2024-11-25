@@ -2,14 +2,17 @@ streamlit
 requests
 pandas
 python-dotenv
+st-theme
 
 ruff
 pytest
 pytest-html
 coverage
 
-
 mkdocs
 mkdocs-material
 mkdocstrings
 mkdocstrings-python
+
+fastapi
+uvicorn

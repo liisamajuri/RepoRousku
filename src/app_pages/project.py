@@ -16,13 +16,14 @@ creation_date = "Luontipvm"
 visibility = "Näkyvyys"
 milestones = "Milestonet"
 issues = "Issuet"
-completion_status = "Projektin valmiusaste"
-project_metrics = "Projektin metriikat"
+completion_status = "Valmiusaste"
+project_metrics = "Metriikat"
 work_hours = "Työtunnit"
 opened_merge_requests = "Avoimet merge requestit"
 closed_issues = "Suljetut issuet"
 commits = "Commitit"
 branches = "Branchit"
+time_period = "Ajanjakso"
 
 # Muuttujat
 proj_data = "proj_data"
@@ -40,11 +41,11 @@ def project_page():
         col1_1, col1_2 = col1.columns([1, 1])
         with col1_1:
             st.write(milestones)
-            milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'orange')
+            milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'blue')
             st.altair_chart(milestone_donut)
         with col1_2:
             st.write(issues)
-            issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'orange')
+            issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'blue')
             st.altair_chart(issue_donut)
 
     with col1:
@@ -75,15 +76,12 @@ def project_page():
 
         with st.expander(info):
             space = st.session_state[proj_data].get_namespace_name()
-            project_url = st.session_state[proj_data].get_project_url()
             st.write(f'''
                 {creation_date}: {st.session_state[proj_data].get_creation_date()}\n
                 {update_date}: {st.session_state[proj_data].get_update_date()}\n
                 {namespace}: {space if space else "-"}\n
                 {visibility}: {st.session_state[proj_data].get_visibility()}\n
             ''')
-            if project_url:
-                st.markdown(f"**GitLab:** [Avaa projekti]({project_url})", unsafe_allow_html=True)
 
     with col3:
         # Projektiryhmä
@@ -101,11 +99,13 @@ def project_page():
 
         # Suljetut issuet ja commitit milestoneittain
         with tab_b1:
-            data, x_field, y_field, color_field = st.session_state[proj_data].get_closed_issues_by_milestone(members)
-            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+            if len(members):
+                data, x_field, y_field, color_field = st.session_state[proj_data].get_closed_issues_by_milestone(members)
+                st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
         with tab_b2:
-            data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
-            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+            if len(members):
+                data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
+                st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
 
         if cl.clockify_available():
             with tab_b3:
@@ -119,11 +119,23 @@ def project_page():
 
         # Aikasarjat suljetuista issueista ja commiteista
         with tab_l1:
-            data, x_label, y_label = st.session_state[proj_data].get_closed_issues_by_date(members)
-            st.bar_chart(data, x_label=x_label, y_label=y_label)
+            if len(members):
+                st.write("")
+                range1 = [0,0]
+                min_date1, max_date1 = st.session_state[proj_data].get_date_limits_for_closed_issues(members)
+                if min_date1 != max_date1:
+                    range1 = st.slider(time_period, min_value=min_date1, max_value=max_date1, value=(min_date1, max_date1), format="YYYY-MM-DD", key = "slider1")
+                data1, x_label1, y_label1 = st.session_state[proj_data].get_closed_issues_by_date(members, range1[0], range1[1])
+                st.bar_chart(data1, x_label=x_label1, y_label=y_label1)
         with tab_l2:
-            data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_date(members)
-            st.bar_chart(data, x=x_field, y=y_field, color=color_field)
+            if len(members):
+                st.write("")
+                range2 = [0,0]
+                min_date2, max_date2 = st.session_state[proj_data].get_date_limits_for_commits(members)
+                if min_date2 != max_date2:
+                    range2 = st.slider(time_period, min_value=min_date2, max_value=max_date2, value=(min_date2, max_date2), format="YYYY-MM-DD", key = "slider2")
+                data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, range2[0], range2[1])
+                st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
 
         if cl.clockify_available():
             with tab_l3:
@@ -134,5 +146,6 @@ if not st.session_state[proj_data]:
     cl.make_page_title(project_title)
     cl.make_start_page_button()
 else:
-    cl.make_page_title(st.session_state[proj_data].get_name())
+    avatar = st.session_state[proj_data].get_avatar()
+    cl.make_page_title(st.session_state[proj_data].get_name(), avatar)
     project_page()
