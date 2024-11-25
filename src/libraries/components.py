@@ -129,7 +129,6 @@ def make_team_member_selector(member_list):
     """
     Projektiryhmän jäsenten listaus ja valinta tarkasteluun
     """
-
     st.markdown(
         '''
         <style>
