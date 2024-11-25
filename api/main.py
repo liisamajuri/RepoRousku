@@ -3,12 +3,21 @@ RepoRousku API -rajapinta toteutettuna FastAPI-sovelluksena, joka tarjoaa pääs
 
 Tässä tiedostossa määritellään API:n perustoiminnot ja reitit.
 """
+import sys
+import os
+
+# Lisää src-kansio Pythonin hakupolkuun
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
+
 
 from fastapi import FastAPI, Depends, HTTPException, Header, Query
 from src.gitlab_api import ProjectData
 from src.clockify_api import ClockifyData
-import os
+from typing import Optional
 from dotenv import load_dotenv
+
+
 
 # Lataa ympäristömuuttujat .env-tiedostosta
 load_dotenv()
@@ -16,7 +25,9 @@ load_dotenv()
 app = FastAPI(
     title="RepoRousku API",
     description="RepoRousku API tarjoaa pääsyn RepoRousku-palvelun keräämään projektidataan, kuten GitLab- ja Clockify-tietoihin.",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/docs",  # Swagger-UI:n oletuspolku
+    redoc_url="/redoc",  # ReDoc-dokumentaation polku
 )
 
 # Tarkista, että ympäristömuuttujat ovat olemassa

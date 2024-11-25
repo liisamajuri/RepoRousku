@@ -16,8 +16,8 @@ creation_date = "Luontipvm"
 visibility = "Näkyvyys"
 milestones = "Milestonet"
 issues = "Issuet"
-completion_status = "Projektin valmiusaste"
-project_metrics = "Projektin metriikat"
+completion_status = "Valmiusaste"
+project_metrics = "Metriikat"
 work_hours = "Työtunnit"
 opened_merge_requests = "Avoimet merge requestit"
 closed_issues = "Suljetut issuet"
@@ -41,11 +41,11 @@ def project_page():
         col1_1, col1_2 = col1.columns([1, 1])
         with col1_1:
             st.write(milestones)
-            milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'orange')
+            milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'blue')
             st.altair_chart(milestone_donut)
         with col1_2:
             st.write(issues)
-            issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'orange')
+            issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'blue')
             st.altair_chart(issue_donut)
 
     with col1:
@@ -146,5 +146,6 @@ if not st.session_state[proj_data]:
     cl.make_page_title(project_title)
     cl.make_start_page_button()
 else:
-    cl.make_page_title(st.session_state[proj_data].get_name())
+    avatar = st.session_state[proj_data].get_avatar()
+    cl.make_page_title(st.session_state[proj_data].get_name(), avatar)
     project_page()
