@@ -25,6 +25,7 @@ closed_issues = "Suljetut issuet"
 commits = "Commitit"
 branches = "Branchit"
 time_period = "Ajanjakso"
+open_issues = "Avoimet issuet"
 
 # Muuttujat
 proj_data = "proj_data"
@@ -57,8 +58,27 @@ def project_page():
         st.write("")
         col1_1, col1_2 = col1.columns([1, 1])
         with col1_1:
+            # Milestonet
             st.metric(milestones, st.session_state[proj_data].count_milestones())
             st.write("")
+
+            # Avoimet merge requestit
+            st.metric(opened_merge_requests, st.session_state[proj_data].count_open_merge_requests())
+            st.write("")
+
+            # Branchit
+            st.metric(branches, st.session_state[proj_data].count_branches())
+
+        with col1_2:
+            # Issuet
+            st.metric(issues, len(st.session_state[proj_data].get_issues()))
+            st.write("")
+
+            # Avoimet issuet
+            st.metric(open_issues, st.session_state[proj_data].count_open_issues())
+            st.write("")
+
+            # Työtunnit
             if cl.clockify_available() and 'clockify_data' in st.session_state:
                 user_hours_df = st.session_state['clockify_data']
                 if not user_hours_df.empty:
@@ -67,12 +87,6 @@ def project_page():
                     st.metric(work_hours, total_project_time)  
                 else:
                     st.warning("Ei löytynyt työtunteja.")
-            else:
-                st.metric(branches, st.session_state[proj_data].count_branches())
-        with col1_2:
-            st.metric(issues, len(st.session_state[proj_data].get_issues()))
-            st.write("")
-            st.metric(opened_merge_requests, st.session_state[proj_data].count_open_merge_requests())
 
         # Expanderit
         st.write("")
@@ -136,8 +150,6 @@ def project_page():
                     st.warning("Sprinttien työtunnit eivät ole saatavilla. Varmista, että tiedot on haettu onnistuneesti start.py-sivulla.")
 
 
-
-
         # Välilehdet aikasarjakaavioihin
         tab_objects_l = st.tabs(tabs)
         tab_l1, tab_l2 = tab_objects_l[:2]
@@ -164,7 +176,7 @@ def project_page():
                 data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, range2[0], range2[1])
                 st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
 
-                # Aikasarjat Clockify työtunneille
+        # Aikasarjat Clockify työtunneille
         if cl.clockify_available():
             with tab_l3:
                 pass
