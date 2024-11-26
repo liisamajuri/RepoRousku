@@ -138,10 +138,11 @@ def make_team_member_selector(member_list):
         unsafe_allow_html=True
     )
 
-    selected = st.multiselect(
+    selected = st.pills(
         members,
         member_list,
-        member_list,
+        selection_mode = 'multi',
+        default = member_list,
         help = help_project_member)
 
     return selected
