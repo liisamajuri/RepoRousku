@@ -21,7 +21,6 @@ class ClockifyData:
         self.init(clockify_url)
 
     def init(self, clockify_url):
-        """Alustaa ClockifyData-luokan hakemalla työtilat tai muut tarvittavat tiedot."""
         self.clockify_url = clockify_url
         self.get_workspaces()
 
@@ -51,7 +50,6 @@ class ClockifyData:
         return hours * 3600 + minutes * 60 + seconds
 
     def get_workspaces(self):
-        """Hakee kaikki työtilat Clockify API:n kautta."""
         response = requests.get(f"{self.clockify_url}/workspaces", headers=self.headers)
         if response.status_code == 200:
             workspaces = response.json()
@@ -62,7 +60,6 @@ class ClockifyData:
             return []
 
     def get_projects(self):
-        """Hakee projektit tietystä työtilasta."""
         if not self.workspace_id:
             print("Työtilan ID ei ole asetettu.")
             return []
@@ -75,7 +72,6 @@ class ClockifyData:
             return []
 
     def get_users_in_workspace(self):
-        """Hakee käyttäjät työtilassa."""
         if not self.workspace_id:
             print("Työtilan ID ei ole asetettu.")
             return []
@@ -110,7 +106,7 @@ class ClockifyData:
                     seconds = self.iso_duration_to_seconds(duration)
                     hours = seconds / 3600
                     
-                    # Lisää tiedot riviin
+                    
                     data.append({
                         "start_time": start_time,
                         "end_time": end_time,
@@ -118,52 +114,91 @@ class ClockifyData:
                         "duration_hours": hours  
                     })
 
-            # Muunnetaan lista DataFrameksi
+            
             df = pd.DataFrame(data)
             return df
         else:
             print(f"Virhe haettaessa aikakirjauksia käyttäjälle {user_id}: {response.status_code}")
             return pd.DataFrame()
+        
+    def get_all_user_hours_df(self):
+        """
+    Hakee kaikkien käyttäjien työtunnit ja palauttaa ne yhdistettynä DataFrame-muodossa.
+    """
+        users_in_workspace = self.get_users_in_workspace()
+        all_user_hours = []
+
+        for user in users_in_workspace:
+            user_id = user["id"]
+            time_entries_df = self.get_time_entries_df(user_id, self.project_id)
+            if not time_entries_df.empty:
+                total_hours = time_entries_df['duration_hours'].sum()
+                all_user_hours.append({
+                    "Nimi": user.get("name", "Tuntematon käyttäjä"),  
+                    "Työtunnit": total_hours
+                })
+
+    
+        return pd.DataFrame(all_user_hours)
+
+
 
     def get_sprint_hours(self, gitlab_url, gitlab_token):
         """
         Yhdistää GitLabin sprintit (milestone) ja Clockifyn työtunnit.
-        Palauttaa käyttäjäkohtaiset työtunnit per sprintti.
+        Palauttaa käyttäjäkohtaiset työtunnit per sprintti valmiiksi ryhmiteltynä.
         """
         gitlab_project = ProjectData(gitlab_url, gitlab_token)
         milestones = gitlab_project.get_milestones()
 
-        sprint_hours = []
+        if milestones.empty:
+            return pd.DataFrame()  # Palautetaan tyhjä DataFrame, jos milestoneja ei ole
 
-        # Hakee Clockify-työtunnit
+        sprint_hours = []
         users_in_workspace = self.get_users_in_workspace()
 
         for _, milestone in milestones.iterrows():
             milestone_name = milestone['title']
-            start_date = milestone['start_date']
-            end_date = milestone['due_date']
+            start_date = pd.Timestamp(milestone['start_date'])  # Muutetaan Timestamp-muotoon
+            end_date = pd.Timestamp(milestone['due_date'])  # Muutetaan Timestamp-muotoon
 
             # Käydään läpi kaikki käyttäjät ja lasketaan heidän työtunnit sprintissä
             for user in users_in_workspace:
                 user_id = user["id"]
-                time_entries_df = self.get_time_entries_df(user_id, self.project_id)  
+                time_entries_df = self.get_time_entries_df(user_id, self.project_id)
 
                 if not time_entries_df.empty:
-                    total_hours = 0
-                    for _, entry in time_entries_df.iterrows():
-                        entry_time = datetime.strptime(entry["start_time"], "%Y-%m-%dT%H:%M:%SZ")
-                        if start_date <= entry_time.date() <= end_date:
-                            total_hours += entry["duration_hours"]
+                    # Muutetaan aikaleimat Timestamp-muotoon vertailua varten
+                    time_entries_df['start_time'] = pd.to_datetime(time_entries_df['start_time'], format="%Y-%m-%dT%H:%M:%SZ")
 
+                    # Suodatetaan merkinnät sprintin päivämäärien perusteella
+                    sprint_entries = time_entries_df[
+                        (time_entries_df['start_time'] >= start_date) & 
+                        (time_entries_df['start_time'] <= end_date)
+                    ]
+
+                    # Lasketaan kokonaiskesto tunneissa
+                    total_hours = sprint_entries['duration_hours'].sum()
+
+                    # Lisätään tiedot listaan
                     sprint_hours.append({
-                        "user": user["name"],  # Lisää käyttäjän nimi
+                        "user": user["name"],
                         "milestone": milestone_name,
                         "start_date": start_date,
                         "end_date": end_date,
                         "total_hours": total_hours
                     })
 
-        return pd.DataFrame(sprint_hours)
+        # Luodaan DataFrame
+        sprint_hours_df = pd.DataFrame(sprint_hours)
+
+        if not sprint_hours_df.empty:
+            # Ryhmitellään tiedot käyttäjän ja sprintin mukaan
+            sprint_hours_df_grouped = sprint_hours_df.groupby(['user', 'milestone']).agg({'total_hours': 'sum'}).reset_index()
+            return sprint_hours_df_grouped
+
+        return pd.DataFrame()  # Palautetaan tyhjä DataFrame, jos tietoja ei ole
+
     def get_tags(self):
         if not self.workspace_id:
             print("Työtilan ID ei ole asetettu.")
@@ -192,21 +227,21 @@ class ClockifyData:
         if not self.workspace_id:
             raise ValueError("Työtilan ID ei ole asetettu.")
 
-        # Hae kaikki tagit työtilasta
+        
         tags = self.get_tags()
         if not tags:
             print("Ei löytynyt tageja.")
             return pd.DataFrame()
 
-        # Hae käyttäjät työtilasta
+        
         users_in_workspace = self.get_users_in_workspace()
 
-        # Alustetaan lista tuloksia varten
+        
         tag_hours_list = []
 
-        # Käydään läpi kaikki käyttäjät
+       
         for user_id in user_ids:
-            # Etsi käyttäjä id:n perusteella
+            
             user = next((user for user in users_in_workspace if user["id"] == user_id), None)
             if user is None:
                 print(f"Käyttäjää {user_id} ei löytynyt työtilasta.")
@@ -225,7 +260,7 @@ class ClockifyData:
 
             time_entries = response.json()
 
-            # Käydään läpi kaikki tagit ja lasketaan niihin liittyvät tunnit
+            
             for tag in tags:
                 tag_id = tag["id"]
                 tag_name = tag["name"]
@@ -236,16 +271,16 @@ class ClockifyData:
                     if "tagIds" in entry and tag_id in entry["tagIds"]
                 ]
 
-                # Laske tagin kokonaiskesto tunneissa
+                
                 total_hours = sum(
                     self.iso_duration_to_seconds(entry["timeInterval"].get("duration", "PT0S")) / 3600
                     for entry in tagged_entries
                 )
 
-                # Lisää tulos listaan
+               
                 tag_hours_list.append({"user_id": user_id, "user_name": user["name"], "tag": tag_name, "total_hours": total_hours})
 
-        # Palauta DataFrame
+        
         return pd.DataFrame(tag_hours_list)
 
 

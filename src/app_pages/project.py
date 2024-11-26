@@ -5,6 +5,9 @@ projektiryhmän jäseniä sekä issueita ja committeja jaoteltuina milestonejen 
 
 import streamlit as st
 import libraries.components as cl
+from app_pages.start import fetch_clockify_data
+from clockify_api import ClockifyData
+from gitlab_api import ProjectData
 
 # Kielikäännökset
 project_title = "Projekti"
@@ -27,6 +30,7 @@ time_period = "Ajanjakso"
 
 # Muuttujat
 proj_data = "proj_data"
+clockify_data = st.session_state.get('clockify_data')
 
 def project_page():
     """
@@ -57,8 +61,14 @@ def project_page():
         with col1_1:
             st.metric(milestones, st.session_state[proj_data].count_milestones())
             st.write("")
-            if cl.clockify_available():
-                st.metric(work_hours, 125)
+            if cl.clockify_available() and 'clockify_data' in st.session_state:
+                user_hours_df = st.session_state['clockify_data']
+                if not user_hours_df.empty:
+                    total_project_time = user_hours_df[work_hours].sum()
+                    total_project_time = int(total_project_time)
+                    st.metric(work_hours, total_project_time)  
+                else:
+                    st.warning("Ei löytynyt työtunteja.")
             else:
                 st.metric(branches, st.session_state[proj_data].count_branches())
         with col1_2:
@@ -107,9 +117,26 @@ def project_page():
                 data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
                 st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
 
-        if cl.clockify_available():
-            with tab_b3:
-                pass # TODO: Clockify
+        with tab_b3:
+            if 'sprint_hours_df_grouped' in st.session_state:
+                sprint_hours_df_grouped = st.session_state['sprint_hours_df_grouped']
+                if not sprint_hours_df_grouped.empty:
+                    try:
+                        filtered_df = sprint_hours_df_grouped[sprint_hours_df_grouped['user'].isin(members)]
+                        if not filtered_df.empty:
+                            pivot_df = filtered_df.pivot(index='milestone', columns='user', values='total_hours').fillna(0)
+                            st.bar_chart(pivot_df, use_container_width=True, horizontal=True)
+                        else:
+                            st.warning("Ei löytynyt työtunteja valituille jäsenille.")
+                    except KeyError as e:
+                        st.error(f"Data puuttuu odotetuista sarakkeista: {e}")
+                else:
+                    st.warning("Ei löytynyt työtunteja sprinteiltä.")
+            else:
+                st.warning("Sprinttien työtunnit eivät ole saatavilla. Varmista, että tiedot on haettu onnistuneesti start.py-sivulla.")
+
+
+
 
         # Välilehdet aikasarjakaavioihin
         tab_objects_l = st.tabs(tabs)
@@ -137,9 +164,14 @@ def project_page():
                 data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, range2[0], range2[1])
                 st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
 
-        if cl.clockify_available():
-            with tab_l3:
-                pass # TODO: Clockify
+                # Aikasarjat Clockify työtunneille
+        with tab_l3:
+            if cl.clockify_available():
+                with tab_l3:
+                    pass
+
+
+
 
 
 if not st.session_state[proj_data]:
