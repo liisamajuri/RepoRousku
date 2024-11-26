@@ -195,7 +195,6 @@ def project_page():
         with tab_l2:
             if len(members):
                 st.write("")
-                range2 = [0,0]
                 data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, start_date, end_date)
                 st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
 
