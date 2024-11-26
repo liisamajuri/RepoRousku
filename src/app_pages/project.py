@@ -5,9 +5,7 @@ projektiryhmän jäseniä sekä issueita ja committeja jaoteltuina milestonejen 
 
 import streamlit as st
 import libraries.components as cl
-from app_pages.start import fetch_clockify_data
-from clockify_api import ClockifyData
-from gitlab_api import ProjectData
+
 
 # Kielikäännökset
 project_title = "Projekti"

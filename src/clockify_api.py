@@ -3,7 +3,7 @@ import os
 import re
 import pandas as pd
 from gitlab_api import ProjectData
-from datetime import datetime
+
 
 
 class ClockifyData:

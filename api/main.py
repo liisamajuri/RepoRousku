@@ -94,9 +94,12 @@ def get_gitlab_token():
     return token
 
 @app.get("/api/v1/gitlab/project-summary")
-async def get_gitlab_project_summary(project_url: str, token: str = Header(None, alias="Authorization")):
+async def get_gitlab_project_summary(
+    project_url: str = Query(..., description="GitLab-projektin URL"),
+    token: str = Header(None, alias="Authorization")
+):
     """
-    Hakee GitLab-projektin statistiikan.
+    Hakee GitLab-projektin tilastot.
 
     Args:
         project_url (str): GitLab-projektin URL.
@@ -109,33 +112,55 @@ async def get_gitlab_project_summary(project_url: str, token: str = Header(None,
     if not auth_token:
         raise HTTPException(status_code=401, detail="Token puuttuu!")
 
-    # Simuloitu palautus testauksen ajaksi
-    project_summary = {
-        "project_id": 123,
-        "name": "PalikkaPalvelut",
-        "namespace": "projektiopinnot",
-        "creation_date": "2023-12-01",
-        "update_date": "2024-01-10",
-        "milestones": {
-            "total": 5,
-            "active": 2,
-            "upcoming": 1,
-            "completed": 2
-        },
-        "issues": {
-            "total": 50,
-            "open": 10,
-            "closed": 40
-        },
-        "commits": 150,
-        "branches": 3,
-        "merge_requests": {
-            "total": 5,
-            "open": 1
-        }
-    }
+    try:
+        # Alustetaan ProjectData-olio
+        project_data = ProjectData(project_url, auth_token)
 
-    return project_summary
+        # Haetaan projektin perustiedot
+        project_id = project_data.get_id()
+        name = project_data.get_name()
+        namespace = project_data.get_namespace_name()
+        creation_date = project_data.get_creation_date()
+        update_date = project_data.get_update_date()
+
+        # Haetaan projektin tilastot
+        milestones_df = project_data.get_milestones()
+        issues_df = project_data.get_issues()
+        commits_count = len(project_data.get_commits())
+        branches_count = project_data.count_branches()
+        merge_requests_df = project_data.get_merge_requests()
+
+        # Rakennetaan vastaus datasta
+        response = {
+            "project_id": project_id,
+            "name": name,
+            "namespace": namespace,
+            "creation_date": creation_date,
+            "update_date": update_date,
+            "milestones": {
+                "total": len(milestones_df),
+                "active": len(milestones_df[milestones_df["status"] == "Aktiivinen"]) if not milestones_df.empty else 0,
+                "upcoming": len(milestones_df[milestones_df["status"] == "Tuleva"]) if not milestones_df.empty else 0,
+                "completed": len(milestones_df[milestones_df["status"] == "Päättynyt"]) if not milestones_df.empty else 0,
+            },
+            "issues": {
+                "total": len(issues_df),
+                "open": len(issues_df[issues_df["state"] == "opened"]) if not issues_df.empty else 0,
+                "closed": len(issues_df[issues_df["state"] == "closed"]) if not issues_df.empty else 0,
+            },
+            "commits": commits_count,
+            "branches": branches_count,
+            "merge_requests": {
+                "total": len(merge_requests_df),
+                "open": len(merge_requests_df[merge_requests_df["state"] == "opened"]) if not merge_requests_df.empty else 0,
+            },
+        }
+
+        return response
+
+    except Exception as e:
+        print(f"Error fetching project summary: {e}")
+        raise HTTPException(status_code=500, detail=f"Projektin tietojen haku epäonnistui: {str(e)}")
 
     
 @app.get("/api/v1/gitlab/member-summary")
