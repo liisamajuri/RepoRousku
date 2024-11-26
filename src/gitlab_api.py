@@ -589,20 +589,21 @@ class ProjectData:
         # Suodatetaan assigneet selectorissa tehdyn valinnan mukaan
         df = df[df[key_assignees].isin(members)]
 
+        df[key_closed_at] = df[key_closed_at]
+
+        start_date = df[key_closed_at].min().date()
+        end_date = df[key_closed_at].max().date()
+
         # Suodatetaan ajanjakson mukaan, jos se on määritelty
-        start_date = end_date = 0
-        if min_date != 0 and max_date != 0:
+        if min_date and max_date:
             start_date = pd.to_datetime(min_date)
             end_date = pd.to_datetime(max_date)
             df = df[(df[key_closed_at] >= start_date) & (df[key_closed_at] <= end_date)]
-        elif min_date != max_date:
-            start_date = df[key_closed_at].min()
-            end_date = df[key_closed_at].max()
 
         # Ryhmitellään data päivämäärän ja jäsenen mukaan
         df = df.groupby([df[key_closed_at].dt.date, key_assignees]).size().unstack(fill_value=0)
 
-        if start_date and end_date:
+        if start_date and end_date and start_date != end_date:
             # Täydennetään dataframe, että kaikki päivämäärät ajanjaksolta ovat mukana
             date_range = pd.date_range(start=start_date, end=end_date, freq='D')
 
@@ -628,15 +629,14 @@ class ProjectData:
 
         df[key_committed_date] = df[key_committed_date].dt.normalize()
 
+        start_date = df[key_committed_date].min()
+        end_date = df[key_committed_date].max()
+
         # Suodatetaan ajanjakson mukaan, jos se on määritelty
-        start_date = end_date = 0
-        if min_date != 0 and max_date != 0:
+        if min_date and max_date:
             start_date = pd.to_datetime(min_date)
             end_date = pd.to_datetime(max_date)
             df = df[(df[key_committed_date] >= start_date) & (df[key_committed_date] <= end_date)]
-        elif min_date != max_date:
-            start_date = df[key_committed_date].min()
-            end_date = df[key_committed_date].max()
 
         # Uudelleennimetään sarakkeita kaaviota varten
         df = df.rename(columns={key_author_name: key_member, key_committed_date: key_date})
@@ -718,3 +718,25 @@ class ProjectData:
             return grouped_data, key_milestone, key_pcs, key_member
 
         return pd.DataFrame(columns=[key_milestone, key_pcs, key_member]), key_milestone, key_pcs, key_member
+
+
+    def get_milestone_data_for_slider(self, start_date_column, end_date_column):
+        """
+        Muodostaa milestonejen nimistä sekä aloitus- ja lopetuspäivämääristä dataframen
+        """
+        df = self.get_milestones()
+
+        if len(df):
+            # Varmistetaan, että milestonet ovat järjestyksessä
+            df = df.sort_values(by=key_iid, ascending=True)
+
+            # Valitaan milestonet, jotka ovat päättyneet tai aktiivinen
+            df = df[(df[key_status] == status_ended) | (df[key_status] == status_active)]
+
+            # Valitaan sarakkeet
+            df = df[[key_title, key_start_date, key_due_date]]
+
+            # UUdelleennimetään sarakkeita
+            df = df.rename(columns={key_start_date: start_date_column, key_due_date: end_date_column})
+
+        return df
