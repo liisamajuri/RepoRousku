@@ -152,35 +152,27 @@ class ClockifyData:
         milestones = gitlab_project.get_milestones()
 
         if milestones.empty:
-            return pd.DataFrame()  # Palautetaan tyhjä DataFrame, jos milestoneja ei ole
+            return pd.DataFrame()
 
         sprint_hours = []
         users_in_workspace = self.get_users_in_workspace()
 
         for _, milestone in milestones.iterrows():
             milestone_name = milestone['title']
-            start_date = pd.Timestamp(milestone['start_date'])  # Muutetaan Timestamp-muotoon
-            end_date = pd.Timestamp(milestone['due_date'])  # Muutetaan Timestamp-muotoon
-
-            # Käydään läpi kaikki käyttäjät ja lasketaan heidän työtunnit sprintissä
+            start_date = pd.Timestamp(milestone['start_date'])
+            end_date = pd.Timestamp(milestone['due_date']) 
             for user in users_in_workspace:
                 user_id = user["id"]
                 time_entries_df = self.get_time_entries_df(user_id, self.project_id)
-
                 if not time_entries_df.empty:
-                    # Muutetaan aikaleimat Timestamp-muotoon vertailua varten
                     time_entries_df['start_time'] = pd.to_datetime(time_entries_df['start_time'], format="%Y-%m-%dT%H:%M:%SZ")
-
-                    # Suodatetaan merkinnät sprintin päivämäärien perusteella
                     sprint_entries = time_entries_df[
                         (time_entries_df['start_time'] >= start_date) & 
                         (time_entries_df['start_time'] <= end_date)
                     ]
 
-                    # Lasketaan kokonaiskesto tunneissa
                     total_hours = sprint_entries['duration_hours'].sum()
 
-                    # Lisätään tiedot listaan
                     sprint_hours.append({
                         "user": user["name"],
                         "milestone": milestone_name,
@@ -189,21 +181,17 @@ class ClockifyData:
                         "total_hours": total_hours
                     })
 
-        # Luodaan DataFrame
         sprint_hours_df = pd.DataFrame(sprint_hours)
 
         if not sprint_hours_df.empty:
-            # Ryhmitellään tiedot käyttäjän ja sprintin mukaan
             sprint_hours_df_grouped = sprint_hours_df.groupby(['user', 'milestone']).agg({'total_hours': 'sum'}).reset_index()
             return sprint_hours_df_grouped
-
-        return pd.DataFrame()  # Palautetaan tyhjä DataFrame, jos tietoja ei ole
+        return pd.DataFrame()
 
     def get_tags(self):
         if not self.workspace_id:
             print("Työtilan ID ei ole asetettu.")
             return []
-
         response = requests.get(f"{self.clockify_url}/workspaces/{self.workspace_id}/tags", headers=self.headers)
         print("get_tags response JSON:", response.json())
 
@@ -227,96 +215,68 @@ class ClockifyData:
         if not self.workspace_id:
             raise ValueError("Työtilan ID ei ole asetettu.")
 
-        
         tags = self.get_tags()
         if not tags:
             print("Ei löytynyt tageja.")
             return pd.DataFrame()
 
-        
         users_in_workspace = self.get_users_in_workspace()
 
-        
         tag_hours_list = []
 
-       
         for user_id in user_ids:
             
             user = next((user for user in users_in_workspace if user["id"] == user_id), None)
             if user is None:
                 print(f"Käyttäjää {user_id} ei löytynyt työtilasta.")
-                continue  # Siirrytään seuraavaan käyttäjään
-
-            # Hae aikakirjaukset tietyltä käyttäjältä ja projektilta
+                continue  
             url = f"{self.clockify_url}/workspaces/{self.workspace_id}/user/{user_id}/time-entries?project={project_id}"
             response = requests.get(url, headers=self.headers)
-
             if response.status_code == 404:
                 print(f"Projektia ei löydy ID:llä {project_id} käyttäjältä {user_id}.")
-                continue  # Siirrytään seuraavaan käyttäjään
+                continue
             elif response.status_code != 200:
                 print(f"Virhe haettaessa aikakirjauksia projektista {project_id} käyttäjältä {user_id}: {response.status_code}")
                 continue
-
             time_entries = response.json()
-
-            
             for tag in tags:
                 tag_id = tag["id"]
                 tag_name = tag["name"]
-
-                # Suodata aikakirjaukset, joissa on tämä tagi
                 tagged_entries = [
                     entry for entry in time_entries
                     if "tagIds" in entry and tag_id in entry["tagIds"]
                 ]
-
-                
                 total_hours = sum(
                     self.iso_duration_to_seconds(entry["timeInterval"].get("duration", "PT0S")) / 3600
                     for entry in tagged_entries
                 )
-
-               
                 tag_hours_list.append({"user_id": user_id, "user_name": user["name"], "tag": tag_name, "total_hours": total_hours})
-
-        
         return pd.DataFrame(tag_hours_list)
-
-
-
-
 
 
 
     def get_tag_hours(self):
         """Hakee ja laskee työtunnit kullekin tagille työtilassa."""
-        tag_hours_list = []  # Listaa tagien kokonaistunnit
+        tag_hours_list = []
 
         tags = self.get_tags()
         if not tags:
             print("Ei löytynyt tageja.")
             return pd.DataFrame()
-
         for tag in tags:
             tag_id = tag["id"]
             tag_name = tag["name"]
             print(f"Käsitellään tagi: {tag_name}, ID: {tag_id}")
-
-            # Haetaan aikakirjaukset tälle tagille
             time_entries_df = self.get_time_entries_by_tag(tag_ids=[tag_id])
-
             if not time_entries_df.empty:
-                total_tag_hours = time_entries_df['duration_hours'].sum()  # Summataan tunnit
+                total_tag_hours = time_entries_df['duration_hours'].sum()
                 print(f"Tagille {tag_name} kokonaistunnit: {total_tag_hours}")
                 tag_hours_list.append({
                     "tag": tag_name,
-                    "total_hours": total_tag_hours  # Kokonaistunnit tagille
+                    "total_hours": total_tag_hours
                 })
             else:
                 print(f"Ei aikakirjauksia tagille {tag_name}")
-
-        # Palautetaan DataFrame kokonaistunneista
         if tag_hours_list:
             tag_hours_df = pd.DataFrame(tag_hours_list)
             print(f"Tag Hours List: {tag_hours_df}")
