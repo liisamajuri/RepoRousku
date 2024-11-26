@@ -167,10 +167,11 @@ def validate_url(url):
 
 def clockify_available():
     """
-    Palauttaa True, jos Clockifyn tiedot saatavilla
-    TODO: Toteuta funktio
+    Palauttaa True, jos Clockifyn tiedot ja työtunnit saatavilla
     """
-    return False
+    return (st.session_state.get("clockify_workspace") is not None and 
+            st.session_state.get("clockify_project") is not None and 
+            'clockify_data' in st.session_state and not st.session_state['clockify_data'].empty)
 
 
 def format_time_columns(df, column_list):
