@@ -102,6 +102,8 @@ def project_page():
 
         tab_objects_b = st.tabs(tabs)
         tab_b1, tab_b2 = tab_objects_b[:2]
+
+        tab_b3 = None
         if cl.clockify_available():
             tab_b3 = tab_objects_b[2]
 
@@ -114,24 +116,24 @@ def project_page():
             if len(members):
                 data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
                 st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
-
-        with tab_b3:
-            if 'sprint_hours_df_grouped' in st.session_state:
-                sprint_hours_df_grouped = st.session_state['sprint_hours_df_grouped']
-                if not sprint_hours_df_grouped.empty:
-                    try:
-                        filtered_df = sprint_hours_df_grouped[sprint_hours_df_grouped['user'].isin(members)]
-                        if not filtered_df.empty:
-                            pivot_df = filtered_df.pivot(index='milestone', columns='user', values='total_hours').fillna(0)
-                            st.bar_chart(pivot_df, use_container_width=True, horizontal=True)
-                        else:
-                            st.warning("Ei löytynyt työtunteja valituille jäsenille.")
-                    except KeyError as e:
-                        st.error(f"Data puuttuu odotetuista sarakkeista: {e}")
+        if tab_b3:
+            with tab_b3:
+                if 'sprint_hours_df_grouped' in st.session_state:
+                    sprint_hours_df_grouped = st.session_state['sprint_hours_df_grouped']
+                    if not sprint_hours_df_grouped.empty:
+                        try:
+                            filtered_df = sprint_hours_df_grouped[sprint_hours_df_grouped['user'].isin(members)]
+                            if not filtered_df.empty:
+                                pivot_df = filtered_df.pivot(index='milestone', columns='user', values='total_hours').fillna(0)
+                                st.bar_chart(pivot_df, use_container_width=True, horizontal=True)
+                            else:
+                                st.warning("Ei löytynyt työtunteja valituille jäsenille.")
+                        except KeyError as e:
+                            st.error(f"Data puuttuu odotetuista sarakkeista: {e}")
+                    else:
+                        st.warning("Ei löytynyt työtunteja sprinteiltä.")
                 else:
-                    st.warning("Ei löytynyt työtunteja sprinteiltä.")
-            else:
-                st.warning("Sprinttien työtunnit eivät ole saatavilla. Varmista, että tiedot on haettu onnistuneesti start.py-sivulla.")
+                    st.warning("Sprinttien työtunnit eivät ole saatavilla. Varmista, että tiedot on haettu onnistuneesti start.py-sivulla.")
 
 
 
@@ -163,10 +165,9 @@ def project_page():
                 st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
 
                 # Aikasarjat Clockify työtunneille
-        with tab_l3:
-            if cl.clockify_available():
-                with tab_l3:
-                    pass
+        if cl.clockify_available():
+            with tab_l3:
+                pass
 
 
 
