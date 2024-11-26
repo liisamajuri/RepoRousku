@@ -13,6 +13,7 @@ import libraries.env_tokens as et
 from gitlab_api import ProjectData
 from clockify_api import ClockifyData
 import os
+
 # Kielikäännökset
 app_title = "RepoRousku"
 repo_address = "GitLab-repositorion osoite"
@@ -26,7 +27,7 @@ remove_tokens_help = "Poista tallennetut access tokenit."
 help_required = "Pakollinen. Projektitietojen haku GitLabista edellyttää GitLabin access tokenia."
 help_optional = "Valinnainen. Jos Clockifyn access tokenia ei määritetä, tietoja ei haeta Clockifystä."
 help_repo_address = "Anna projektin päätason url"
-help_crunch = "Hae projektin tiedot GitLabista"
+help_crunch = "Hae projektin tiedot"
 fetching_data = "Haetaan tietoja..."
 missing_g_token = "GitLab Access Token puuttuu!"
 missing_url = "GitLab-projektin osoite puuttuu!"

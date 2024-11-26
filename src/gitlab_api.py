@@ -358,6 +358,14 @@ class ProjectData:
         return pd.DataFrame()
 
 
+    def count_open_issues(self):
+        """
+        Palauttaa avoimien issueiden lukumäärän
+        """
+        df = self.get_open_issues()
+        return len(df)
+
+
     def get_closed_issues(self):
         """
         Palauttaa suljetut issuet
