@@ -24,8 +24,11 @@ opened_merge_requests = "Avoimet merge requestit"
 closed_issues = "Suljetut issuet"
 commits = "Commitit"
 branches = "Branchit"
-time_period = "Ajanjakso"
+time_period = "Milestonet"
 open_issues = "Avoimet issuet"
+start_txt = "alku"
+end_txt = "loppu"
+slider_help = "Valitse tarkasteltavan ajanjakson alku ja loppu. Ajanjakso sisältää aina vain kokonaisia milestoneja."
 
 # Muuttujat
 proj_data = "proj_data"
@@ -149,6 +152,33 @@ def project_page():
                 else:
                     st.warning("Sprinttien työtunnit eivät ole saatavilla. Varmista, että tiedot on haettu onnistuneesti start.py-sivulla.")
 
+        # Aikajakson valinta
+        start_date = None
+        end_date = None
+        milestone_df = st.session_state[proj_data].get_milestone_data_for_slider(start_txt, end_txt)
+
+        if len(milestone_df):
+            # Koodataan milestonejen nimiin alku ja loppu -tekstit
+            slider_options = milestone_df.iloc[:,0].tolist()
+            slider_options = [s + ' ' + start_txt for s in slider_options] + [slider_options[-1] + ' ' + end_txt]
+            start, end = st.select_slider(time_period, options=slider_options, value = (slider_options[0], slider_options[-1]), help=slider_help)
+
+            if start and end and start != end:
+
+                # Selvitetään koodatuista ajankohtien nimistä päivämäärät
+                start_milestone, separator, start_col = start.rpartition(' ')
+                end_milestone, separator, end_col = end.rpartition(' ')
+
+                start_date = milestone_df[milestone_df.iloc[:, 0] == start_milestone].iloc[0, milestone_df.columns.get_loc(start_col)]
+
+                if end_col == end_txt:
+                    end_date = milestone_df[milestone_df.iloc[:, 0] == end_milestone].iloc[0, milestone_df.columns.get_loc(end_col)]
+                else:
+                    row_index = max(0,  milestone_df[milestone_df.iloc[:, 0] == end_milestone].index[0] - 1)
+                    end_date = milestone_df.iloc[row_index, milestone_df.columns.get_loc(end_txt)]
+
+                start_date = start_date.date()
+                end_date = end_date.date()
 
         # Välilehdet aikasarjakaavioihin
         tab_objects_l = st.tabs(tabs)
@@ -160,29 +190,19 @@ def project_page():
         with tab_l1:
             if len(members):
                 st.write("")
-                range1 = [0,0]
-                min_date1, max_date1 = st.session_state[proj_data].get_date_limits_for_closed_issues(members)
-                if min_date1 != max_date1:
-                    range1 = st.slider(time_period, min_value=min_date1, max_value=max_date1, value=(min_date1, max_date1), format="YYYY-MM-DD", key = "slider1")
-                data1, x_label1, y_label1 = st.session_state[proj_data].get_closed_issues_by_date(members, range1[0], range1[1])
+                data1, x_label1, y_label1 = st.session_state[proj_data].get_closed_issues_by_date(members, start_date, end_date)
                 st.bar_chart(data1, x_label=x_label1, y_label=y_label1)
         with tab_l2:
             if len(members):
                 st.write("")
                 range2 = [0,0]
-                min_date2, max_date2 = st.session_state[proj_data].get_date_limits_for_commits(members)
-                if min_date2 != max_date2:
-                    range2 = st.slider(time_period, min_value=min_date2, max_value=max_date2, value=(min_date2, max_date2), format="YYYY-MM-DD", key = "slider2")
-                data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, range2[0], range2[1])
+                data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, start_date, end_date)
                 st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
 
         # Aikasarjat Clockify työtunneille
         if cl.clockify_available():
             with tab_l3:
                 pass
-
-
-
 
 
 if not st.session_state[proj_data]:
