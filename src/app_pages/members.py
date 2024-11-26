@@ -113,8 +113,18 @@ def member_page():
     with col3:
         if cl.clockify_available():
             st.markdown(f"### {work_hours_title}")
-            total_hours = st.session_state[proj_data].get_all_user_hours_df(st.session_state[proj_data].get_id())['Työtunnit'].sum()
-            st.metric("Työtunnit", f"{total_hours:.2f} h")
+            if cl.clockify_available() and 'clockify_data' in st.session_state:
+                user_hours_df = st.session_state['clockify_data']
+            
+                if not user_hours_df.empty:
+                    # Suodatus jäsenen mukaan, jos valittu jäsen
+                    if selected_member != all_members:
+                        user_hours_df = user_hours_df[user_hours_df["Nimi"] == selected_member]
+                    
+                    total_project_time = user_hours_df[work_hours_title].sum()
+                    total_project_time = int(total_project_time)
+                    
+                    st.metric(work_hours_title, total_project_time)
             # TODO: Lisää piirakkadiagrammi myöhemmin
         else:
             st.write(clockify_not_available) #TODO: Tähän RepoRouskun logo jos ei näytettävää dataa
