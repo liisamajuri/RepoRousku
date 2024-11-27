@@ -8,7 +8,6 @@ import streamlit as st
 from pathlib import Path
 import libraries.components as cl
 
-import os
 
 # Kielikäännökset
 member_title = "Jäsenet"
@@ -97,7 +96,6 @@ def member_page():
             # Suodata valittujen milestonien mukaan
             if selected_milestones:
                 open_issues = open_issues[open_issues["milestone"].isin(selected_milestones)]
-
 
             if open_issues.empty:
                 st.write(no_issues)
