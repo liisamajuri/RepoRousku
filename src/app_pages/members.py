@@ -5,7 +5,10 @@ projektikurssin raportointia varten.
 """
 
 import streamlit as st
+from pathlib import Path
 import libraries.components as cl
+
+import os
 
 # Kielikäännökset
 member_title = "Jäsenet"
@@ -25,6 +28,7 @@ all_members = "Kaikki"
 
 # Muuttujat
 proj_data = "proj_data"
+white_color = "#ffffff"
 
 def member_page():
     """
@@ -151,13 +155,20 @@ def member_page():
     with col3:
         if cl.clockify_available():
             st.markdown(f"### {work_hours_title}")
-            total_hours = st.session_state[proj_data].get_all_user_hours_df(st.session_state[proj_data].get_id())['Työtunnit'].sum()
+            total_hours = 10000 
             
             # TODO: Lisää tuntien suodatus milestonejen mukaan, jos mahdollista
             st.metric(work_hours_title, f"{total_hours:.2f} h")
             # TODO: Lisää piirakkadiagrammi myöhemmin
         else:
-            st.write(clockify_not_available) #TODO: Tähän RepoRouskun logo jos ei näytettävää dataa
+            # näytää logo, jos Clockify-data ei ole saatavilla
+            bc = cl.get_background_color()
+            if bc and bc == white_color:
+                image_path = Path(__file__).parent.parent / 'images' / 'mushroom_light.png'
+            
+            else:
+                image_path = Path(__file__).parent.parent / 'images' / 'mushroom_dark.png'
+            st.image(str(image_path), caption=clockify_not_available)
 
 # Sivun otsikko 
 cl.make_page_title(member_title)
