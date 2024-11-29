@@ -110,7 +110,8 @@ def fetch_sprint_and_tag_hours(clockify, gitlab_url, gitlab_token):
     if not sprint_and_tag_hours_df.empty: 
         st.session_state["sprint_and_tag_hours"] = sprint_and_tag_hours_df
         st.success("Sprinttien ja tagien työtunnit on haettu ja tallennettu!")
-    else: st.warning("Sprinttien ja tagien työtunteja ei löytynyt.")
+    else:
+        st.warning("Sprinttien ja tagien työtunteja ei löytynyt.")
 
 
 
