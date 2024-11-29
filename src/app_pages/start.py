@@ -102,6 +102,16 @@ def fetch_sprint_hours(clockify, gitlab_url, gitlab_token):
     else:
         st.warning("Sprinttien työtunteja ei löytynyt.")
 
+def fetch_sprint_and_tag_hours(clockify, gitlab_url, gitlab_token):
+    """
+    Hakee ja tallentaa sprinteittäin ja tageittain kertyneet työtunnit session_stateen.
+    """
+    sprint_and_tag_hours_df = clockify.get_project_tag_and_sprint_hours(gitlab_url, gitlab_token)
+    if not sprint_and_tag_hours_df.empty: 
+        st.session_state["sprint_and_tag_hours"] = sprint_and_tag_hours_df
+        st.success("Sprinttien ja tagien työtunnit on haettu ja tallennettu!")
+    else: st.warning("Sprinttien ja tagien työtunteja ei löytynyt.")
+
 
 
 def get_project_data(gitlab_url, gitlab_token):
@@ -205,10 +215,11 @@ def start_page():
                         # Clockify-datan haku
                         if clockify_token_value:
                             fetch_sprint_hours(clockify, gitlab_url, gitlab_token_value)
-                            if "sprint_hours_df_grouped" in st.session_state:
-                                st.success("Clockify- ja sprinttidata haettu onnistuneesti!")
+                            fetch_sprint_and_tag_hours(clockify, gitlab_url, gitlab_token_value)
+                            if "sprint_and_tag_hours" in st.session_state:
+                                st.success("Tägien tunnit haettu")
                             else:
-                                st.warning("Sprinttidataa ei voitu tallentaa.")
+                                st.warning("Tägien tunteja ei voitu hakea!")
 
                         st.switch_page("app_pages/project.py")
                     else:
