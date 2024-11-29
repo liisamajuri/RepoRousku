@@ -7,6 +7,7 @@ projektikurssin raportointia varten.
 import streamlit as st
 from pathlib import Path
 import libraries.components as cl
+import plotly.express as px
 
 
 # Kielikäännökset
@@ -149,15 +150,49 @@ def member_page():
         st.metric(open_issues_title, len(open_issues))
 
 
-    # Kolmas kolumni: tuntitiedot ja piirakkadiagrammi (tulee myöhemmin)
+    # Kolmas kolumni: tuntitiedot ja piirakkadiagrammi
     with col3:
         if cl.clockify_available():
-            st.markdown(f"### {work_hours_title}")
-            total_hours = 10000 
-            
-            # TODO: Lisää tuntien suodatus milestonejen mukaan, jos mahdollista
-            st.metric(work_hours_title, f"{total_hours:.2f} h")
-            # TODO: Lisää piirakkadiagrammi myöhemmin
+            if 'sprint_hours_df_grouped' in st.session_state:
+                sprint_hours_df_grouped = st.session_state['sprint_hours_df_grouped']
+                if selected_member != all_members:
+                    filtered_df = sprint_hours_df_grouped[
+                        (sprint_hours_df_grouped['user'] == selected_member) & 
+                        (sprint_hours_df_grouped['milestone'].isin(selected_milestones))
+                    ]
+                else:
+                    filtered_df = sprint_hours_df_grouped[
+                        sprint_hours_df_grouped['milestone'].isin(selected_milestones)
+                    ]
+                if not filtered_df.empty:
+                    total_hours = filtered_df['total_hours'].sum()
+                    st.metric(work_hours_title, f"{total_hours:.2f} h")
+            if "sprint_and_tag_hours" in st.session_state:
+                sprint_tag_hours_df = st.session_state["sprint_and_tag_hours"]
+                if selected_member != all_members:
+                    filtered_tag_df = sprint_tag_hours_df[
+                        (sprint_tag_hours_df['user_name'] == selected_member) & 
+                        (sprint_tag_hours_df['milestone'].isin(selected_milestones))
+                    ]
+                else:
+                    filtered_tag_df = sprint_tag_hours_df[
+                        sprint_tag_hours_df['milestone'].isin(selected_milestones)
+                    ]
+
+                if not filtered_tag_df.empty:
+                    tag_hours_df = filtered_tag_df.groupby('tag')['total_tag_hours'].sum().reset_index()
+
+                    if not tag_hours_df.empty:
+                        fig = px.pie(
+                        tag_hours_df, 
+                        names='tag', 
+                        values='total_tag_hours', 
+                        title=f"Työaika tageittain: {selected_member}",
+                        labels={'tag': 'Tagi', 'total_tag_hours': 'Tunnit'}
+                    )
+                    st.plotly_chart(fig)
+                else:
+                    st.write("Ei tagitietoja saatavilla.")
         else:
             # näytää logo, jos Clockify-data ei ole saatavilla
             bc = cl.get_background_color()

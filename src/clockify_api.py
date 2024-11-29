@@ -3,6 +3,7 @@ import os
 import re
 import pandas as pd
 from gitlab_api import ProjectData
+import pytz 
 
 
 
@@ -144,10 +145,6 @@ class ClockifyData:
 
 
     def get_sprint_hours(self, gitlab_url, gitlab_token):
-        """
-        Yhdistää GitLabin sprintit (milestone) ja Clockifyn työtunnit.
-        Palauttaa käyttäjäkohtaiset työtunnit per sprintti valmiiksi ryhmiteltynä.
-        """
         gitlab_project = ProjectData(gitlab_url, gitlab_token)
         milestones = gitlab_project.get_milestones()
 
@@ -159,18 +156,19 @@ class ClockifyData:
 
         for _, milestone in milestones.iterrows():
             milestone_name = milestone['title']
-            start_date = pd.Timestamp(milestone['start_date'])
-            end_date = pd.Timestamp(milestone['due_date']) 
+            start_date = pd.Timestamp(milestone['start_date']).replace(hour=0, minute=0, second=0, tzinfo=pytz.UTC)
+            end_date = pd.Timestamp(milestone['due_date']).replace(hour=23, minute=59, second=59, tzinfo=pytz.UTC)
+
             for user in users_in_workspace:
                 user_id = user["id"]
                 time_entries_df = self.get_time_entries_df(user_id, self.project_id)
                 if not time_entries_df.empty:
-                    time_entries_df['start_time'] = pd.to_datetime(time_entries_df['start_time'], format="%Y-%m-%dT%H:%M:%SZ")
+                    time_entries_df['start_time'] = pd.to_datetime(time_entries_df['start_time'], format="%Y-%m-%dT%H:%M:%SZ").dt.tz_localize('UTC')
+                    time_entries_df['duration_hours'] = time_entries_df['duration_seconds'] / 3600
                     sprint_entries = time_entries_df[
                         (time_entries_df['start_time'] >= start_date) & 
                         (time_entries_df['start_time'] <= end_date)
                     ]
-
                     total_hours = sprint_entries['duration_hours'].sum()
 
                     sprint_hours.append({
@@ -184,8 +182,10 @@ class ClockifyData:
         sprint_hours_df = pd.DataFrame(sprint_hours)
 
         if not sprint_hours_df.empty:
+            # Group by user and milestone, summing the total hours worked
             sprint_hours_df_grouped = sprint_hours_df.groupby(['user', 'milestone']).agg({'total_hours': 'sum'}).reset_index()
             return sprint_hours_df_grouped
+    
         return pd.DataFrame()
 
     def get_tags(self):
@@ -254,7 +254,6 @@ class ClockifyData:
         return pd.DataFrame(tag_hours_list)
 
 
-
     def get_tag_hours(self):
         """Hakee ja laskee työtunnit kullekin tagille työtilassa."""
         tag_hours_list = []
@@ -283,3 +282,85 @@ class ClockifyData:
             return tag_hours_df
         else:
             return pd.DataFrame()
+    def get_project_tag_and_sprint_hours(self, gitlab_url, gitlab_token):
+        """
+        Hakee projektin tagit, aikakirjaukset, sprintit ja laskee tunnit sekä tageittain että sprintittäin käyttäjille.
+        """
+        if not self.workspace_id:
+            raise ValueError("Työtilan ID ei ole asetettu.")
+
+        tags = self.get_tags()
+        if not tags:
+            print("Ei löytynyt tageja.")
+            return pd.DataFrame()
+
+        gitlab_project = ProjectData(gitlab_url, gitlab_token)
+        milestones = gitlab_project.get_milestones()
+
+        if milestones.empty:
+            print("Ei löytynyt sprints-milestoneja.")
+            return pd.DataFrame()
+
+        users_in_workspace = self.get_users_in_workspace()
+
+        tag_and_sprint_hours_list = []
+
+        for user in users_in_workspace:
+            user_id = user["id"]
+            user_name = user["name"]
+
+            url = f"{self.clockify_url}/workspaces/{self.workspace_id}/user/{user_id}/time-entries"
+            response = requests.get(url, headers=self.headers)
+
+            if response.status_code == 404:
+                print(f"Aikakirjauksia ei löydy käyttäjältä {user_id}.")
+                continue
+            elif response.status_code != 200:
+                print(f"Virhe haettaessa aikakirjauksia käyttäjältä {user_id}: {response.status_code}")
+                continue
+
+            try:
+                time_entries = response.json()
+            except ValueError:
+                print(f"Virhe käsiteltäessä JSON-vastausta käyttäjältä {user_id}.")
+                continue
+            for _, milestone in milestones.iterrows():
+                milestone_name = milestone['title']
+                start_date = pd.Timestamp(milestone['start_date']).replace(hour=0, minute=0, second=0, tzinfo=pytz.UTC)
+                end_date = pd.Timestamp(milestone['due_date']).replace(hour=23, minute=59, second=59, tzinfo=pytz.UTC)
+
+                sprint_entries = [
+                    entry for entry in time_entries
+                    if "timeInterval" in entry and 
+                    start_date <= pd.to_datetime(entry["timeInterval"]["start"]) <= end_date
+                ]
+                sprint_total_hours = sum(
+                    self.iso_duration_to_seconds(entry["timeInterval"].get("duration", "PT0S")) / 3600
+                    for entry in sprint_entries
+                )
+
+                for tag in tags:
+                    tag_id = tag["id"]
+                    tag_name = tag["name"]
+                    tagged_entries = [
+                        entry for entry in sprint_entries
+                        if entry.get("tagIds") and tag_id in entry["tagIds"]
+                    ]
+
+
+                    tag_total_hours = sum(
+                        self.iso_duration_to_seconds(entry["timeInterval"].get("duration", "PT0S")) / 3600
+                        for entry in tagged_entries
+                    )
+
+                    tag_and_sprint_hours_list.append({
+                        "user_id": user_id,
+                        "user_name": user_name,
+                        "tag": tag_name,
+                        "milestone": milestone_name,
+                        "start_date": start_date,
+                        "end_date": end_date,
+                        "total_tag_hours": tag_total_hours,
+                        "total_sprint_hours": sprint_total_hours
+                    })
+        return pd.DataFrame(tag_and_sprint_hours_list)

@@ -4,6 +4,7 @@ pandas
 python-dotenv
 st-theme
 matplotlib
+plotly
 
 ruff
 pytest
