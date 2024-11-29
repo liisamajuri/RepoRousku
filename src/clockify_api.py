@@ -303,8 +303,6 @@ class ClockifyData:
 
         users_in_workspace = self.get_users_in_workspace()
 
-        users_dict = {user["id"]: user for user in users_in_workspace}
-
         tag_and_sprint_hours_list = []
 
         for user in users_in_workspace:
