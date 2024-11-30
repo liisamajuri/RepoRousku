@@ -16,7 +16,7 @@ key_clockify_token = "CLOCKIFY_TOKEN"
 
 def remove_tokens_from_env_file():
     """
-    Poistaa ympäristötiedostosta tokenit
+    Poistaa ympäristötiedostosta tokenit.
     """
     if os.path.exists(env_path):
         with open(env_path, "r") as file:
@@ -31,7 +31,10 @@ def remove_tokens_from_env_file():
 
 def get_env_tokens():
     """
-    Palauttaa ympäristöön tallennetut tokenit
+    Palauttaa ympäristöön tallennetut tokenit.
+
+    Returns:
+        (tuple): GitLab-token, Clockify-token.
     """
     os.environ.pop(key_gitlab_token, None)
     os.environ.pop(key_clockify_token, None)
@@ -44,7 +47,11 @@ def get_env_tokens():
 
 def save_tokens_to_env(gitlab_token_value, clockify_token_value):
     """
-    Tallentaa tokenit ympäristötiedostoon
+    Tallentaa tokenit ympäristötiedostoon.
+
+    Args:
+        gitlab_token_value (str): GitLab-token.
+        clockify_token_value (str): Clockify-token.
     """
     with open(env_path, "w") as f:
         if gitlab_token_value:

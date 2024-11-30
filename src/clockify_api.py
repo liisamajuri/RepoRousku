@@ -1,3 +1,9 @@
+"""
+RepoRouskun rajapinta, joka hakee tiedot Clockifyn APIsta.
+Sisältää ClockifyData-luokan, joka kapseloi työtuntitiedot ja tarjoaa 
+palveluinaan pureskeltua dataa käyttöliittymää varten.
+"""
+
 import requests
 import os
 import re
@@ -8,6 +14,9 @@ import pytz
 
 
 class ClockifyData:
+    """
+    Luokka Clockifyn tietojen hakemiseen ja käsittelyyn.
+    """
     def __init__(self, clockify_url, api_key=None):
         self.clockify_url = clockify_url
         self.workspace_id = None
@@ -22,6 +31,9 @@ class ClockifyData:
         self.init(clockify_url)
 
     def init(self, clockify_url):
+        """
+        Luokan alustus.
+        """
         self.clockify_url = clockify_url
         self.get_workspaces()
 
@@ -124,8 +136,8 @@ class ClockifyData:
         
     def get_all_user_hours_df(self):
         """
-    Hakee kaikkien käyttäjien työtunnit ja palauttaa ne yhdistettynä DataFrame-muodossa.
-    """
+        Hakee kaikkien käyttäjien työtunnit ja palauttaa ne yhdistettynä DataFrame-muodossa.
+        """
         users_in_workspace = self.get_users_in_workspace()
         all_user_hours = []
 
@@ -143,8 +155,10 @@ class ClockifyData:
         return pd.DataFrame(all_user_hours)
 
 
-
     def get_sprint_hours(self, gitlab_url, gitlab_token):
+        """
+        Hakee kaikkien käyttäjien työtunnit milestoneittain ja palauttaa ne yhdistettynä DataFrame-muodossa.
+        """
         gitlab_project = ProjectData(gitlab_url, gitlab_token)
         milestones = gitlab_project.get_milestones()
 
@@ -188,7 +202,11 @@ class ClockifyData:
     
         return pd.DataFrame()
 
+
     def get_tags(self):
+        """
+        Hakee tagit ja palauttaa ne listana.
+        """
         if not self.workspace_id:
             print("Työtilan ID ei ole asetettu.")
             return []
@@ -201,6 +219,7 @@ class ClockifyData:
             print(f"Virhe haettaessa tageja: {response.status_code}")
             return []
 
+
     def get_project_tag_hours(self, project_id, user_ids):
         """
         Hakee projektin kaikki tagit, aikakirjaukset ja laskee tunnit tageittain useille käyttäjille.
@@ -210,7 +229,7 @@ class ClockifyData:
             user_ids (list): Lista Clockify-käyttäjien ID:istä.
 
         Returns:
-            pd.DataFrame: DataFrame, joka sisältää tagin nimen ja siihen liittyvät tunnit kaikille käyttäjille.
+            (DataFrame): DataFrame, joka sisältää tagin nimen ja siihen liittyvät tunnit kaikille käyttäjille.
         """
         if not self.workspace_id:
             raise ValueError("Työtilan ID ei ole asetettu.")
@@ -282,6 +301,8 @@ class ClockifyData:
             return tag_hours_df
         else:
             return pd.DataFrame()
+
+
     def get_project_tag_and_sprint_hours(self, gitlab_url, gitlab_token):
         """
         Hakee projektin tagit, aikakirjaukset, sprintit ja laskee tunnit sekä tageittain että sprintittäin käyttäjille.

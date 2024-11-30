@@ -28,7 +28,7 @@ _Olitpa projektitiimin jäsen tai opettaja, RepoRousku antaa sinulle hyvän käs
 
 
 
-_Yksityikohtaisemmat käytön ohjeet löydät [täältä](http://localhost:8502/usage/)_
+_Yksityiskohtaisemmat käytön ohjeet löydät [täältä](http://localhost:8502/usage/)_
 
 Voit aloittaa RepoRouskun käytön seuraavilla pikaohjeilla:
 

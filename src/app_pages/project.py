@@ -34,25 +34,233 @@ slider_help = "Valitse tarkasteltavan ajanjakson alku ja loppu. Ajanjakso sisäl
 proj_data = "proj_data"
 clockify_data = st.session_state.get('clockify_data')
 
+
+def milestone_donut():
+    """
+    Donitsikaavio päättyneistä milestoneista suhteessa projektin kaikkiin milestoneihin.
+    """
+    st.write(milestones)
+    milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'blue')
+    st.altair_chart(milestone_donut)
+
+
+def issues_donut():
+    """
+    Donitsikaavio suljetuista issueista suhteessa projektin kaikkiin issueisiin.
+    """
+    st.write(issues)
+    issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'blue')
+    st.altair_chart(issue_donut)
+
+
+def milestone_metric():
+    """
+    Metriikka projektin milesonejen kokonaismäärästä.
+    """
+    st.metric(milestones, st.session_state[proj_data].count_milestones())
+
+
+def merge_request_metric():
+    """
+    Metriikka projektin avoimien merge requestien määrästä.
+    """
+    st.metric(opened_merge_requests, st.session_state[proj_data].count_open_merge_requests())
+
+
+def branch_metric():
+    """
+    Metriikka projektin branchien määrästä.
+    """
+    st.metric(branches, st.session_state[proj_data].count_branches())
+
+
+def issues_metric():
+    """
+    Metriikka projektin issueiden kokonaismäärästä.
+    """
+    st.metric(issues, len(st.session_state[proj_data].get_issues()))
+
+
+def open_issues_metric():
+    """
+    Metriikka projektin avoimien issueiden määrästä.
+    """
+    st.metric(open_issues, st.session_state[proj_data].count_open_issues())
+
+
+def work_hours_metric():
+    """
+    Metriikka projektin työtuntien kokonaismäärästä.
+    """
+    if cl.clockify_available() and 'clockify_data' in st.session_state:
+        user_hours_df = st.session_state['clockify_data']
+        if not user_hours_df.empty:
+            total_project_time = user_hours_df[work_hours].sum()
+            total_project_time = int(total_project_time)
+            st.metric(work_hours, total_project_time)
+        else:
+            st.warning("Ei löytynyt työtunteja.")
+
+
+def project_description_expander():
+    """
+    Projektin kuvauksen sisältävä komponentti.
+    """
+    desc = st.session_state[proj_data].get_description()
+    if desc:
+        with st.expander(description):
+            st.write(desc)
+
+
+def project_info_expander():
+    """
+    Projektin perustiedot sisältävä komponentti.
+    """
+    with st.expander(info):
+        space = st.session_state[proj_data].get_namespace_name()
+        st.write(f'''
+            {creation_date}: {st.session_state[proj_data].get_creation_date()}\n
+            {update_date}: {st.session_state[proj_data].get_update_date()}\n
+            {namespace}: {space if space else "-"}\n
+            {visibility}: {st.session_state[proj_data].get_visibility()}\n
+        ''')
+
+
+def project_members():
+    """
+    Projektiryhmän jäsenten valitsin.
+    """
+    members = cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
+    return members
+
+
+def closed_issues_by_milestone(members):
+    """
+    Palkkikaavio suljetuista issueista jäsenittäin ja milestoneittain.
+
+    Args:
+        members (list): Lista projektiryhmän jäsenten nimistä.
+    """
+    if len(members):
+        data, x_field, y_field, color_field = st.session_state[proj_data].get_closed_issues_by_milestone(members)
+        st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+
+
+def commits_by_milestone(members):
+    """
+    Palkkikaavio commiteista jäsenittäin ja milestoneittain.
+
+    Args:
+        members (list): Lista projektiryhmän jäsenten nimistä.
+    """
+    if len(members):
+        data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
+        st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+
+
+def work_hours_data(members):
+    """
+    Palkkikaavio työtunneista jäsenittäin ja milestoneittain.
+
+    Args:
+        members (list): Lista projektiryhmän jäsenten nimistä.
+    """
+    if 'sprint_hours_df_grouped' in st.session_state:
+        sprint_hours_df_grouped = st.session_state['sprint_hours_df_grouped']
+        if not sprint_hours_df_grouped.empty:
+            try:
+                filtered_df = sprint_hours_df_grouped[sprint_hours_df_grouped['user'].isin(members)]
+                if not filtered_df.empty:
+                    pivot_df = filtered_df.pivot(index='milestone', columns='user', values='total_hours').fillna(0)
+                    st.bar_chart(pivot_df, use_container_width=True, horizontal=True)
+                else:
+                    st.warning("Ei löytynyt työtunteja valituille jäsenille.")
+            except KeyError as e:
+                st.error(f"Data puuttuu odotetuista sarakkeista: {e}")
+        else:
+            st.warning("Ei löytynyt työtunteja sprinteiltä.")
+    else:
+        st.warning("Sprinttien työtunnit eivät ole saatavilla. Varmista, että tiedot on haettu onnistuneesti start.py-sivulla.")
+
+
+def milestone_selector():
+    """
+    Tarkasteltavien milestonejen valintakomponentti.
+    """
+    start_date = None
+    end_date = None
+    milestone_df = st.session_state[proj_data].get_milestone_data_for_slider(start_txt, end_txt)
+
+    if len(milestone_df):
+        # Koodataan milestonejen nimiin alku ja loppu -tekstit
+        slider_options = milestone_df.iloc[:,0].tolist()
+        slider_options = [s + ' ' + start_txt for s in slider_options] + [slider_options[-1] + ' ' + end_txt]
+        start, end = st.select_slider(time_period, options=slider_options, value = (slider_options[0], slider_options[-1]), help=slider_help)
+
+        if start and end and start != end:
+
+            # Selvitetään koodatuista ajankohtien nimistä päivämäärät
+            start_milestone, separator, start_col = start.rpartition(' ')
+            end_milestone, separator, end_col = end.rpartition(' ')
+
+            start_date = milestone_df[milestone_df.iloc[:, 0] == start_milestone].iloc[0, milestone_df.columns.get_loc(start_col)]
+
+            if end_col == end_txt:
+                end_date = milestone_df[milestone_df.iloc[:, 0] == end_milestone].iloc[0, milestone_df.columns.get_loc(end_col)]
+            else:
+                row_index = max(0,  milestone_df[milestone_df.iloc[:, 0] == end_milestone].index[0] - 1)
+                end_date = milestone_df.iloc[row_index, milestone_df.columns.get_loc(end_txt)]
+
+            start_date = start_date.date()
+            end_date = end_date.date()
+
+    return start_date, end_date
+
+
+def closed_issues_by_date(members, start_date, end_date):
+    """
+    Suljetut issuet aikasarjana valittujen jäsenten ja milestonejen mukaan.
+
+    Args:
+        members (list): Lista projektiryhmän jäsenten nimistä.
+        start_date (date): Aikajakson alkupvm.
+        end_date (date): Aikajakson loppupvm.
+    """
+    if len(members):
+        st.write("")
+        data1, x_label1, y_label1 = st.session_state[proj_data].get_closed_issues_by_date(members, start_date, end_date)
+        st.bar_chart(data1, x_label=x_label1, y_label=y_label1)
+
+
+def commits_by_date(members, start_date, end_date):
+    """
+    Commitit aikasarjana valittujen jäsenten ja milestonejen mukaan.
+
+    Args:
+        members (list): Lista projektiryhmän jäsenten nimistä.
+        start_date (date): Aikajakson alkupvm.
+        end_date (date): Aikajakson loppupvm.
+    """
+    if len(members):
+        st.write("")
+        data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, start_date, end_date)
+        st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
+
+
 def project_page():
     """
-    Sivulla esitetään projektin keskeisimmät tiedot
+    Moduulin pääkoodilohko, joka koostaa projektin tiedot -sivun eri komponenteista.
     """
     col1, col2, col3 = st.columns([3, 0.5, 9])
 
     with col1:
-        
         # Donitsit
         st.markdown(f'#### {completion_status}')
         col1_1, col1_2 = col1.columns([1, 1])
         with col1_1:
-            st.write(milestones)
-            milestone_donut = cl.make_donut(st.session_state[proj_data].get_readiness_ml(), milestones, 'blue')
-            st.altair_chart(milestone_donut)
+            milestone_donut()
         with col1_2:
-            st.write(issues)
-            issue_donut = cl.make_donut(st.session_state[proj_data].get_readiness_issues(), issues, 'blue')
-            st.altair_chart(issue_donut)
+            issues_donut()
 
     with col1:
         # Mittarit
@@ -62,55 +270,37 @@ def project_page():
         col1_1, col1_2 = col1.columns([1, 1])
         with col1_1:
             # Milestonet
-            st.metric(milestones, st.session_state[proj_data].count_milestones())
+            milestone_metric()
             st.write("")
 
             # Avoimet merge requestit
-            st.metric(opened_merge_requests, st.session_state[proj_data].count_open_merge_requests())
+            merge_request_metric()
             st.write("")
 
             # Branchit
-            st.metric(branches, st.session_state[proj_data].count_branches())
+            branch_metric()
 
         with col1_2:
             # Issuet
-            st.metric(issues, len(st.session_state[proj_data].get_issues()))
+            issues_metric()
             st.write("")
 
             # Avoimet issuet
-            st.metric(open_issues, st.session_state[proj_data].count_open_issues())
+            open_issues_metric()
             st.write("")
 
             # Työtunnit
-            if cl.clockify_available() and 'clockify_data' in st.session_state:
-                user_hours_df = st.session_state['clockify_data']
-                if not user_hours_df.empty:
-                    total_project_time = user_hours_df[work_hours].sum()
-                    total_project_time = int(total_project_time)
-                    st.metric(work_hours, total_project_time)  
-                else:
-                    st.warning("Ei löytynyt työtunteja.")
+            work_hours_metric()
 
         # Expanderit
         st.write("")
         st.write("")
-        desc = st.session_state[proj_data].get_description()
-        if desc:
-            with st.expander(description):
-                st.write(desc)
-
-        with st.expander(info):
-            space = st.session_state[proj_data].get_namespace_name()
-            st.write(f'''
-                {creation_date}: {st.session_state[proj_data].get_creation_date()}\n
-                {update_date}: {st.session_state[proj_data].get_update_date()}\n
-                {namespace}: {space if space else "-"}\n
-                {visibility}: {st.session_state[proj_data].get_visibility()}\n
-            ''')
+        project_description_expander()
+        project_info_expander()
 
     with col3:
         # Projektiryhmä
-        members = cl.make_team_member_selector(st.session_state[proj_data].get_assignees())
+        members = project_members()
 
         # Välilehdet milestonekaavioihin
         tabs = [closed_issues, commits]
@@ -126,59 +316,15 @@ def project_page():
 
         # Suljetut issuet ja commitit milestoneittain
         with tab_b1:
-            if len(members):
-                data, x_field, y_field, color_field = st.session_state[proj_data].get_closed_issues_by_milestone(members)
-                st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+            closed_issues_by_milestone(members)
         with tab_b2:
-            if len(members):
-                data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
-                st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+            commits_by_milestone(members)
         if tab_b3:
             with tab_b3:
-                if 'sprint_hours_df_grouped' in st.session_state:
-                    sprint_hours_df_grouped = st.session_state['sprint_hours_df_grouped']
-                    if not sprint_hours_df_grouped.empty:
-                        try:
-                            filtered_df = sprint_hours_df_grouped[sprint_hours_df_grouped['user'].isin(members)]
-                            if not filtered_df.empty:
-                                pivot_df = filtered_df.pivot(index='milestone', columns='user', values='total_hours').fillna(0)
-                                st.bar_chart(pivot_df, use_container_width=True, horizontal=True)
-                            else:
-                                st.warning("Ei löytynyt työtunteja valituille jäsenille.")
-                        except KeyError as e:
-                            st.error(f"Data puuttuu odotetuista sarakkeista: {e}")
-                    else:
-                        st.warning("Ei löytynyt työtunteja sprinteiltä.")
-                else:
-                    st.warning("Sprinttien työtunnit eivät ole saatavilla. Varmista, että tiedot on haettu onnistuneesti start.py-sivulla.")
+                work_hours_data(members)
 
         # Aikajakson valinta
-        start_date = None
-        end_date = None
-        milestone_df = st.session_state[proj_data].get_milestone_data_for_slider(start_txt, end_txt)
-
-        if len(milestone_df):
-            # Koodataan milestonejen nimiin alku ja loppu -tekstit
-            slider_options = milestone_df.iloc[:,0].tolist()
-            slider_options = [s + ' ' + start_txt for s in slider_options] + [slider_options[-1] + ' ' + end_txt]
-            start, end = st.select_slider(time_period, options=slider_options, value = (slider_options[0], slider_options[-1]), help=slider_help)
-
-            if start and end and start != end:
-
-                # Selvitetään koodatuista ajankohtien nimistä päivämäärät
-                start_milestone, separator, start_col = start.rpartition(' ')
-                end_milestone, separator, end_col = end.rpartition(' ')
-
-                start_date = milestone_df[milestone_df.iloc[:, 0] == start_milestone].iloc[0, milestone_df.columns.get_loc(start_col)]
-
-                if end_col == end_txt:
-                    end_date = milestone_df[milestone_df.iloc[:, 0] == end_milestone].iloc[0, milestone_df.columns.get_loc(end_col)]
-                else:
-                    row_index = max(0,  milestone_df[milestone_df.iloc[:, 0] == end_milestone].index[0] - 1)
-                    end_date = milestone_df.iloc[row_index, milestone_df.columns.get_loc(end_txt)]
-
-                start_date = start_date.date()
-                end_date = end_date.date()
+        start_date, end_date = milestone_selector()
 
         # Välilehdet aikasarjakaavioihin
         tab_objects_l = st.tabs(tabs)
@@ -188,15 +334,9 @@ def project_page():
 
         # Aikasarjat suljetuista issueista ja commiteista
         with tab_l1:
-            if len(members):
-                st.write("")
-                data1, x_label1, y_label1 = st.session_state[proj_data].get_closed_issues_by_date(members, start_date, end_date)
-                st.bar_chart(data1, x_label=x_label1, y_label=y_label1)
+            closed_issues_by_date(members, start_date, end_date)
         with tab_l2:
-            if len(members):
-                st.write("")
-                data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, start_date, end_date)
-                st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
+            commits_by_date(members, start_date, end_date)
 
         # Aikasarjat Clockify työtunneille
         if cl.clockify_available():
