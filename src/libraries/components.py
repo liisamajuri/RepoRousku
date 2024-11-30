@@ -1,5 +1,5 @@
 """
-RepoRouskun komponenttikirjasto, joka sisältää sovelluksen sivuilla yhteisesti käytettävät komponentit ja toiminnallisuudet.
+RepoRouskun komponenttikirjasto, joka sisältää sovelluksen eri sivuilla yhteisesti käytettävät komponentit ja toiminnallisuudet.
 """
 
 import streamlit as st
@@ -25,7 +25,10 @@ red_color = "#FF4B4B"
 
 def get_background_color():
     """
-    Palauttaa aktiivisen taustavärin
+    Palauttaa aktiivisen taustavärin.
+
+    Returns:
+        (str): Taustaväri.
     """
     theme = st_theme()
     return theme['backgroundColor'].lower() if theme else None
@@ -33,8 +36,11 @@ def get_background_color():
 
 def get_title_color():
     """
-    Otsikon väri valitun väriteeman mukaan
-    Ei kannata käyttää, koska hakemisessa on viivettä
+    Palauttaa otsikon värin valitun väriteeman mukaan.
+    Ei kannata käyttää, koska hakemisessa on viivettä.
+
+    Returns:
+        (str): Otsikon väri taustavärin mukaan.
     """
     bc = get_background_color()
     if bc and bc.lower() == dark_background:
@@ -44,7 +50,10 @@ def get_title_color():
 
 def make_page_title(title, avatar_url=None):
     """
-    Sivun otsikko alleviivauksella ja mahdollisella avattarella
+    Sivun otsikko alleviivauksella ja mahdollisella avattarella.
+
+    Args:
+        avatar_url (str, optional): Projektin avattaren url.
     """
     # Otsikko avattarella, jos kuva määritelty ja oikeudet riittävät sen saamiseen
     if avatar_url and requests.get(avatar_url).status_code == 200:
@@ -71,7 +80,7 @@ def make_page_title(title, avatar_url=None):
 
 def make_start_page_button():
     """
-    Kehoite ja painike projektin valintaan
+    Kehoite ja painike projektin valintaan.
     """
     st.info(info_specify_proj, icon="ℹ️")
     if st.button(specify_proj):
@@ -80,8 +89,13 @@ def make_start_page_button():
 
 def make_donut(input_response, input_text, input_color):
     """
-    Donitsikaavio
+    Donitsikaavio annettujen parametrien mukaisesti.
     Koodin lähde: https://github.com/dataprofessor/population-dashboard/blob/master/streamlit_app.py
+
+    Args:
+        input_response (int): Arvo.
+        input_text (str): Teksti.
+        input_color (str): Väriteema.
     """
     if input_color == 'blue':
         chart_color = [light_primary_color, dark_primary_color] # RepoRousku
@@ -127,7 +141,10 @@ def make_donut(input_response, input_text, input_color):
 
 def make_team_member_selector(member_list):
     """
-    Projektiryhmän jäsenten listaus ja valinta tarkasteluun
+    Projektiryhmän jäsenten listaus ja valinta tarkasteluun.
+
+    Args:
+        member_list (list): Lista jäsenten nimistä.
     """
     st.markdown(
         '''
@@ -150,7 +167,10 @@ def make_team_member_selector(member_list):
 
 def validate_url(url):
     """
-    Tarkastaa, onko annettu url validi
+    Tarkastaa, onko annettu url validi.
+
+    Args:
+        url (str): Tarkastettava url.
     """
     if not url.startswith("https://") or url == "https://":
         return False
@@ -168,7 +188,10 @@ def validate_url(url):
 
 def clockify_available():
     """
-    Palauttaa True, jos Clockifyn tiedot ja työtunnit saatavilla
+    Palauttaa True, jos Clockifyn tiedot ja työtunnit saatavilla.
+
+    Returns:
+        (bool): True, jos Clockifyn data käytettävissä.
     """
     return (st.session_state.get("clockify_workspace") is not None and 
             st.session_state.get("clockify_project") is not None and 
@@ -179,6 +202,13 @@ def format_time_columns(df, column_list):
     """
     Muuttaa parametrina annettujen aikaleimasarakkeiden formaatin
     ja poistaa aikavyöhykkeen.
+
+    Args:
+        df (DataFrame): Dataframe, jossa formatoitavat sarakkeet.
+        column_list (list): Lista sarakenimistä.
+
+    Returns:
+        (DataFrame): DataFrame, jossa määritellyt sarakkeet formatoitu.
     """
     for column in column_list:
         # Muutetaan aikaleima datetime-objektiksi ja poistetaan aikavyöhyke

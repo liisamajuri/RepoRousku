@@ -5,11 +5,20 @@ Tässä dokumentaatiossa kuvataan RepoRouskun Python-koodin eri moduulien toimin
 
 ---
 
-## Käyttäjät -sivu
 
-Dokumentaatio `members.py` -moduulista, joka sisältää funktiot projektiryhmän jäsenten tietojen käsittelyyn.
+## Aloitussivu
 
-::: src.app_pages.members
+Dokumentaatio `start.py` -moduulista, joka käsittelee projektin aloitussivun ja tokenien syötön.
+
+::: src.app_pages.start
+
+---
+
+## Main -sovellus
+
+Dokumentaatio `app.py` -moduulista, joka sisältää sovelluksen päätoiminnot ja navigaation.
+
+::: src.app
 
 ---
 
@@ -21,11 +30,27 @@ Dokumentaatio `project.py` -moduulista, joka näyttää projektin keskeiset tied
 
 ---
 
-## Aloitussivu
+## Käyttäjät -sivu
 
-Dokumentaatio `start.py` -moduulista, joka käsittelee projektin aloitussivun ja tokenien syötön.
+Dokumentaatio `members.py` -moduulista, joka sisältää funktiot projektiryhmän jäsenten tietojen käsittelyyn.
 
-::: src.app_pages.start
+::: src.app_pages.members
+
+---
+
+## GitLab-integraatio
+
+Dokumentaatio `gitlab_api.py` -moduulista, joka sisältää luokan GitLabin tietojen hakuun ja käsittelyyn.
+
+::: src.gitlab_api
+
+---
+
+## Clockify-integraatio
+
+Dokumentaatio `clockify_api.py` -moduulista, joka sisältää luokan Clockifyn tietojen hakuun ja käsittelyyn.
+
+::: src.clockify_api
 
 ---
 
@@ -37,32 +62,42 @@ Dokumentaatio `components.py` -moduulista, joka sisältää useita erilaisia kom
 
 ---
 
-## Main -sovellus
+## Tokenit
 
-Dokumentaatio `app.py` -moduulista, joka sisältää sovelluksen päätoiminnot ja navigaation.
+Dokumentaatio `env_tokens.py` -moduulista, joka sisältää tokenien käsittelyyn liittyvät funktiot.
 
-::: src.app
+::: src.libraries.env_tokens
 
-## Clockify-integraatio
+---
 
-::: src.clockify_api
 
-## GitLab-integraatio
+## Salaus
 
-::: src.gitlab_api
+Dokumentaatio `encryption.py` -moduulista, joka sisältää tokenien salaukseen liittyvät funktiot.
+
+::: src.libraries.encryption
 
 ---
 
 ## API-testaus
 
-Dokumentaatio `api_tests.py` modulista.
+Dokumentaatio `api_tests.py` moduulista.
 
 ::: tests.api_tests
 
+---
+
 ## Yksikkötestaus
 
-Dokumentaatio `unit_tests.py` modulista.
+Dokumentaatio `unit_tests.py` moduulista.
 
 ::: tests.unit_tests
 
+---
+
+## Integraatiotestaus
+
+Dokumentaatio `integration_tests.py` moduulista.
+
+::: tests.unit_tests
 

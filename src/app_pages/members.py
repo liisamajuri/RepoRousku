@@ -32,7 +32,11 @@ white_color = "#ffffff"
 
 def member_page():
     """
-    Sivu projektiryhmän jäsenten statistiikan tarkasteluun
+    Sivu projektiryhmän jäsenten statistiikan tarkasteluun.
+
+    Tietoja on mahdollista suodattaa valitsemalla tarkasteltavat milestonet sekä projektiryhmän
+    yksi jäsen / kaikki jäsenet. Dashboardilla esitetään listaukset issueista, keskeisimmät
+    työskentelyn metriikat ja myös työtunnit, mikäli Clockify-integraatio on käytössä.
     """
     # Tarkista, että proj_data on määritelty sessiossa ennen projektin nimen näyttämistä
     project_title = st.session_state[proj_data].get_name() if proj_data in st.session_state else "Projekti"
@@ -194,7 +198,7 @@ def member_page():
                 else:
                     st.write("Ei tagitietoja saatavilla.")
         else:
-            # näytää logo, jos Clockify-data ei ole saatavilla
+            # näytä logo, jos Clockify-data ei ole saatavilla
             bc = cl.get_background_color()
             if bc and bc == white_color:
                 image_path = Path(__file__).parent.parent / 'images' / 'mushroom_light.png'

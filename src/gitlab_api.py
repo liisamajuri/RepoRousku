@@ -63,7 +63,7 @@ project_data = [key_milestones, key_issues, key_commits, key_branches, key_label
 
 class ProjectData:
     """
-    Luokka GitLab-projektin tietojen hakemiseen ja käsittelyyn
+    Luokka GitLab-projektin tietojen hakemiseen ja käsittelyyn.
     """
     def __init__(self, gitlab_url, gitlab_token):
         """
@@ -85,26 +85,62 @@ class ProjectData:
     ### Projektin metatietojen getterit
 
     def get_meta_data(self, data_type):
+        """
+        Palauttaa parametrina määritellyn arvon projektin metadatasta.
+
+        Args:
+            data_type (str): Pyydetyn tietokentän nimi.
+        """
         return self.project_meta_data[data_type] if self.project_meta_data else None
 
 
     def get_name(self):
+        """
+        Palauttaa projektin nimen.
+
+        Returns:
+            (str): Projektin nimi.
+        """
         return self.get_meta_data(key_name)
 
 
     def get_id(self):
+        """
+        Palauttaa projektin id:n.
+
+        Returns:
+            (str): Projektin id
+        """
         return self.get_meta_data(key_id)
 
 
     def get_description(self):
+        """
+        Palauttaa projektin kuvauksen.
+
+        Returns:
+            (str): Projektin kuvaus.
+        """
         return self.get_meta_data(key_desc)
 
 
     def get_visibility(self):
+        """
+        Palauttaa projektin näkyvyyden.
+
+        Returns:
+            (str): Projektin näkyvyys.
+        """
         return self.get_meta_data(key_visibility)
 
 
     def get_avatar(self):
+        """
+        Palauttaa projektin avattaren urlin.
+
+        Returns:
+            (str): Projektin avattaren url.
+        """
         url = self.get_meta_data(key_avatar)
         return url if url else None
 
@@ -112,30 +148,51 @@ class ProjectData:
     ### Projektin tietojen getterit
 
     def get_data(self, data_type):
+        """
+        Palauttaa parametrina määritellyn arvon projektin datasta.
+
+        Args:
+            data_type (str): Pyydetyn tietokentän nimi.
+        """
         return self.project_data[data_type] if self.project_data else None
 
 
     def get_project_url(self):
+        """
+        Palauttaa projektin urlin.
+
+        Returns:
+            (str): Projektin url.
+        """
         return self.project_url
 
 
     def get_creation_date(self):
         """
-        Palauttaa projektin luontipäivämäärän formaatissa pp.kk.vvvv
+        Palauttaa projektin luontipäivämäärän formaatissa pp.kk.vvvv.
+
+        Returns:
+            (date): Projektin luontipäivämäärä.
         """
         return self.format_date(self.get_meta_data(key_created_at))
 
 
     def get_update_date(self):
         """
-        Palauttaa projektin viimeisimmän päivityspäivämäärän formaatissa pp.kk.vvvv
+        Palauttaa projektin viimeisimmän päivityspäivämäärän formaatissa pp.kk.vvvv.
+
+        Returns:
+            (date): Projektin luontipäivämäärä.
         """
         return self.format_date(self.get_meta_data(key_updated))
 
 
     def get_namespace_name(self):
         """
-        Palauttaa projektin nimiavaruuden nimen
+        Palauttaa projektin nimiavaruuden nimen.
+
+        Returns:
+            (str): Projektin nimiavaruuden nimi.
         """
         namespace = self.get_meta_data(key_namespace)
         if namespace:
@@ -145,7 +202,10 @@ class ProjectData:
 
     def get_milestones(self):
         """
-        Palauttaa milestonetiedot dataframena
+        Palauttaa milestonetiedot dataframena.
+
+        Returns:
+            (DataFrame): Projektin milestonet.
         """
         milestones = self.get_data(key_milestones)
         if milestones:
@@ -186,7 +246,10 @@ class ProjectData:
 
     def get_issues(self):
         """
-        Palauttaa issuetiedot dataframena
+        Palauttaa issuetiedot dataframena.
+
+        Returns:
+            (DataFrame): Projektin kaikki issuet.
         """
         issues = self.get_data(key_issues)
         if issues:
@@ -211,8 +274,14 @@ class ProjectData:
 
     def get_commits(self, members=None):
         """
-        Palauttaa committien tiedot dataframena
-        Suodatetaan jäsenten mukaan, jos jäsenet määritelty parametrissa
+        Palauttaa committien tiedot dataframena.
+        Suodatetaan jäsenten mukaan, jos jäsenet määritelty parametrissa.
+
+        Args:
+            members (list, optional): Lista jäsenten nimistä, joiden mukaan tiedot suodatetaan.
+
+        Returns:
+            (DataFrame): Jäsenten commitit.
         """
         commits = self.get_data(key_commits)
         if commits:
@@ -235,7 +304,10 @@ class ProjectData:
 
     def get_branches(self):
         """
-        Palauttaa branchien tiedot dataframena
+        Palauttaa branchien tiedot dataframena.
+
+        Returns:
+            (DataFrame): Projektin branchit.
         """
         branches = self.get_data(key_branches)
         if branches:
@@ -246,7 +318,10 @@ class ProjectData:
 
     def count_branches(self):
         """
-        Palauttaa branchien lukumäärän
+        Palauttaa branchien lukumäärän.
+
+        Returns:
+            (int): Projektin branchien lukumäärä.
         """
         branches = self.get_branches()
         return len(branches)
@@ -254,7 +329,10 @@ class ProjectData:
 
     def get_labels(self):
         """
-        Palauttaa labelien tiedot dataframena
+        Palauttaa labelien tiedot dataframena.
+
+        Returns:
+            (DataFrame): Projektin labelit.
         """
         labels = self.get_data(key_labels)
         if labels:
@@ -265,7 +343,10 @@ class ProjectData:
 
     def get_merge_requests(self):
         """
-        Palauttaa merge requestien tiedot dataframena
+        Palauttaa merge requestien tiedot dataframena.
+
+        Returns:
+            (DataFrame): Projektin avoimet merge requestit.
         """
         merge_requests = self.get_data(key_merge_requests)
         if merge_requests:
@@ -276,7 +357,10 @@ class ProjectData:
 
     def count_open_merge_requests(self):
         """
-        Palauttaa avoimien merge requestien lukumäärän
+        Palauttaa avoimien merge requestien lukumäärän.
+
+        Returns:
+            (int): Projektin avoimien merge requestien lukumäärä.
         """
         df = self.get_merge_requests()
         if len(df):
@@ -287,7 +371,10 @@ class ProjectData:
 
     def get_pipelines(self):
         """
-        Palauttaa pipelinejen tiedot dataframena
+        Palauttaa pipelinejen tiedot dataframena.
+
+        Returns:
+            (DataFrame): Projektin pipelinet.
         """
         pipelines = self.get_data(key_pipelines)
         if pipelines:
@@ -298,7 +385,10 @@ class ProjectData:
 
     def count_expired_milestones(self):
         """
-        Palauttaa päättyneiden milestonejen lukumäärän
+        Palauttaa päättyneiden milestonejen lukumäärän.
+
+        Returns:
+            (int): Projektin päättyneiden milestonejen lukumäärä.
         """
         df = self.get_milestones()
         if len(df):
@@ -308,7 +398,10 @@ class ProjectData:
 
     def count_active_milestones(self):
         """
-        Palauttaa aktiivisten milestonejen lukumäärän
+        Palauttaa aktiivisten milestonejen lukumäärän.
+
+        Returns:
+            (int): Projektin aktiivisten milestonejen lukumäärä.
         """
         df = self.get_milestones()
         if len(df):
@@ -316,9 +409,12 @@ class ProjectData:
         return 0
 
 
-    def get_upcoming_milestones(self):
+    def count_upcoming_milestones(self):
         """
-        Palauttaa tulevien milestonejen lukumäärän
+        Palauttaa tulevien milestonejen lukumäärän.
+
+        Returns:
+            (int): Projektin tulevien milestonejen lukumäärä.
         """
         df = self.get_milestones()
         if len(df):
@@ -328,7 +424,10 @@ class ProjectData:
 
     def get_readiness_ml(self):
         """
-        Palauttaa projektin valmiusasteen milestonejen mukaan
+        Palauttaa projektin valmiusasteen milestonejen mukaan.
+
+        Returns:
+            (int): Projektin milestonetason valmiusaste kokonaislukuprosenttina.
         """
         expired = self.count_expired_milestones()
         all_milestones = self.count_milestones()
@@ -339,7 +438,10 @@ class ProjectData:
 
     def count_milestones(self):
         """
-        Palauttaa milestonejen kokonaislukumäärän
+        Palauttaa milestonejen kokonaislukumäärän.
+
+        Returns:
+            (int): Projektin milestonejen lukumäärä.
         """
         df = self.get_milestones()
         if len(df):
@@ -349,7 +451,10 @@ class ProjectData:
 
     def get_open_issues(self):
         """
-        Palauttaa avoimet issuet
+        Palauttaa avoimet issuet.
+
+        Returns:
+            (DataFrame): Projektin avoimet issuet.
         """
         df = self.get_issues()
         if not df.empty:
@@ -360,7 +465,10 @@ class ProjectData:
 
     def count_open_issues(self):
         """
-        Palauttaa avoimien issueiden lukumäärän
+        Palauttaa avoimien issueiden lukumäärän.
+
+        Returns:
+            (int): Projektin avoimien issueiden lukumäärä.
         """
         df = self.get_open_issues()
         return len(df)
@@ -368,7 +476,10 @@ class ProjectData:
 
     def get_closed_issues(self):
         """
-        Palauttaa suljetut issuet
+        Palauttaa suljetut issuet.
+
+        Returns:
+            (DataFrame): Projektin suljetut issuet.
         """
         df = self.get_issues()
         if not df.empty:
@@ -379,7 +490,10 @@ class ProjectData:
 
     def get_readiness_issues(self):
         """
-        Palauttaa projektin valmiusasteen milestonejen mukaan
+        Palauttaa projektin valmiusasteen issueiden mukaan.
+
+        Returns:
+            (int): Projektin issuetason valmiusaste kokonaislukuprosenttina.
         """
         all_issues = len(self.get_issues())
         closed = len(self.get_closed_issues())
@@ -390,7 +504,10 @@ class ProjectData:
 
     def get_assignees(self):
         """
-        Palauttaa listan uniikeista henkilönimistä, jotka on kerätty projektin issueista
+        Palauttaa listan uniikeista henkilönimistä, jotka on kerätty projektin issueista.
+
+        Returns:
+            (list): Lista henkilönimistä.
         """
         assignees_list = []
         issues = self.get_data(key_issues)
@@ -407,13 +524,13 @@ class ProjectData:
             df_unique_assignees = df_assignees.drop_duplicates().reset_index(drop=True)
             name_list = df_unique_assignees[key_name].tolist()
 
-            return  name_list
+            return name_list
         return []
 
 
     def reset(self):
         """
-        Resetoi olion tiedot 
+        Resetoi olion tiedot.
         """
         self.project_url = None
         self.api_url = None
@@ -423,7 +540,14 @@ class ProjectData:
 
     def fetch_data(self, url, params={}):
         """
-        Suorittaa hakupyynnön GitLabin REST APIin
+        Suorittaa hakupyynnön GitLabin REST APIin.
+
+        Args:
+            url (str): Projektin GitLab-url.
+            params (dict): GET-kutsun parametrilista.
+
+        Returns:
+            (json): Haetut tiedot tai None.
         """
         response = requests.get(url, headers=self.headers, params=params)
         if response.status_code == 200:
@@ -437,7 +561,14 @@ class ProjectData:
 
     def fetch_data_with_pagination(self, url, params={}):
         """
-        Suorittaa hakupyynnön GitLabin REST APIin
+        Suorittaa hakupyynnön GitLabin REST APIin.
+
+        Args:
+            url (str): Projektin GitLab-url.
+            params (dict): GET-kutsun parametrilista.
+
+        Returns:
+            (json): Haetut tiedot tai None.
         """
         all_items = []
         page = 1
@@ -460,7 +591,13 @@ class ProjectData:
 
     def generate_api_url(self, project_url):
         """
-        Muodostaa GitLab-projektin url-osoitteesta kyseisen GitLab-instanssin REST API -osoitteen
+        Muodostaa GitLab-projektin url-osoitteesta kyseisen GitLab-instanssin REST API -osoitteen.
+
+        Args:
+            project_url (str): Projektin GitLab-url.
+
+        Returns:
+            (str): GitLabin REST API -osoite.
         """
         # Erotetaan isäntänimi esim. "https://gitlab.com" tai "https://your-gitlab-instance.com"
         pattern = r'^(https://[^/]+)/(.*)$'
@@ -473,14 +610,23 @@ class ProjectData:
 
     def format_date(self, orig_date):
         """
-        Palauttaa päivämäärän muodossa pp.kk.vvvv
+        Palauttaa päivämäärän muodossa pp.kk.vvvv.
+
+        Args:
+            orig_date (datetime): Päivämäärä.
+
+        Returns:
+            (str): Päivämäärän muodossa pp.kk.vvvv.
         """
         return datetime.strptime(orig_date[:10], "%Y-%m-%d").strftime("%d.%m.%Y")
 
 
     def get_project_data(self):
         """
-        Hakee projektin tiedot oliolle
+        Hakee projektin tiedot oliolle.
+
+        Returns:
+            (json): Projektin tiedot.
         """
         all_data = {}
 
@@ -496,7 +642,10 @@ class ProjectData:
 
     def get_project_meta_data(self):
         """
-        Hakee projektin yleistiedot oliolle
+        Hakee projektin yleistiedot oliolle.
+
+        Returns:
+            (json): Projektin metatiedot.
         """
         if not self.project_url:
             return None    
@@ -515,7 +664,10 @@ class ProjectData:
 
     def init(self, url):
         """
-        Hakee projektin tiedot GitLabista ja asettaa ne oliolle
+        Hakee projektin tiedot GitLabista ja asettaa ne oliolle.
+
+        Args:
+            url (str): Projektin GitLab-url.
         """
         if cl.validate_url(url):
             api_url = self.generate_api_url(url)
@@ -533,7 +685,7 @@ class ProjectData:
 
     def save_data_to_file(self):
         """
-        Tallentaa projektin tiedot tiedostoon json-formaatissa
+        Tallentaa projektin tiedot tiedostoon json-formaatissa.
         """
         with open(self.output_file_name, 'w') as f:
             json.dump(self.project_data, f, indent=4)
@@ -543,7 +695,13 @@ class ProjectData:
 
     def get_date_limits_for_closed_issues(self, members):
         """
-        Palauttaa aikajakson, jolloin parametrin members jäsenien issueita on suljettu
+        Palauttaa aikajakson, jolloin parametrin members jäsenien issueita on suljettu.
+
+        Args:
+            members (list): Lista jäsenten nimistä, joiden mukaan issuet suodatetaan.
+
+        Returns:
+            (tuple): Aikajakson ensimmäinen ja viimeinen päivämäärä.
         """
         df = self.get_closed_issues()
 
@@ -564,7 +722,13 @@ class ProjectData:
 
     def get_date_limits_for_commits(self, members):
         """
-        Palauttaa aikajakson, jolloin parametrin members jäsenet ovat tehneet committeja
+        Palauttaa aikajakson, jolloin parametrin members jäsenet ovat tehneet committeja.
+
+        Args:
+            members (list): Lista jäsenten nimistä, joiden mukaan commitit suodatetaan.
+
+        Returns:
+            (tuple): Aikajakson ensimmäinen ja viimeinen päivämäärä.
         """
         df = self.get_commits(members)
 
@@ -579,7 +743,17 @@ class ProjectData:
 
     def get_closed_issues_by_date(self, members, min_date, max_date):
         """
-        Palauttaa dataframen suljetuista issueista päivämäärän mukaan
+        Palauttaa dataframen suljetuista issueista päivämäärän mukaan.
+
+        Args:
+            members (list): Lista jäsenten nimistä, joiden mukaan issuet suodatetaan.
+            min_date (date): Aikajakson ensimmäinen pivämäärä.
+            max_date (date): Aikajakson viimeinen pivämäärä.
+
+        Returns:
+            (DataFrame): Suljetut issuet jäsenten ja aikajakson mukaan suodatettuna.
+            (str): Päivämääräakselin nimi.
+            (str): Kappalemääräakselin nimi.
         """
         df = self.get_closed_issues()
 
@@ -623,7 +797,17 @@ class ProjectData:
 
     def get_commits_by_date(self, members, min_date, max_date):
         """
-        Palauttaa dataframen commiteista päivämäärän mukaan
+        Palauttaa dataframen commiteista päivämäärän mukaan.
+
+        Args:
+            members (list): Lista jäsenten nimistä, joiden mukaan issuet suodatetaan.
+            min_date (date): Aikajakson ensimmäinen pivämäärä.
+            max_date (date): Aikajakson viimeinen pivämäärä.
+
+        Returns:
+            (DataFrame): Commitit jäsenten ja aikajakson mukaan suodatettuna.
+            (str): Päivämääräakselin nimi.
+            (str): Kappalemääräakselin nimi.
         """
         df = self.get_commits(members)
 
@@ -664,7 +848,16 @@ class ProjectData:
 
     def get_closed_issues_by_milestone(self, members):
         """
-        Palauttaa dataframen suljetuista issueista milestonejen mukaan
+        Palauttaa dataframen suljetuista issueista milestonejen mukaan.
+
+        Args:
+            members (list): Lista jäsenten nimistä, joiden mukaan issuet suodatetaan.
+
+        Returns:
+            (DataFrame): Suljetut issuet jäsenten mukaan suodatettuna.
+            (str): Päivämääräsarakkeen nimi.
+            (str): Kappalemääräsarakkeen nimi.
+            (str): Jäsensarakkeen nimi.
         """
         df = self.get_closed_issues()
 
@@ -688,7 +881,16 @@ class ProjectData:
 
     def get_commits_by_milestone(self, members):
         """
-        Palauttaa dataframen commiteista milestonejen mukaan
+        Palauttaa dataframen commiteista milestonejen mukaan.
+
+        Args:
+            members (list): Lista jäsenten nimistä, joiden mukaan commitit suodatetaan.
+
+        Returns:
+            (DataFrame): Commitit jäsenten mukaan suodatettuna.
+            (str): Milestonesarakkeen nimi.
+            (str): Kappalemääräsarakkeen nimi.
+            (str): Jäsensarakkeen nimi.
         """
         df_commits = self.get_commits(members)
         df_milestones = self.get_milestones()
@@ -722,7 +924,14 @@ class ProjectData:
 
     def get_milestone_data_for_slider(self, start_date_column, end_date_column):
         """
-        Muodostaa milestonejen nimistä sekä aloitus- ja lopetuspäivämääristä dataframen
+        Muodostaa milestonejen nimistä sekä aloitus- ja lopetuspäivämääristä dataframen.
+
+        Args:
+            start_date_column (str): Alkupäivämäärälle asetettava sarakenimi.
+            end_date_column (str): Loppupäivämäärälle asetettava sarakenimi .
+
+        Returns:
+           (DataFrame): Milestonet alku- ja loppupäivämäärineen.
         """
         df = self.get_milestones()
 

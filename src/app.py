@@ -24,7 +24,7 @@ if proj_data not in st.session_state:
 
 def set_appearance():
     """
-    Määrittää sovelluksen ulkoasun
+    Määrittää sovelluksen ulkoasun.
     """
     st.set_page_config(
         page_title = app_title,
@@ -36,7 +36,7 @@ def set_appearance():
 
 def create_navigation_panel():
     """
-    Luo navigointivalikon sivustorakenteesta
+    Luo navigointivalikon sivustorakenteesta.
     """
     # Navigointivalikko
     app_pages = {
@@ -66,7 +66,7 @@ def create_navigation_panel():
 
 def main():
     """
-    Sovelluksen pääohjelma
+    Sovelluksen pääohjelma.
     """
     set_appearance()
     create_navigation_panel()

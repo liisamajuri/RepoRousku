@@ -1,7 +1,7 @@
 """
 RepoRouskun etusivu, jonka avulla käyttäjä määrittelee tarkasteltavan projektin ja tarvittavat pääsyoikeudet projektin dataan.
 Käyttäjän tulee antaa vähintään projektin GitLab-repositorion URL ja Access Token. Jos käyttäjä määrittää lisäksi 
-GitLab-projektiin liittyvän Clockify-projektin ja sen Access Tokenin, on sovelluksessa mahdollista tarkastella myös 
+GitLab-projektiin liittyvän Clockify-projektin  Access Tokenin, on sovelluksessa mahdollista tarkastella myös 
 projektin ajankäyttöä.
 """
 
@@ -42,7 +42,17 @@ white_color = "#ffffff"
 clockify_workspace = "clockify_workspace"
 clockify_project = "clockify_project"
 
+
 def setup_clockify(clockify_token):
+    """
+    Asettaa Clockify-muuttujiin arvot.
+
+    Args:
+        clockify_token (str): Clockifyn Access Token.
+
+    Returns:
+        (ClockiFy): Clockifyn tiedot sisältävä olio tai None.
+    """
     if clockify_token:
         os.environ["CLOCKIFY_TOKEN"] = clockify_token 
         clockify = ClockifyData("https://api.clockify.me/api/v1")
@@ -51,9 +61,16 @@ def setup_clockify(clockify_token):
         st.error("Clockify Token puuttuu!", icon="❗")
         return None
 
+
 def fetch_clockify_data(clockify):
     """
     Hakee Clockify-datan, projektin työtunnit ja tallentaa ne session_stateen.
+
+    Args:
+        clockify (ClockiFy): ClockiFy-olio.
+
+    Returns:
+        (DataFrame): Clockifyyn kirjatut työtunnit.
     """
     if clockify:
         try:
@@ -91,9 +108,15 @@ def fetch_clockify_data(clockify):
         st.error("Clockify Token puuttuu!", icon="❗")
         return None
 
+
 def fetch_sprint_hours(clockify, gitlab_url, gitlab_token):
     """
     Hakee ja tallentaa sprinteittäin kertyneet työtunnit session_stateen.
+
+    Args:
+        clockify (ClockiFy): ClockiFy-olio.
+        gitlab_url (str): Projektin GitLab url.
+        gitlab_token (str): Projektin GitLabin Access Token.
     """
     sprint_hours_df_grouped = clockify.get_sprint_hours(gitlab_url, gitlab_token)
     if not sprint_hours_df_grouped.empty:
@@ -102,9 +125,15 @@ def fetch_sprint_hours(clockify, gitlab_url, gitlab_token):
     else:
         st.warning("Sprinttien työtunteja ei löytynyt.")
 
+
 def fetch_sprint_and_tag_hours(clockify, gitlab_url, gitlab_token):
     """
     Hakee ja tallentaa sprinteittäin ja tageittain kertyneet työtunnit session_stateen.
+
+    Args:
+        clockify (ClockiFy): ClockiFy-olio.
+        gitlab_url (str): Projektin GitLab url.
+        gitlab_token (str): Projektin GitLabin Access Token
     """
     sprint_and_tag_hours_df = clockify.get_project_tag_and_sprint_hours(gitlab_url, gitlab_token)
     if not sprint_and_tag_hours_df.empty: 
@@ -117,7 +146,11 @@ def fetch_sprint_and_tag_hours(clockify, gitlab_url, gitlab_token):
 
 def get_project_data(gitlab_url, gitlab_token):
     """
-    Haetaan data annetusta projektista
+    Hakee datan GitLab-projektista.
+
+    Args:
+        gitlab_url (str): Projektin GitLab url.
+        gitlab_token (str): GitLab Access Token.
     """
     if gitlab_url.endswith('/'):
         gitlab_url = gitlab_url[:-1]
@@ -133,9 +166,8 @@ def get_project_data(gitlab_url, gitlab_token):
 
 def start_page():
     """
-    Sivu sisältää syöttökentät GitLabin ja Clockifyn -projektien ja niiden access tokenien määrittämiseen
+    Moduulin pääkoodilohko, joka muodostaa sivun projektin GitLab-osoitteen ja tarvittavien Access Tokenien määrittelyyn.
     """
-
     # Alustetaan session_state, jos proj_data puuttuu
     if proj_data not in st.session_state:
         st.session_state[proj_data] = None
