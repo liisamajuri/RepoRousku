@@ -5,6 +5,7 @@ Tässä tiedostossa määritellään API:n perustoiminnot ja reitit.
 """
 import sys
 import os
+import logging
 
 # Lisää src-kansio Pythonin hakupolkuun
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
@@ -16,11 +17,16 @@ from src.gitlab_api import ProjectData
 from src.clockify_api import ClockifyData
 from typing import Optional
 from dotenv import load_dotenv
-
+from fastapi.responses import JSONResponse
 
 
 # Lataa ympäristömuuttujat .env-tiedostosta
 load_dotenv()
+
+
+# Loggerin asetukset
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger("RepoRouskuAPI")
 
 app = FastAPI(
     title="RepoRousku API",
@@ -39,6 +45,8 @@ if not GITLAB_TOKEN:
 if not CLOCKIFY_TOKEN:
     raise RuntimeError("CLOCKIFY_TOKEN ympäristömuuttujaa ei löydy. Varmista, että .env-tiedosto on määritetty oikein.")
 
+logger.info("Ympäristömuuttujat ladattu onnistuneesti.")
+
 @app.get("/")
 async def root():
     """
@@ -47,6 +55,7 @@ async def root():
     Returns:
         dict: Tervetuloviesti API:n käyttäjille.
     """
+    logger.debug("Käyttäjä pyysi juuripolkua.")
     return {"message": "Tervetuloa RepoRousku API:in!"}
 
 
@@ -58,6 +67,7 @@ async def health_check():
     Returns:
         dict: API:n tilan ilmoittava viesti.
     """
+    logger.debug("Käyttäjä pyysi health-checkiä.")
     return {"status": "ok", "message": "Hyvä Liisa! API wörkkii oikein!"}
 
 
@@ -69,6 +79,7 @@ async def api_status():
     Returns:
         dict: Tila- ja versiotiedot.
     """
+    logger.debug("Käyttäjä pyysi API:n status-endpointtia.")
     return {
         "status": "running",
         "version": "1.0.0",
@@ -243,90 +254,101 @@ async def get_member_summary(project_url: str, member: str, token: str = Depends
         raise HTTPException(status_code=500, detail=f"Jäsenen tilastojen haku epäonnistui: {str(e)}")
     
     
+    
 ### CLOCKIFY-RAJAPINTA ###
 
 CLOCKIFY_URL = "https://api.clockify.me/api/v1"
 
-@app.get("/api/v1/clockify/project-timelogs")
-async def get_project_timelogs(
-    workspace_id: str = Query(..., description="Clockify-työtilan ID"),
-    project_id: str = Query(..., description="Clockify-projektin ID"),
-    group_by_member: bool = Query(False, description="Ryhmittele jäsenittäin (oletuksena ei)"),
-):
+
+@app.get("/api/v1/clockify/workspaces")
+async def get_workspaces():
     """
-    Hakee projektin aikakirjaukset.
-
-    Args:
-        workspace_id (str): Työtilan ID.
-        project_id (str): Projektin ID.
-        group_by_member (bool): Ryhmittely jäsenittäin (valinnainen).
-
-    Returns:
-        dict: Projektin aikakirjaukset.
+    Palauttaa kaikki saatavilla olevat työtilat.
     """
     try:
         clockify = ClockifyData(CLOCKIFY_URL)
-        clockify.workspace_id = workspace_id
-
-        if group_by_member:
-            user_hours_df = clockify.get_all_user_hours_df(project_id)
-            timelogs = user_hours_df.to_dict(orient="records") if not user_hours_df.empty else []
-        else:
-            total_hours = 0
-            user_hours_df = clockify.get_all_user_hours_df(project_id)
-            if not user_hours_df.empty:
-                total_hours = user_hours_df["Työtunnit"].sum()
-            timelogs = [{"total": total_hours}]
-
-        return {
-            "workspace_id": workspace_id,
-            "project_id": project_id,
-            "timelogs": timelogs
-        }
-
+        workspaces = clockify.get_workspaces()
+        return {"workspaces": workspaces}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Projektin aikakirjausten haku epäonnistui: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Työtilojen haku epäonnistui: {str(e)}")
 
 
-@app.get("/api/v1/clockify/member-timelogs")
-async def get_member_timelogs(
-    workspace_id: str = Query(..., description="Clockify-työtilan ID"),
-    project_id: str = Query(..., description="Clockify-projektin ID"),
-    user_id: str = Query(..., description="Clockify-käyttäjän ID"),
-):
+@app.get("/api/v1/clockify/workspaces/{workspace_id}/projects")
+async def get_projects(workspace_id: str):
     """
-    Hakee käyttäjän aikakirjaukset.
-
-    Args:
-        workspace_id (str): Työtilan ID.
-        project_id (str): Projektin ID.
-        user_id (str): Käyttäjän ID.
-
-    Returns:
-        dict: Käyttäjän aikakirjaukset.
+    Palauttaa kaikki projektit annetusta työtilasta.
     """
     try:
         clockify = ClockifyData(CLOCKIFY_URL)
         clockify.workspace_id = workspace_id
+        projects = clockify.get_projects()
+        if not projects:
+            return {"projects": [], "message": "Ei löytynyt projekteja annetusta työtilasta."}
+        return {"projects": projects}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Projektien haku epäonnistui: {str(e)}")
 
+
+@app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/users")
+async def get_users_and_hours(workspace_id: str, project_id: str):
+    """
+    Palauttaa kaikkien projektin käyttäjien tunnit annetusta työtilasta.
+    """
+    try:
+        clockify = ClockifyData(CLOCKIFY_URL)
+        clockify.workspace_id = workspace_id
+        clockify.project_id = project_id
+        user_hours_df = clockify.get_all_user_hours_df()
+        if user_hours_df.empty:
+            return {"users": [], "message": "Ei löytynyt tunnitietoja käyttäjille projektissa."}
+        return JSONResponse(user_hours_df.to_dict(orient="records"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Käyttäjätuntien haku epäonnistui: {str(e)}")
+
+
+@app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/users/{user_id}/time-entries")
+async def get_time_entries(workspace_id: str, project_id: str, user_id: str):
+    """
+    Palauttaa yksittäisen käyttäjän aikakirjaukset projektista.
+    """
+    try:
+        clockify = ClockifyData(CLOCKIFY_URL)
+        clockify.workspace_id = workspace_id
+        clockify.project_id = project_id
         time_entries_df = clockify.get_time_entries_df(user_id, project_id)
         if time_entries_df.empty:
-            return {
-                "workspace_id": workspace_id,
-                "project_id": project_id,
-                "user_id": user_id,
-                "timelogs": []
-            }
-
-        timelogs = time_entries_df.to_dict(orient="records")
-        total_hours = time_entries_df["duration_hours"].sum()
-
-        return {
-            "workspace_id": workspace_id,
-            "project_id": project_id,
-            "user_id": user_id,
-            "timelogs": [{"total": total_hours}] + timelogs
-        }
-
+            return {"time_entries": [], "message": "Ei löytynyt aikakirjauksia käyttäjälle projektissa."}
+        return JSONResponse(time_entries_df.to_dict(orient="records"))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Käyttäjän aikakirjausten haku epäonnistui: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Aikakirjausten haku epäonnistui: {str(e)}")
+    
+@app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/total-hours")
+async def get_project_total_hours(workspace_id: str, project_id: str):
+    """
+    Palauttaa projektin kokonaistunnit.
+    """
+    try:
+        clockify = ClockifyData(CLOCKIFY_URL)
+        clockify.workspace_id = workspace_id
+        clockify.project_id = project_id
+        user_hours_df = clockify.get_all_user_hours_df()
+        total_hours = user_hours_df["Työtunnit"].sum() if not user_hours_df.empty else 0
+        return {"project_id": project_id, "total_hours": total_hours}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Projektin kokonaistuntien haku epäonnistui: {str(e)}")
+    
+    
+@app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/users/{user_id}/total-hours")
+async def get_user_total_hours(workspace_id: str, project_id: str, user_id: str):
+    """
+    Palauttaa käyttäjän kokonaistunnit projektissa.
+    """
+    try:
+        clockify = ClockifyData(CLOCKIFY_URL)
+        clockify.workspace_id = workspace_id
+        clockify.project_id = project_id
+        time_entries_df = clockify.get_time_entries_df(user_id, project_id)
+        total_hours = time_entries_df["duration_hours"].sum() if not time_entries_df.empty else 0
+        return {"user_id": user_id, "project_id": project_id, "total_hours": total_hours}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Käyttäjän kokonaistuntien haku epäonnistui: {str(e)}")
