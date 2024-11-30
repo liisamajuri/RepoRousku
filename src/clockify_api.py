@@ -63,6 +63,9 @@ class ClockifyData:
         return hours * 3600 + minutes * 60 + seconds
 
     def get_workspaces(self):
+        """
+        Hakee Clockifyn workspacet
+        """
         response = requests.get(f"{self.clockify_url}/workspaces", headers=self.headers)
         if response.status_code == 200:
             workspaces = response.json()
@@ -73,6 +76,9 @@ class ClockifyData:
             return []
 
     def get_projects(self):
+        """
+        Hakee workspacen projektit
+        """
         if not self.workspace_id:
             print("Työtilan ID ei ole asetettu.")
             return []
@@ -85,6 +91,9 @@ class ClockifyData:
             return []
 
     def get_users_in_workspace(self):
+        """
+        Hakee workspacen käyttäjät
+        """
         if not self.workspace_id:
             print("Työtilan ID ei ole asetettu.")
             return []
