@@ -3,40 +3,30 @@
 # Määrittele ympäristömuuttujat käyttämällä @name tai {{variable_name}}-muotoa.
 @baseUrl = http://localhost:8088/api/v1
 @apiToken = {{CLOCKIFY_TOKEN}}
-@workspaceId = Palikkapalvelut
-@projectId = Project-4
-@userId = Liisa Majuri
+@workspaceId = 671fabab605d557fc5342652
+@projectId = 671fac534ce4600d320d577d
+@userId = 630d04501a9b7114ea4bb041
 
-### Hae työtilat
+### Hae kaikki työtilat
 GET {{baseUrl}}/clockify/workspaces
 Authorization: Bearer {{apiToken}}
-
-###
 
 ### Hae työtilan projektit
 GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/projects
 Authorization: Bearer {{apiToken}}
 
-###
-
-### Hae työtilan käyttäjät
-GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/users
+### Hae kaikkien käyttäjien työtunnit projektista
+GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/projects/{{projectId}}/users
 Authorization: Bearer {{apiToken}}
 
-###
-
-### Hae projektin aikakirjaukset ilman jäsenryhmittelyä
-GET {{baseUrl}}/clockify/project-timelogs?workspace_id={{workspaceId}}&project_id={{projectId}}&group_by_member=false
+### Hae yksittäisen käyttäjän aikakirjaukset projektista
+GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/projects/{{projectId}}/users/{{userId}}/time-entries
 Authorization: Bearer {{apiToken}}
 
-###
-
-### Hae projektin aikakirjaukset jäsenittäin
-GET {{baseUrl}}/clockify/project-timelogs?workspace_id={{workspaceId}}&project_id={{projectId}}&group_by_member=true
+### Hae projektin kokonaistunnit
+GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/projects/{{projectId}}/total-hours
 Authorization: Bearer {{apiToken}}
 
-###
-
-### Hae käyttäjän aikakirjaukset
-GET {{baseUrl}}/clockify/member-timelogs?workspace_id={{workspaceId}}&project_id={{projectId}}&user_id={{userId}}
+### Hae käyttäjän kokonaistunnit projektissa
+GET {{baseUrl}}/clockify/workspaces/{{workspaceId}}/projects/{{projectId}}/users/{{userId}}/total-hours
 Authorization: Bearer {{apiToken}}
