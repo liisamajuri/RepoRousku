@@ -1,23 +1,51 @@
 """
 Yksikkötestit (PalikkaPalvelut)
 
-Tämä moduuli sisältää yksikkötestejä ProjectData-luokalle, joka hakee projektin tietoja
-GitLabista. Testit kattavat keskeiset tiedot, kuten projektin metadata, milestonet, issuet 
-ja commitit. Testit on toteutettu pytestin avulla, ja käytettävä data on mock-datalla
+Tämä moduuli sisältää yksikkötestejä ProjectData- ja ClockifyData-luokille.
+Testit kattavat keskeiset toiminnot, kuten projektien, milestonejen, issueiden,
+committien, työtilojen ja aikakirjausten hakemisen.
+
+Testit on toteutettu pytestin avulla, ja käytettävä data on mock-datalla
 simuloitu.
 
-Testin lopussa on lisätesti, joka tarkistaa, että HTML-raportti on luotu ja tulostaa 
-linkin sen avaamiseksi selaimessa.
+Testin lopussa tarkistetaan, että HTML-raportti on luotu ja tulostetaan
+linkki sen avaamiseksi selaimessa.
 """
 
 import sys
 import os
 import pytest
+from unittest.mock import MagicMock, patch
 import pandas as pd
 from datetime import datetime
 from gitlab_api import ProjectData
+from clockify_api import ClockifyData
+
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+
+### LOGGERIN KONFIGUROINTI ###
+
+import logging
+
+# Luo loggeri
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Lisää konsoli-handleri
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+# Määritä formatteri
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+
+# Lisää handler loggeriin
+logger.addHandler(console_handler)
+
+
+
+### GITLAB-KOMPONENTTI ###
 
 # Testidata: projektin metatiedot ja datakomponentit
 test_meta_data = {
@@ -143,6 +171,7 @@ def test_get_milestones(project):
     assert milestones_df["status"].iloc[1] == "Aktiivinen"
     assert milestones_df["status"].iloc[2] == "Tuleva"
 
+
 def test_get_issues(project):
     """
     Testaa issue-tietojen hakua ja tarkistaa issueiden tilan sekä assignee-nimien oikeellisuuden.
@@ -189,6 +218,73 @@ def test_get_assignees(project):
     assert isinstance(assignees, list)
     assert len(assignees) == 2
     assert "User1" in assignees and "User2" in assignees
+
+
+### CLOCKIFY-KOMPONENTTI ###
+
+# Testidata
+test_workspaces_data = [
+    {"id": "workspace1", "name": "Test Workspace 1"},
+    {"id": "workspace2", "name": "Test Workspace 2"},
+]
+
+test_projects_data = [
+    {"id": "project1", "name": "Test Project 1"},
+    {"id": "project2", "name": "Test Project 2"},
+]
+
+test_user_hours_data = [
+    {"user": "User1", "hours": 15},
+    {"user": "User2", "hours": 20},
+]
+
+@pytest.fixture
+def mock_clockify():
+    """
+    Luo mockatun ClockifyData-olion, jonka metodit palauttavat
+    ennalta määriteltyä testidataa.
+    """
+    with patch("clockify_api.ClockifyData.__init__", return_value=None):  # Mockaa __init__
+        clockify = ClockifyData()
+        clockify.clockify_url = "https://mock.clockify.api/v1" 
+        clockify.headers = {"X-Api-Key": "mock_api_key"}
+        clockify.get_workspaces = MagicMock(return_value=test_workspaces_data)
+        clockify.get_projects = MagicMock(return_value=test_projects_data)
+        clockify.get_all_user_hours_df = MagicMock(return_value=pd.DataFrame(test_user_hours_data))
+        return clockify
+    
+
+def test_get_workspaces(mock_clockify):
+    """
+    Testaa työtilojen hakemista.
+    """
+    workspaces = mock_clockify.get_workspaces()
+    logger.debug(f"Haetut työtilat: {workspaces}")
+    assert len(workspaces) == 2
+    assert workspaces[0]["name"] == "Test Workspace 1"
+    assert workspaces[1]["name"] == "Test Workspace 2"
+
+def test_get_projects(mock_clockify):
+    """
+    Testaa projektien hakemista.
+    """
+    projects = mock_clockify.get_projects()
+    logger.debug(f"Haetut projektit: {projects}")
+    assert len(projects) == 2
+    assert projects[0]["name"] == "Test Project 1"
+
+def test_get_all_user_hours_df(mock_clockify):
+    """
+    Testaa käyttäjien tuntien hakemista DataFrame-muodossa.
+    """
+    user_hours_df = mock_clockify.get_all_user_hours_df()
+    logger.debug(f"Haetut käyttäjätunnit: {user_hours_df}")
+    assert len(user_hours_df) == 2
+    assert user_hours_df.loc[0, "user"] == "User1"
+    assert user_hours_df.loc[1, "hours"] == 20
+    
+    
+### TESTIRAPORTTI ###    
 
 def test_report_exists():
     """

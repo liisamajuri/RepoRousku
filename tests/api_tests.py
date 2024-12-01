@@ -14,6 +14,26 @@ tapaus testataan käyttöliittymän testauksen yhteydessä eikä osana API-teste
 import pytest
 import os
 from gitlab_api import ProjectData
+from clockify_api import ClockifyData
+import pandas as pd
+from unittest.mock import patch
+
+
+### MOCK-TOKENIT ###
+
+MOCK_CLOCKIFY_TOKEN = "mock_clockify_token"
+MOCK_GITLAB_TOKEN = "mock_gitlab_token"
+
+@pytest.fixture(autouse=True)
+def mock_env_tokens(monkeypatch):
+    """
+    Asettaa mock-tokenit ympäristömuuttujiin.
+    """
+    monkeypatch.setenv("CLOCKIFY_TOKEN", MOCK_CLOCKIFY_TOKEN)
+    monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
+
+
+### GITLAB-KOMPONENTTI ###
 
 valid_token = os.getenv("GITLAB_TOKEN")
 invalid_token = "12345-6789-012345678901234"
@@ -81,6 +101,66 @@ def test_private_project_no_access(private_project_no_access):
     meta_data = private_project_no_access.get_project_meta_data()
     assert meta_data is None, "Yksityisen projektin tietojen haku pitäisi epäonnistua ilman jäsenyyttä"
     
+
+    
+    
+### CLOCKIFY-KOMPONENTTI ###
+
+# Mockataan ClockifyData käytettäväksi testeissä
+valid_clockify_token = os.getenv("CLOCKIFY_TOKEN")
+invalid_clockify_token = "12345-6789-012345678901234"
+clockify_url = "https://api.clockify.me/api/v1"
+valid_workspace_id = "671fabab605d557fc5342652"
+valid_project_id = "671fac534ce4600d320d577d"
+
+
+### Pytest-fixturet ###
+@pytest.fixture
+def valid_clockify():
+    """Palauttaa ClockifyData-olion oikealla tokenilla."""
+    return ClockifyData(clockify_url=clockify_url, api_key=valid_clockify_token)
+
+
+@pytest.fixture
+def invalid_clockify():
+    """Palauttaa ClockifyData-olion väärällä tokenilla."""
+    return ClockifyData(clockify_url=clockify_url, api_key=invalid_clockify_token)
+
+
+### Testit ###
+def test_valid_get_workspaces(valid_clockify):
+    """Testaa työtilojen hakua oikealla tokenilla Clockifysta."""
+    with patch.object(valid_clockify, "get_workspaces", return_value=[{"name": "Test Workspace", "id": "workspace_123"}]):
+        workspaces = valid_clockify.get_workspaces()
+        assert isinstance(workspaces, list), "Palautuksen pitäisi olla lista"
+        assert len(workspaces) > 0, "Työtiloja pitäisi olla saatavilla"
+        assert workspaces[0]["name"] == "Test Workspace", "Työtilojen nimi ei vastannut odotettua"
+
+def test_valid_get_projects(valid_clockify):
+    """Testaa projektien hakua oikealla tokenilla Clockifysta."""
+    valid_clockify.workspace_id = "workspace_123"
+    with patch.object(valid_clockify, "get_projects", return_value=[{"name": "Test Project", "id": "project_456"}]):
+        projects = valid_clockify.get_projects()
+        assert isinstance(projects, list), "Palautuksen pitäisi olla lista"
+        assert len(projects) > 0, "Projektien pitäisi olla saatavilla valitusta työtilasta"
+        assert projects[0]["name"] == "Test Project", "Projektin nimi ei vastannut odotettua"
+
+
+def test_invalid_token_get_workspaces(invalid_clockify):
+    """Testaa työtilojen hakua virheellisellä tokenilla."""
+    workspaces = invalid_clockify.get_workspaces()
+    assert workspaces == [], "Virheellisen tokenin pitäisi palauttaa tyhjä lista"
+
+
+def test_get_projects_with_invalid_token(invalid_clockify):
+    """Testaa projektien hakua virheellisellä tokenilla."""
+    invalid_clockify.workspace_id = valid_workspace_id
+    projects = invalid_clockify.get_projects()
+    assert projects == [], "Virheellisen tokenin pitäisi palauttaa tyhjä lista projekteille"
+    
+    
+
+### TESTIRAPORTTI ### 
 
 def test_report_exists():
     """

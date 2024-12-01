@@ -1,4 +1,5 @@
 streamlit
+streamlit_theme
 requests
 pandas
 python-dotenv
