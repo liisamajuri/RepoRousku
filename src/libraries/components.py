@@ -50,24 +50,27 @@ def get_title_color():
     return light_primary_color
 
 
-def make_page_title(title, avatar_url=None):
+def make_page_title(page_title, project_name, avatar_url=None):
     """
     Sivun otsikko alleviivauksella ja mahdollisella avattarella.
 
     Args:
+        page_title (str): Sivun nimi.
+        project_name (str): Projektin nimi.
         avatar_url (str, optional): Projektin avattaren url.
     """
     # Otsikko avattarella, jos kuva määritelty ja oikeudet riittävät sen saamiseen
     if avatar_url and requests.get(avatar_url).status_code == 200:
         st.markdown(
             f'<div style="display: flex; align-items: center;">'
+            f'<h2 style="color: {light_primary_color}; margin-top: 0px; margin-bottom: 5px;">{page_title + ": "+  project_name}</h2>'
             f'<img src="{avatar_url}" width="50" style="margin-right: 10px;">'
-            f'<h2 style="color: {light_primary_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>'
             f'</div>',
             unsafe_allow_html=True
         )
     # Pelkkä otsikko
     else:
+        title = page_title + ": " + project_name
         st.markdown(
             f'<h2 style="color: {light_primary_color}; margin-top: 0px; margin-bottom: 5px;">{title}</h2>',
             unsafe_allow_html=True

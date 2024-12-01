@@ -42,7 +42,7 @@ def member_page():
     project_title = st.session_state[proj_data].get_name() if proj_data in st.session_state else "Projekti"
 
     # Näytä projektin nimi 
-    st.markdown(f"## {project_title}")
+    cl.make_page_title(member_title, project_title)
     
     # Valinnat
     col1, col2 = st.columns([1, 1])
@@ -208,8 +208,8 @@ def member_page():
             st.image(str(image_path), caption=clockify_not_available)
 
 # Sivun otsikko 
-cl.make_page_title(member_title)
 if not st.session_state[proj_data]:
+    cl.make_page_title(member_title)
     cl.make_start_page_button()
 else:
     member_page()

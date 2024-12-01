@@ -346,5 +346,5 @@ if not st.session_state[proj_data]:
     cl.make_start_page_button()
 else:
     avatar = st.session_state[proj_data].get_avatar()
-    cl.make_page_title(st.session_state[proj_data].get_name(), avatar)
+    cl.make_page_title(project_title, st.session_state[proj_data].get_name(), avatar)
     project_page()
