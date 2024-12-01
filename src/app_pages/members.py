@@ -8,10 +8,12 @@ import streamlit as st
 from pathlib import Path
 import libraries.components as cl
 import plotly.express as px
+import numpy as np
 
 
 # Kielikäännökset
 member_title = "Jäsenet"
+issues_title = "Issuet"
 closed_issues_title = "Suljetut issuet"
 open_issues_title = "Avoimet issuet"
 metrics_title = "Metriikat"
@@ -22,7 +24,7 @@ total = "Kokonaismäärä"
 titles = "Issueiden otsikot"
 clockify_not_available = "Clockify-integraatio ei ole käytössä."
 select_member = "Valitse jäsen projektitiimistä"
-select_milestone = "Valitse milestone"
+select_milestone = "Valitse milestonet"
 commits = "Commitit"
 all_members = "Kaikki"
 
@@ -45,8 +47,8 @@ def member_page():
     cl.make_page_title(member_title, project_title)
     
     # Valinnat
-    col1, col2 = st.columns([1, 1])
-    
+    col1, col_empty, col2 = st.columns([2, 0.1, 3])
+
     # Käyttäjävalinta
     with col1: 
         selected_member = st.selectbox(select_member, [all_members] + st.session_state[proj_data].get_assignees())
@@ -55,22 +57,21 @@ def member_page():
     with col2:
         milestones = st.session_state[proj_data].get_milestones()
         milestone_options = milestones['title'].tolist() if not milestones.empty else []
-        selected_milestones = st.multiselect(
+        selected_milestones = st.pills(
             select_milestone,
             options=milestone_options,
-            default=milestone_options
+            selection_mode = 'multi',
+            default = milestone_options
         )
-
-    col1, col2, col3 = st.columns([2, 1, 1.5])
 
     # Ensimmäinen kolumni: suljetut/avoimet issuet välilehtinä
     with col1:
+        st.markdown(f"### {issues_title}")
+
         tab1, tab2 = st.tabs([closed_issues_title, open_issues_title])
 
         with tab1:
-            st.markdown(f"### {closed_issues_title}")
             closed_issues = st.session_state[proj_data].get_closed_issues()
-           
 
             # Suodata valitun jäsenen mukaan
             if selected_member != all_members:
@@ -87,11 +88,11 @@ def member_page():
                     closed_issues[['title', 'milestone']].rename(
                         columns={'title': 'Otsikko', 'milestone': 'Milestone'}
                     ).reset_index(drop=True),
-                    height=400
+                    height=400,
+                    use_container_width=True
                 )
 
         with tab2:
-            st.markdown(f"### {open_issues_title}")
             open_issues = st.session_state[proj_data].get_open_issues()
 
             # Suodata valitun jäsenen mukaan
@@ -109,12 +110,17 @@ def member_page():
                     open_issues[['title', 'milestone']].rename(
                         columns={'title': 'Otsikko', 'milestone': 'Milestone'}
                     ).reset_index(drop=True),
-                    height=400
+                    height=400,
+                    use_container_width=True
                 )
 
     # Toinen kolumni: kommittien ja issueiden lukumäärät laatikossa
-    with col2:
+    col2_1, col2_2 = col2.columns([1, 3])
+    
+    with col2_1:
         st.markdown(f"### {metrics_title}")
+        st.write("")
+        st.write("")
 
         # Suodata valitun jäsenen mukaan ja valittujen milestonejen mukaan
         if selected_member != all_members:
@@ -131,6 +137,7 @@ def member_page():
 
         total_commits = commit_data["kpl"].sum() if not commit_data.empty else 0
         st.metric(commits, total_commits)
+        st.write("")
 
         # Suljetut issuet valitun jäsenen ja milestonejen mukaan
         closed_issues = st.session_state[proj_data].get_closed_issues()
@@ -141,6 +148,7 @@ def member_page():
 
         # Näytä suljettujen issueiden määrä
         st.metric(closed_issues_title, len(closed_issues))
+        st.write("")
 
         # Avoimet issuet valitun jäsenen ja milestonejen mukaan
         open_issues = st.session_state[proj_data].get_open_issues()
@@ -152,11 +160,15 @@ def member_page():
 
         # Näytä avointen issueiden määrä
         st.metric(open_issues_title, len(open_issues))
+        st.write("")
 
 
     # Kolmas kolumni: tuntitiedot ja piirakkadiagrammi
-    with col3:
-        if cl.clockify_available():
+    if cl.clockify_available():
+        total_hours = 0
+        with col2_2:
+            st.markdown(f"### {work_hours_title}")
+
             if 'sprint_hours_df_grouped' in st.session_state:
                 sprint_hours_df_grouped = st.session_state['sprint_hours_df_grouped']
                 if selected_member != all_members:
@@ -170,7 +182,6 @@ def member_page():
                     ]
                 if not filtered_df.empty:
                     total_hours = filtered_df['total_hours'].sum()
-                    st.metric(work_hours_title, f"{total_hours:.2f} h")
             if "sprint_and_tag_hours" in st.session_state:
                 sprint_tag_hours_df = st.session_state["sprint_and_tag_hours"]
                 if selected_member != all_members:
@@ -197,15 +208,18 @@ def member_page():
                     st.plotly_chart(fig)
                 else:
                     st.write("Ei tagitietoja saatavilla.")
+        with col2_1:
+            st.metric(work_hours_title, np.round(total_hours).astype(int))
+
+    else:
+        # näytä logo, jos Clockify-data ei ole saatavilla
+        bc = cl.get_background_color()
+        if bc and bc == white_color:
+            image_path = Path(__file__).parent.parent / 'images' / 'mushroom_light.png'
+
         else:
-            # näytä logo, jos Clockify-data ei ole saatavilla
-            bc = cl.get_background_color()
-            if bc and bc == white_color:
-                image_path = Path(__file__).parent.parent / 'images' / 'mushroom_light.png'
-            
-            else:
-                image_path = Path(__file__).parent.parent / 'images' / 'mushroom_dark.png'
-            st.image(str(image_path), caption=clockify_not_available)
+            image_path = Path(__file__).parent.parent / 'images' / 'mushroom_dark.png'
+        st.image(str(image_path), caption=clockify_not_available)
 
 # Sivun otsikko 
 if not st.session_state[proj_data]:
