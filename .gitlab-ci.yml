@@ -41,9 +41,6 @@ test:
   allow_failure: false  
   script:
     - coverage run -m pytest -v
-  variables:
-    CLOCKIFY_TOKEN: $CLOCKIFY_TOKEN
-    GITLAB_TOKEN: $GITLAB_TOKEN
   artifacts:
     paths:
       - .coverage
