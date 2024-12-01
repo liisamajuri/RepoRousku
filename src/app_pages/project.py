@@ -211,9 +211,6 @@ def milestone_selector():
                 row_index = max(0,  milestone_df[milestone_df.iloc[:, 0] == end_milestone].index[0] - 1)
                 end_date = milestone_df.iloc[row_index, milestone_df.columns.get_loc(end_txt)]
 
-            start_date = start_date.date()
-            end_date = end_date.date()
-
     return start_date, end_date
 
 

@@ -5,6 +5,8 @@ python-dotenv
 st-theme
 matplotlib
 plotly
+tzlocal
+datetime
 
 ruff
 pytest

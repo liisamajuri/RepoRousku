@@ -6,6 +6,8 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import requests
+from datetime import datetime
+from tzlocal import get_localzone
 
 from streamlit_theme import st_theme
 
@@ -198,10 +200,35 @@ def clockify_available():
             'clockify_data' in st.session_state and not st.session_state['clockify_data'].empty)
 
 
+def convert_timestamp_to_local_date(iso_date):
+    """
+    Muuttaa ISO 8601 aikaleiman paikallisen aikavyöhykkeen datetime.date formaattia olevaksi päivämääräksi
+
+    Args:
+        iso_date (timestamp): Aikaleima ISO 8601 formaatissa
+
+    Returns:
+        (datetime.date): Päivämäärä vvvv-kk-pp
+
+    """
+    if iso_date:
+        # Muunnetaan aikaleima UTC-ajaksi
+        utc_time = datetime.fromisoformat(iso_date.replace("Z", "+00:00"))
+
+        # Selvitetään paikallinen aikavyöhyke
+        local_timezone = get_localzone()
+
+        # Muunnetaan utc-aikaleima paikalliseen aikaan
+        local_time = utc_time.astimezone(local_timezone)
+
+        # Palauta pelkkä päivämäärä
+        return local_time.date()
+
+
 def format_time_columns(df, column_list):
     """
-    Muuttaa parametrina annettujen aikaleimasarakkeiden formaatin
-    ja poistaa aikavyöhykkeen.
+    Muuttaa parametrina annettujen aikaleimasarakkeiden ajan lokaaliksi ja 
+    formaatttiin ISO 8601 -> datetime.date.
 
     Args:
         df (DataFrame): Dataframe, jossa formatoitavat sarakkeet.
@@ -212,6 +239,6 @@ def format_time_columns(df, column_list):
     """
     for column in column_list:
         # Muutetaan aikaleima datetime-objektiksi ja poistetaan aikavyöhyke
-        df[column] = pd.to_datetime(df[column], utc=True).dt.tz_localize(None)
+        df[column] = df[column].apply(convert_timestamp_to_local_date)
 
     return df
