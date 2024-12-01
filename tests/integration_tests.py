@@ -6,11 +6,10 @@ Testit varmistavat, että käyttöliittymä voi hakea ja käsitellä dataa taust
 nämä tiedot esitetään sovelluksessa oikein.
 
 Integraatiotestit tarkastelevat mm. seuraavia skenaarioita:
-1. Ympäristömuuttujien (GITLAB_TOKEN ja CLOCKIFY_TOKEN) olemassaolo ja käyttö.
-2. GitLab-projektin tietojen haku ja käsittely.
-3. Clockify-datan haku ja siirtäminen käyttöliittymän tilaan (`session_state`).
-4. Datan käsittely kaavioita varten.
-5. Testiraportin luonti.
+1. GitLab-projektin tietojen haku ja käsittely.
+2. Clockify-datan haku ja siirtäminen käyttöliittymän tilaan (`session_state`).
+3. Datan käsittely kaavioita varten.
+4. Testiraportin luonti.
 
 """
 
@@ -26,26 +25,29 @@ from clockify_api import ClockifyData
 from app_pages.start import get_project_data, fetch_clockify_data
 from unittest.mock import patch
 
-### YMPÄRISTÖMUUTTUJAT ###
+### MOCK-TOKENIT ###
 
-def test_environment_variables():
+MOCK_CLOCKIFY_TOKEN = "mock_clockify_token"
+MOCK_GITLAB_TOKEN = "mock_gitlab_token"
+
+@pytest.fixture(autouse=True)
+def mock_env_tokens(monkeypatch):
     """
-    Testaa ympäristömuuttujien toimivuutta ja tulostaa niiden arvot.
+    Asettaa mock-tokenit ympäristömuuttujiin.
     """
-    clockify_token = os.getenv("CLOCKIFY_TOKEN")
-    gitlab_token = os.getenv("GITLAB_TOKEN")
-    print(f"CLOCKIFY_TOKEN: {clockify_token}")
-    print(f"GITLAB_TOKEN: {gitlab_token}")
-    
-    assert clockify_token is not None, "CLOCKIFY_TOKEN ympäristömuuttuja puuttuu!"
-    assert gitlab_token is not None, "GITLAB_TOKEN ympäristömuuttuja puuttuu!"
+    monkeypatch.setenv("CLOCKIFY_TOKEN", MOCK_CLOCKIFY_TOKEN)
+    monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
 
 
 
 ### GITLAB-KOMPONENTTI ###
 
 # Aseta testimuuttujat
-valid_gitlab_token = os.getenv("GITLAB_TOKEN")
+if os.getenv("GITLAB_TOKEN"):
+    valid_gitlab_token = os.getenv("GITLAB_TOKEN")
+else:
+    valid_gitlab_token = MOCK_GITLAB_TOKEN
+    
 test_project_url = "https://gitlab.dclabra.fi/palikkapalvelut/PalikkaTesti-Small-Public"
 
 @pytest.fixture
@@ -115,7 +117,11 @@ def test_data_handling_in_charts(valid_project):
 ### CLOCKIFY-KOMPONENTTI ###
 
 # Aseta testimuuttujat
-valid_clockify_token = os.getenv("CLOCKIFY_TOKEN")
+if os.getenv("CLOCKIFY_TOKEN"):
+    valid_clockify_token = os.getenv("CLOCKIFY_TOKEN")
+else:
+    valid_clockify_token = MOCK_CLOCKIFY_TOKEN
+
 clockify_url = "https://api.clockify.me/api/v1"
 valid_workspace_id = "671fabab605d557fc5342652"
 valid_project_id = "671fac534ce4600d320d577d"
