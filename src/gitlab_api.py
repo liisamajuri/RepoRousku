@@ -226,11 +226,11 @@ class ProjectData:
                     today = datetime.now().date()
 
                     def milestone_status(row):
-                        if row[key_state] == value_closed or row[key_due_date].date() < today:
+                        if row[key_state] == value_closed or row[key_due_date] < today:
                             return status_ended
-                        elif row[key_start_date].date() <= today <= row[key_due_date].date():
+                        elif row[key_start_date] <= today <= row[key_due_date]:
                             return status_active
-                        elif row[key_due_date].date() > today:
+                        elif row[key_due_date] > today:
                             return status_upcoming
                         else:
                             return "EOS"
@@ -713,8 +713,8 @@ class ProjectData:
 
         if len(df):
             # Päivämäärärajat liukusäädintä varten
-            min_date = df[key_closed_at].min().date()
-            max_date = df[key_closed_at].max().date()
+            min_date = df[key_closed_at].min()
+            max_date = df[key_closed_at].max()
             return min_date, max_date
         else:
             return 0,0
@@ -734,8 +734,8 @@ class ProjectData:
 
         if len(df):
             # Päivämäärärajat liukusäädintä varten
-            min_date = df[key_committed_date].min().date()
-            max_date = df[key_committed_date].max().date()
+            min_date = df[key_committed_date].min()
+            max_date = df[key_committed_date].max()
             return min_date, max_date
         else:
             return 0,0
@@ -765,17 +765,17 @@ class ProjectData:
 
         df[key_closed_at] = df[key_closed_at]
 
-        start_date = df[key_closed_at].min().date()
-        end_date = df[key_closed_at].max().date()
+        start_date = df[key_closed_at].min()
+        end_date = df[key_closed_at].max()
 
         # Suodatetaan ajanjakson mukaan, jos se on määritelty
         if min_date and max_date:
-            start_date = pd.to_datetime(min_date)
-            end_date = pd.to_datetime(max_date)
+            start_date = pd.to_datetime(min_date).date()
+            end_date = pd.to_datetime(max_date).date()
             df = df[(df[key_closed_at] >= start_date) & (df[key_closed_at] <= end_date)]
 
         # Ryhmitellään data päivämäärän ja jäsenen mukaan
-        df = df.groupby([df[key_closed_at].dt.date, key_assignees]).size().unstack(fill_value=0)
+        df = df.groupby([df[key_closed_at], key_assignees]).size().unstack(fill_value=0)
 
         if start_date and end_date and start_date != end_date:
             # Täydennetään dataframe, että kaikki päivämäärät ajanjaksolta ovat mukana
@@ -811,22 +811,20 @@ class ProjectData:
         """
         df = self.get_commits(members)
 
-        df[key_committed_date] = df[key_committed_date].dt.normalize()
-
         start_date = df[key_committed_date].min()
         end_date = df[key_committed_date].max()
 
         # Suodatetaan ajanjakson mukaan, jos se on määritelty
         if min_date and max_date:
-            start_date = pd.to_datetime(min_date)
-            end_date = pd.to_datetime(max_date)
+            start_date = pd.to_datetime(min_date).date()
+            end_date = pd.to_datetime(max_date).date()
             df = df[(df[key_committed_date] >= start_date) & (df[key_committed_date] <= end_date)]
 
         # Uudelleennimetään sarakkeita kaaviota varten
         df = df.rename(columns={key_author_name: key_member, key_committed_date: key_date})
 
         # Ryhmitellään data päivämäärän ja jäsenen mukaan
-        df = df.groupby([df[key_date].dt.date, key_member]).size().unstack(fill_value=0)
+        df = df.groupby([df[key_date], key_member]).size().unstack(fill_value=0)
 
         if start_date and end_date:
             # Täydennetään dataframe, että kaikki päivämäärät ajanjaksolta ovat mukana
@@ -898,7 +896,6 @@ class ProjectData:
         if len(df_commits) and len(df_milestones):
             # Liitetään milestone commit-päivämäärän perusteella
             def get_milestone_for_commit(commit_date):
-                commit_date = commit_date.normalize()
                 milestone = df_milestones[(df_milestones[key_start_date] <= commit_date) & (df_milestones[key_due_date] >= commit_date)]
                 return milestone[key_title].iloc[0] if not milestone.empty else None
 
