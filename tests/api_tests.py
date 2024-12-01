@@ -118,8 +118,6 @@ valid_project_id = "671fac534ce4600d320d577d"
 @pytest.fixture
 def valid_clockify():
     """Palauttaa ClockifyData-olion oikealla tokenilla."""
-    if not valid_clockify_token:
-        raise ValueError("CLOCKIFY_TOKEN ympäristömuuttujaa ei ole asetettu!")
     return ClockifyData(clockify_url=clockify_url, api_key=valid_clockify_token)
 
 
