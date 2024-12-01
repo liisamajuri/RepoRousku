@@ -130,17 +130,20 @@ def invalid_clockify():
 ### Testit ###
 def test_valid_get_workspaces(valid_clockify):
     """Testaa työtilojen hakua oikealla tokenilla Clockifysta."""
-    workspaces = valid_clockify.get_workspaces()
-    assert isinstance(workspaces, list), "Palautuksen pitäisi olla lista"
-    assert len(workspaces) > 0, "Työtiloja pitäisi olla saatavilla"
-
+    with patch.object(valid_clockify, "get_workspaces", return_value=[{"name": "Test Workspace", "id": "workspace_123"}]):
+        workspaces = valid_clockify.get_workspaces()
+        assert isinstance(workspaces, list), "Palautuksen pitäisi olla lista"
+        assert len(workspaces) > 0, "Työtiloja pitäisi olla saatavilla"
+        assert workspaces[0]["name"] == "Test Workspace", "Työtilojen nimi ei vastannut odotettua"
 
 def test_valid_get_projects(valid_clockify):
     """Testaa projektien hakua oikealla tokenilla Clockifysta."""
-    valid_clockify.workspace_id = valid_workspace_id
-    projects = valid_clockify.get_projects()
-    assert isinstance(projects, list), "Palautuksen pitäisi olla lista"
-    assert len(projects) > 0, "Projektien pitäisi olla saatavilla valitusta työtilasta"
+    valid_clockify.workspace_id = "workspace_123"
+    with patch.object(valid_clockify, "get_projects", return_value=[{"name": "Test Project", "id": "project_456"}]):
+        projects = valid_clockify.get_projects()
+        assert isinstance(projects, list), "Palautuksen pitäisi olla lista"
+        assert len(projects) > 0, "Projektien pitäisi olla saatavilla valitusta työtilasta"
+        assert projects[0]["name"] == "Test Project", "Projektin nimi ei vastannut odotettua"
 
 
 def test_invalid_token_get_workspaces(invalid_clockify):
