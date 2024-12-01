@@ -868,6 +868,14 @@ class ProjectData:
         # Lasketaan issueiden määrä kullekin milestone ja assignees -yhdistelmälle
         grouped_data = df_filtered.groupby([key_milestone, key_assignees]).size().reset_index(name=key_pcs)
 
+        # Lisätään puuttuvat milestone-assignee-yhdistelmät
+        df_milestones = self.get_milestones()
+        all_milestones = df_milestones[key_title].unique()
+        grouped_data = (
+            grouped_data.set_index([key_milestone, key_assignees])
+            .reindex(pd.MultiIndex.from_product([all_milestones, members], names=[key_milestone, key_assignees]), fill_value=0)
+            .reset_index())
+
         # Uudelleennimetään sarake
         grouped_data = grouped_data.rename(columns={key_assignees: key_member})
 
@@ -910,6 +918,14 @@ class ProjectData:
 
             # Varmistetaan, että data on oikeassa muodossa kaaviota varten
             grouped_data.columns = [key_milestone, key_member, key_pcs]
+
+            # Lisätään puuttuvat milestone-assignee-yhdistelmät
+            df_milestones = self.get_milestones()
+            all_milestones = df_milestones[key_title].unique()
+            grouped_data = (
+                grouped_data.set_index([key_milestone, key_member])
+                .reindex(pd.MultiIndex.from_product([all_milestones, members], names=[key_milestone, key_member]), fill_value=0)
+                .reset_index())
 
             # Lukumäärät kokonaisluvuksi
             grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
