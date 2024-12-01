@@ -23,14 +23,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       GITLAB_TOKEN: "${GITLAB_TOKEN}"
+      CLOCKIFY_TOKEN: "${CLOCKIFY_TOKEN}"
       PYTHONPATH: "/app/src"
     volumes:
       - ./tests:/app/tests
       - ./tests/reports:/app/tests/reports
+      - ./.env:/app/.env
     command: >
       sh -c "
+      echo 'Kontin ympäristömuuttujat:' &&
+      env &&
       ruff check src -v &&
       coverage run -m pytest -v --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
       coverage run -m pytest -v --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
