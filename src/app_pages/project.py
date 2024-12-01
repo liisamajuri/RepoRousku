@@ -29,6 +29,9 @@ open_issues = "Avoimet issuet"
 start_txt = "alku"
 end_txt = "loppu"
 slider_help = "Valitse tarkasteltavan ajanjakson alku ja loppu. Ajanjakso sisältää aina vain kokonaisia milestoneja."
+no_members = "Valitse vähintään yksi jäsen"
+no_issues = "Ei suljettuja issueita valituilla jäsenillä"
+no_commits = "Ei committeja valituilla jäsenillä"
 
 # Muuttujat
 proj_data = "proj_data"
@@ -143,7 +146,12 @@ def closed_issues_by_milestone(members):
     """
     if len(members):
         data, x_field, y_field, color_field = st.session_state[proj_data].get_closed_issues_by_milestone(members)
-        st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+        if data[y_field].sum():
+            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+        else:
+            st.warning(no_issues)
+    else:
+        st.warning(no_members)
 
 
 def commits_by_milestone(members):
@@ -155,7 +163,12 @@ def commits_by_milestone(members):
     """
     if len(members):
         data, x_field, y_field, color_field = st.session_state[proj_data].get_commits_by_milestone(members)
-        st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+        if data[y_field].sum():
+            st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
+        else:
+            st.warning(no_commits)
+    else:
+        st.warning(no_members)
 
 
 def work_hours_data(members):
@@ -225,8 +238,13 @@ def closed_issues_by_date(members, start_date, end_date):
     """
     if len(members):
         st.write("")
-        data1, x_label1, y_label1 = st.session_state[proj_data].get_closed_issues_by_date(members, start_date, end_date)
-        st.bar_chart(data1, x_label=x_label1, y_label=y_label1)
+        data, x_label, y_label = st.session_state[proj_data].get_closed_issues_by_date(members, start_date, end_date)
+        if not data.empty:
+            st.bar_chart(data, x_label=x_label, y_label=y_label)
+        else:
+            st.warning(no_issues)
+    else:
+        st.warning(no_members)
 
 
 def commits_by_date(members, start_date, end_date):
@@ -240,8 +258,13 @@ def commits_by_date(members, start_date, end_date):
     """
     if len(members):
         st.write("")
-        data2, x_label2, y_label2 = st.session_state[proj_data].get_commits_by_date(members, start_date, end_date)
-        st.bar_chart(data2, x_label=x_label2, y_label=y_label2)
+        data, x_label, y_label = st.session_state[proj_data].get_commits_by_date(members, start_date, end_date)
+        if not data.empty:
+            st.bar_chart(data, x_label=x_label, y_label=y_label)
+        else:
+            st.warning(no_commits)
+    else:
+        st.warning(no_members)
 
 
 def project_page():
