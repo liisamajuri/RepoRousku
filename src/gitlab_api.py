@@ -504,28 +504,23 @@ class ProjectData:
 
     def get_assignees(self):
         """
-        Palauttaa listan uniikeista henkilönimistä, jotka on kerätty projektin issueista.
+        Palauttaa listan uniikeista henkilönimistä, jotka on kerätty projektin issueista ja commiteista.
 
         Returns:
-            (list): Lista henkilönimistä.
+            (list): Lista uniikeista henkilönimistä.
         """
-        assignees_list = []
-        issues = self.get_data(key_issues)
+        issue_members = []
+        commit_members = []
+        issues = self.get_issues()
+        commits = self.get_commits()
 
-        if issues:
-            for issue in issues:
-                for assignee in issue[key_assignees]:
-                    assignees_list.append({
-                        key_id: assignee[key_id],
-                        key_name: assignee[key_name]
-                    })
+        if not issues.empty:
+            issue_members = issues.explode(key_assignees)[key_assignees].unique().tolist()
 
-            df_assignees = pd.DataFrame(assignees_list)
-            df_unique_assignees = df_assignees.drop_duplicates().reset_index(drop=True)
-            name_list = df_unique_assignees[key_name].tolist()
+        if not commits.empty:
+            commit_members = commits[key_author_name].unique().tolist()
 
-            return name_list
-        return []
+        return sorted(set(issue_members + commit_members))
 
 
     def reset(self):
@@ -941,7 +936,7 @@ class ProjectData:
 
         Args:
             start_date_column (str): Alkupäivämäärälle asetettava sarakenimi.
-            end_date_column (str): Loppupäivämäärälle asetettava sarakenimi .
+            end_date_column (str): Loppupäivämäärälle asetettava sarakenimi.
 
         Returns:
            (DataFrame): Milestonet alku- ja loppupäivämäärineen.

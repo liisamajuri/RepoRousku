@@ -216,8 +216,8 @@ def test_get_assignees(project):
     print("Testataan assignee-hakua ja duplikaattien poistoa")
     assignees = project.get_assignees()
     assert isinstance(assignees, list)
-    assert len(assignees) == 2
-    assert "User1" in assignees and "User2" in assignees
+    assert len(assignees) == 4
+    assert "User1" in assignees and "User2" in assignees and "Dev1" in assignees and "Dev2" in assignees
 
 
 ### CLOCKIFY-KOMPONENTTI ###
