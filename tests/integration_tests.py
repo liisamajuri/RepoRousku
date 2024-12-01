@@ -36,17 +36,14 @@ def mock_env_tokens(monkeypatch):
     Asettaa mock-tokenit ympäristömuuttujiin.
     """
     monkeypatch.setenv("CLOCKIFY_TOKEN", MOCK_CLOCKIFY_TOKEN)
-    monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
+    #monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
 
 
 
 ### GITLAB-KOMPONENTTI ###
 
 # Aseta testimuuttujat
-if os.getenv("GITLAB_TOKEN"):
-    valid_gitlab_token = os.getenv("GITLAB_TOKEN")
-else:
-    valid_gitlab_token = MOCK_GITLAB_TOKEN
+valid_gitlab_token = os.getenv("GITLAB_TOKEN")
     
 test_project_url = "https://gitlab.dclabra.fi/palikkapalvelut/PalikkaTesti-Small-Public"
 
@@ -117,10 +114,8 @@ def test_data_handling_in_charts(valid_project):
 ### CLOCKIFY-KOMPONENTTI ###
 
 # Aseta testimuuttujat
-if os.getenv("CLOCKIFY_TOKEN"):
-    valid_clockify_token = os.getenv("CLOCKIFY_TOKEN")
-else:
-    valid_clockify_token = MOCK_CLOCKIFY_TOKEN
+
+valid_clockify_token = MOCK_CLOCKIFY_TOKEN
 
 clockify_url = "https://api.clockify.me/api/v1"
 valid_workspace_id = "671fabab605d557fc5342652"

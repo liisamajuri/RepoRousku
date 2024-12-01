@@ -15,8 +15,22 @@ import pytest
 import os
 from gitlab_api import ProjectData
 from clockify_api import ClockifyData
-from unittest.mock import MagicMock, patch
 import pandas as pd
+from unittest.mock import patch
+
+
+### MOCK-TOKENIT ###
+
+MOCK_CLOCKIFY_TOKEN = "mock_clockify_token"
+MOCK_GITLAB_TOKEN = "mock_gitlab_token"
+
+@pytest.fixture(autouse=True)
+def mock_env_tokens(monkeypatch):
+    """
+    Asettaa mock-tokenit ympäristömuuttujiin.
+    """
+    monkeypatch.setenv("CLOCKIFY_TOKEN", MOCK_CLOCKIFY_TOKEN)
+    monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
 
 
 ### GITLAB-KOMPONENTTI ###
