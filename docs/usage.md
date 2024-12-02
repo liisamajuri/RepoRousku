@@ -13,7 +13,7 @@ RepoRousku on kehitetty tukemaan projektitiimien toimintaa GitLabin ja Clockifyn
     git clone git@gitlab.dclabra.fi:projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut.git
     ```
 
-    * **Rakenna Docker-kontti:**
+    * **Rakenna ja käynnistä Docker-kontti:**
     ```python
     docker-compose up --build
     ```
@@ -25,7 +25,7 @@ RepoRousku on kehitetty tukemaan projektitiimien toimintaa GitLabin ja Clockifyn
 Kun käynnistät RepoRouskun ensimmäistä kertaa, sivu pyytää sinua syöttämään GitLab sekä Clockify Access tokenit. 
 
 !!!Tip 
-    **Miten löydän GitLab tai Clockify Access tokenin?** Kurkkaa [täältä](https://gitlab.dclabra.fi/wiki/MOpevPu-QrClH4_ouAV04A?view)
+    **Miten löydän GitLab tai Clockify Access tokenin?** Kurkkaa [täältä](#ohje-gitlab--ja-clockify-access-tokeneiden-luontiin)
 
 ![aloitus_app](images/aloitus_app.png)
 
@@ -37,10 +37,13 @@ Jotta pääset etusivusta pidemmälle, on sinun annettava Rouskuttimelle **GitLa
 
 Kun tarvittavat tiedot on lisätty, paina **Rouskuta** -painiketta. 
 
+### Projekti -sivusto
+
 **Projekti**-sivu koostaa projektin metriikat yhteen interaktiiviseen näkymään.
 
 ![projekti_app](images/projekti_app.png)
 
+### Jäsenet -sivusto
 Sivuston vasemmasta laidasta pääset navigoitumaan sivujen välillä. **Jäsenet** -sivu koostaa jäsenkohtaiset tiedot projekteista ja siihen käytetyistä tunneista sekä **Avaa GitLab**-painikkeella päääset kätevästi suoraan projektin GitLab-repositorioon. 
 ![navigaatio_app](images/navigaatio_app.png)
 
@@ -48,6 +51,49 @@ Jäsenet-sivusto voi olla hyödyllinen etenkin, jos sinun on tarpeen raportoida 
 
 ![jasenkohtainen_app](images/jasenet1_app.png)
 
+
+## Ohje GitLab- ja Clockify Access Tokeneiden luontiin
+
+### GitLab Access Tokenin Generoiminen
+
+1. **Kirjaudu GitLab-tilillesi** ja siirry [Personal Access Token -asetuksiin](https://gitlab.dclabra.fi/-/user_settings/personal_access_tokens).
+   
+2. **Valitse oikeudet**: Valitse **read_api**-oikeudet, jotta voit lukea projektidataa.
+   
+   ![Tokenin oikeudet](https://gitlab.dclabra.fi/wiki/uploads/96f854f5-2395-42f2-8afe-7f2d82e1c41f.png)
+
+3. **Luo token** ja **kopioi se heti** turvalliseen paikkaan. Huomioi, että et voi nähdä tätä tokenia enää myöhemmin.
+   
+   ![Tokenin kopiointi](https://gitlab.dclabra.fi/wiki/uploads/fe757c9e-0080-4f19-833b-f3a052936b08.png)
+
+---
+
+### Clockify Access Tokenin Generoiminen (valinnainen)
+
+Jos haluat nähdä **Clockify**-dataa RepoRousku-mikropalvelussa, sinun tulee luoda myös Clockify Access Token.
+
+1. **Kirjaudu sisään Clockify-tilillesi**
+Avaa [Clockify](https://clockify.me/) ja kirjaudu sisään käyttäjätunnuksellasi ja salasanallasi.
+
+2. **Siirry Asetuksiin**
+Kun olet kirjautunut sisään, vie hiiri oikeaan yläkulmaan ja klikkaa käyttäjäkuvaketta avataksesi valikon. Valitse **"Preferences"** (Asetukset).
+
+   ![Clockify Preferences](https://gitlab.dclabra.fi/wiki/uploads/d9f5a140-6e04-4b2f-b481-e46b266c0239.png)
+
+3. **Siirry "Advanced" -välilehteen**
+Asetuksissa siirry vasemmalla olevaan **"Advanced"**-välilehteen.
+
+4. **Generoi API-avain**
+Etsi **"API Key"** -osio ja klikkaa **"Generate"**-painiketta. Clockify luo sinulle API-avaimen, joka on ainutlaatuinen tilillesi.
+
+   **Tärkeää:** Kopioi API-avain heti ja tallenna se turvalliseen paikkaan, sillä et voi nähdä sitä enää myöhemmin.
+
+   ![Clockify API Key Generation](https://gitlab.dclabra.fi/wiki/uploads/e4551a52-a878-410a-88ad-b731e33d3797.png)
+
+5. **API-avaimen käyttö**
+Nyt sinulla on käytettävissäsi **Access Tokenit** sekä GitLabilta että Clockifylta, joita voit käyttää RepoRousku-mikropalvelussa datan hakemiseen ja projektien hallintaan.
+
+---
 
 ## Tuki ja ongelmanratkaisu
 
