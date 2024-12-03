@@ -394,3 +394,35 @@ class ClockifyData:
                         "total_sprint_hours": sprint_total_hours
                     })
         return pd.DataFrame(tag_and_sprint_hours_list)
+    
+    def get_project_task_hours(self):
+        """ Hae taskit ja niiden tunnit projektista
+        """
+        if not self.workspace_id or not self.project_id:
+            raise ValueError("Workspace ID tai Project ID puuttuu.")
+        
+        url = f"{self.base_url}/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        tasks = response.json()
+
+        task_data = []
+        for task in tasks:
+            duration_str = task.get("duration", "PT0S") 
+            hours, minutes = 0, 0
+            if "H" in duration_str:
+                hours = int(duration_str.split("H")[0].replace("PT", ""))
+                duration_str = duration_str.split("H")[1]
+            if "M" in duration_str:
+                minutes = int(duration_str.split("M")[0])
+            total_hours = hours + minutes / 60
+
+            task_data.append({
+                "Task ID": task.get("id"),
+                "Task Name": task.get("name"),
+                "Status": task.get("status"),
+                "Duration (hours)": round(total_hours, 2), 
+                "Estimated Time (ms)": task.get("estimate", 0)
+            })
+
+        return pd.DataFrame(task_data)
