@@ -45,7 +45,6 @@ if not GITLAB_TOKEN:
 if not CLOCKIFY_TOKEN:
     raise RuntimeError("CLOCKIFY_TOKEN ympäristömuuttujaa ei löydy. Varmista, että .env-tiedosto on määritetty oikein.")
 
-logger.info("Ympäristömuuttujat ladattu onnistuneesti.")
 
 @app.get("/")
 async def root():
