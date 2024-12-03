@@ -15,8 +15,10 @@ services:
     command: >
       sh -c "
       pip install -r requirements.txt &&
-      streamlit run src/app.py --server.port=8501 --server.enableCORS=false &&
-      echo 'PalikkaPalvelut-sovellus saatavilla: http://localhost:8501' 
+      echo '***************************************************************************************************************************************************************' &&
+      echo 'PALIKKAPALVELUT-SOVELLUS SAATAVILLA: http://localhost:8501' &&
+      echo '***************************************************************************************************************************************************************' &&
+      streamlit run src/app.py --server.port=8501 --server.enableCORS=false 
       "
 
   tests:
@@ -35,26 +37,33 @@ services:
       - ./.env:/app/.env
     command: >
       sh -c "
-      echo 'Kontin ympäristömuuttujat:' &&
-      env &&
+      echo '***************************************************************************************************************************************************************' &&
       ruff check src -v &&
+      echo '***************************************************************************************************************************************************************' &&
       coverage run -m pytest -v --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py &&
+      echo '***************************************************************************************************************************************************************' &&
       coverage run -m pytest -v --tb=short --html=tests/reports/api_test_report.html --self-contained-html tests/api_tests.py &&
+      echo '***************************************************************************************************************************************************************' &&
       coverage run -m pytest -v --tb=short --html=tests/reports/integration_test_report.html --self-contained-html tests/integration_tests.py &&
+      echo '***************************************************************************************************************************************************************' &&
       coverage report -m &&
       coverage html -d tests/reports/coverage_html &&
-      echo 'Testiraportit saatavilla: http://localhost:8010'
+      echo '***************************************************************************************************************************************************************' &&
+      echo 'TESTIRAPORTIT SAATAVILLA: http://localhost:8010' &&
+      echo '***************************************************************************************************************************************************************'
       "
 
   reports:
     image: python:3.9-slim
     command: >
       sh -c "
-      python3 -m http.server 8010 -d /app/tests/reports &&
-      echo 'Yksikkötestiraportti saatavilla: http://localhost:8010/unit_test_report.html' &&
-      echo 'API-testiraportti saatavilla: http://localhost:8010/api_test_report.html' &&
-      echo 'Integraatiotestiraportti saatavilla: http://localhost:8010/integration_test_report.html' &&
-      echo 'Kattavuusraportti saatavilla: http://localhost:8010/coverage_html/index.html'
+      echo '***************************************************************************************************************************************************************' &&
+      echo 'YKSIKKÖTESTIRAPORTTI SAATAVILLA: http://localhost:8010/unit_test_report.html' &&
+      echo 'API-TESTIRAPORTTI SAATAVILLA: http://localhost:8010/api_test_report.html' &&
+      echo 'INTEGRAATIOTESTIRAPORTTI SAATAVILLA: http://localhost:8010/integration_test_report.html' &&
+      echo 'TESTIEN KATTAVUUSRAPORTTI SAATAVILLA: http://localhost:8010/coverage_html/index.html' &&
+      echo '***************************************************************************************************************************************************************' &&
+      python3 -m http.server 8010 -d /app/tests/reports
       "
     volumes:
       - ./tests/reports:/app/tests/reports
@@ -69,8 +78,10 @@ services:
       - "8502:8502"  # MkDocs-dokumentaation portti
     command: >
       sh -c "
-      mkdocs serve -a 0.0.0.0:8502 &&
-      echo 'Projektidokumentaatio saatavilla: http://localhost:8502'
+      echo '***************************************************************************************************************************************************************' &&
+      echo 'PROJEKTIDOKUMENTAATIO SAATAVILLA: http://localhost:8502' &&
+      echo '***************************************************************************************************************************************************************' &&
+      mkdocs serve -a 0.0.0.0:8502
       "
 
   api:
@@ -89,6 +100,9 @@ services:
     command: >
       sh -c "
       pip install -r requirements.txt &&
-      uvicorn api.main:app --host 0.0.0.0 --port 8088 &&
-      echo 'API-rajapinta saatavilla: http://localhost:8088'
+      echo '***************************************************************************************************************************************************************' &&
+      echo 'API-RAJAPINTA SAATAVILLA: http://localhost:8088' &&
+      echo 'API-DOKUMENTAATIO SAATAVILLA: http://localhost:8088/docs' &&
+      echo '***************************************************************************************************************************************************************' &&
+      uvicorn api.main:app --host 0.0.0.0 --port 8088
       "
