@@ -1,11 +1,4 @@
-default:
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  before_script:
-    # Login to Gitlab Registry
-    - docker info
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+image: python:3.9-slim
 
 stages:
   - lint
@@ -14,7 +7,6 @@ stages:
   - docs
   - build-prod
   - deploy-prod
-
 
 variables:
   PYTHONPATH: "$CI_PROJECT_DIR/src"
@@ -75,7 +67,6 @@ coverage:
       - tests/reports/coverage_html/
     expire_in: 1 week
 
-
 docs:
   stage: docs
   extends: .default_settings
@@ -90,12 +81,17 @@ docs:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-
 build-prod:
   stage: build-prod
-  environment: production
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
   tags:
     - dind
+  environment: production
+  before_script:
+    - docker info
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
   script:
     - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .
     - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
