@@ -36,7 +36,7 @@ def mock_env_tokens(monkeypatch):
     Asettaa mock-tokenit ympäristömuuttujiin.
     """
     monkeypatch.setenv("CLOCKIFY_TOKEN", MOCK_CLOCKIFY_TOKEN)
-    #monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
+    monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
 
 
 
