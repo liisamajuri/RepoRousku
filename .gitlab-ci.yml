@@ -1,20 +1,10 @@
-default:
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  before_script:
-    # Login to Gitlab Registry
-    - docker info
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+image: python:3.9-slim
 
 stages:
   - lint
   - test
   - coverage
   - docs
-  - build-prod
-  - deploy-prod
-
 
 variables:
   PYTHONPATH: "$CI_PROJECT_DIR/src"
@@ -51,9 +41,6 @@ test:
   allow_failure: false  
   script:
     - coverage run -m pytest -v
-  variables:
-    CLOCKIFY_TOKEN: $CLOCKIFY_TOKEN
-    GITLAB_TOKEN: $GITLAB_TOKEN
   artifacts:
     paths:
       - .coverage
@@ -88,40 +75,4 @@ docs:
       - site/
     expire_in: 1 week
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-
-
-build-prod:
-  stage: build-prod
-  environment: production
-  tags:
-    - dind
-  script:
-    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .
-    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-
-deploy-prod:
-  stage: deploy-prod
-  tags:
-    - shell
-  environment: production
-  script:
-    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan $DEPLOYMENT_SERVER >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - |
-      ssh $SSH_USER@$DEPLOYMENT_SERVER "
-      echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin &&
-      docker pull gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
-      "
-    - echo "Application successfully deployed."
-
-  when: manual
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"' # Dokumentaatio generoidaan vain päähaaran muutoksista
