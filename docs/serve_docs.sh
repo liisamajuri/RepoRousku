@@ -7,6 +7,10 @@ then
     exit
 fi
 
+# Aja Python-skripti
+echo "Valmistellaan rest-tiedostojen dokumentaatiota..."
+python generate_rest_docs.py
+
 # Buildaa dokumentaation MkDocsilla
 echo "Rakennetaan dokumentaatiota..."
 mkdocs build

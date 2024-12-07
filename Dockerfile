@@ -19,5 +19,13 @@ COPY api /app/api
 COPY mkdocs.yml .
 COPY docs /app/docs
 
+# Kopioi tarvittavat tiedotot .rest-tiedostojen autodokumentaatiota varten
+COPY requests /app/requests
+COPY generate_rest_docs.py ./generate_rest_docs.py
+
+# Muodosta .rest-tiedostoista markdown-tiedosto MkDocsia varten
+RUN python generate_rest_docs.py
+
+
 # Käynnistä API (jos tätä Dockerfile käytetään suoraan)
 # CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8088"]
