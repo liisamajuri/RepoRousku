@@ -38,55 +38,56 @@ lint:
   allow_failure: true
   script:
     - ruff check src -v    
+    
+test:
+  stage: test
+  image: python:3.9-slim
+  extends: .default_settings
+  tags:
+    - docker
+  allow_failure: false  
+  script:
+    - coverage run -m pytest -v
+  variables:
+    CLOCKIFY_TOKEN: $CLOCKIFY_TOKEN
+    GITLAB_TOKEN: $GITLAB_TOKEN
+  artifacts:
+    paths:
+      - .coverage
+      - tests/reports/*.html
+      - tests/artefacts/
+    expire_in: 1 week
 
-# test:
-#   stage: test
-#   image: python:3.9-slim
-#   extends: .default_settings
-#   tags:
-#     - docker
-#   allow_failure: false  
-#   script:
-#     - coverage run -m pytest -v
-#   variables:
-#     CLOCKIFY_TOKEN: $CLOCKIFY_TOKEN
-#     GITLAB_TOKEN: $GITLAB_TOKEN
-#   artifacts:
-#     paths:
-#       - .coverage
-#       - tests/reports/*.html
-#       - tests/artefacts/
-#     expire_in: 1 week
+coverage:
+  stage: coverage
+  image: python:3.9-slim
+  extends: .default_settings
+  tags:
+    - docker
+  allow_failure: true  
+  script:
+    - if [ -f .coverage ]; then coverage report -m; fi
+    - if [ -f .coverage ]; then coverage html -d tests/reports/coverage_html; fi
+  artifacts:
+    paths:
+      - tests/reports/coverage_html/
+    expire_in: 1 week
 
-# coverage:
-#   stage: coverage
-#   image: python:3.9-slim
-#   extends: .default_settings
-#   tags:
-#     - docker
-#   allow_failure: true  
-#   script:
-#     - if [ -f .coverage ]; then coverage report -m; fi
-#     - if [ -f .coverage ]; then coverage html -d tests/reports/coverage_html; fi
-#   artifacts:
-#     paths:
-#       - tests/reports/coverage_html/
-#     expire_in: 1 week
-
-# docs:
-#   stage: docs
-#   image: python:3.9-slim
-#   extends: .default_settings
-#   tags:
-#     - docker
-#   script:
-#     - mkdocs build
-#   artifacts:
-#     paths:
-#       - site/
-#     expire_in: 1 week
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "main"'
+docs:
+  stage: docs
+  image: python:3.9-slim
+  extends: .default_settings
+  tags:
+    - dind
+  environment: production
+  before_script:
+    - docker info
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+  script:
+    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .
+    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 build-prod:
   stage: build-prod
