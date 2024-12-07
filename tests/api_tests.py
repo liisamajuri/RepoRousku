@@ -1,8 +1,8 @@
 """
 API-testit (PalikkaPalvelut)
 
-Tämä moduuli sisältää API-testit GitLab-projektille. Näissä testeissä tarkastellaan erityisesti projektitietojen 
-hakua eri token-tilanteissa: toimivalla, virheellisellä ja vanhentuneella tokenilla sekä jäsenyys- ja näkyvyystilanteita.
+Tämä moduuli sisältää API-testit GitLab- ja Clockify-projekteille. Näissä testeissä tarkastellaan erityisesti projektitietojen
+hakua eri token-tilanteissa: toimivalla, virheellisellä ja vanhentuneella tokenilla. GitLabin osalta testataan myös jäsenyys- ja näkyvyystilanteita.
 
 Huom: Tässä tiedostossa ei testata tapausta, jossa token puuttuu kokonaan. Tämä johtuu siitä, että sovelluksen 
 käyttöliittymä (`start.py`) tarkistaa tokenin olemassaolon ennen API-kutsuja. Jos token puuttuu, sovellus 
