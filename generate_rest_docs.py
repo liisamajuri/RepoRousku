@@ -3,7 +3,7 @@ import re
 
 def parse_rest_file(file_path, base_url):
     """
-    Parse a .rest file to extract HTTP requests and their metadata.
+    Parsi rest-tiedostosta moduulikommentti sekä pyyntöjen tyypit, urlit ja kommentit.
     """
     with open(file_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
@@ -54,7 +54,7 @@ def parse_rest_file(file_path, base_url):
 
 def generate_combined_markdown(directory, base_url):
     """
-    Generate a markdown file from all .rest files in a directory.
+    Luo markdown-tiedosto ja yhdistä siihen .rest-tiedostoista parsitut tiedot.
     """
     combined_md = "# REST API Dokumentaatio\n\n"
     combined_md += "Tämä dokumentaatio sisältää yleiskuvauksen .rest-testitiedostoista. Tarkempi Swagger-dokumentaatio löytyy [täältä](http://localhost:8088/docs).\n\n"
