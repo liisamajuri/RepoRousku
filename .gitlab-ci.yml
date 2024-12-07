@@ -78,13 +78,14 @@ docs:
   image: python:3.9-slim
   extends: .default_settings
   tags:
-    - docker
+    - dind
+  environment: production
+  before_script:
+    - docker info
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
   script:
-    - mkdocs build
-  artifacts:
-    paths:
-      - site/
-    expire_in: 1 week
+    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .
+    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
