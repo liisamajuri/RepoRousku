@@ -12,8 +12,6 @@
 GET {{baseUrl}}/gitlab/project-summary?project_url={{projectUrl}}
 Authorization: Bearer {{apiToken}}
 
-###
-
 ### Hae GitLab-projektin jäsenen tilastot
 GET {{baseUrl}}/gitlab/member-summary?project_url={{projectUrl}}&member={{memberName}}
 Authorization: Bearer {{apiToken}}

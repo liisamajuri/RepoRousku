@@ -70,7 +70,6 @@ Dokumentaatio `env_tokens.py` -moduulista, joka sisältää tokenien käsittelyy
 
 ---
 
-
 ## Salaus
 
 Dokumentaatio `encryption.py` -moduulista, joka sisältää tokenien salaukseen liittyvät funktiot.
@@ -79,11 +78,11 @@ Dokumentaatio `encryption.py` -moduulista, joka sisältää tokenien salaukseen 
 
 ---
 
-## API-testaus
+## Inbound API
 
-Dokumentaatio `api_tests.py` moduulista.
+Dokumentaatio  `api/main.py` -moduulista, joka määrittelee RepoRouskun tarjoaman APIn.
 
-::: tests.api_tests
+::: api.main
 
 ---
 
@@ -101,3 +100,16 @@ Dokumentaatio `integration_tests.py` moduulista.
 
 ::: tests.unit_tests
 
+---
+
+## Outbound APIn testaus
+
+Dokumentaatio `api_tests.py` moduulista, joka testaa tietojen hakua GitLabista ja Clockifystä.
+
+::: tests.api_tests
+
+---
+
+## Inbound APIn testaus
+
+Yleiskuvaus .rest-testitiedostoista löytyy [täältä](rest_tests.md) ja yksityiskohtaisempi Swagger-dokumentaatio löytyy [täältä](http://localhost:8088/docs).
