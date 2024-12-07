@@ -1,8 +1,10 @@
+# Oletuskuva ja palvelut
 default:
   image: docker:24.0.5
   services:
-    - docker:24.0.5-dind
+    - docker:24.0.5-dind # Docker-in-Docker -palvelu, jotta voidaan suorittaa Docker-käskyjä
 
+# Pipelinessä käytettävät vaiheet
 stages:
   - lint
   - test
@@ -11,16 +13,19 @@ stages:
   - build-prod
   - deploy-prod
 
+# Pipelinessä käytettävät muuttujat
 variables:
-  PYTHONPATH: "$CI_PROJECT_DIR/src"
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHONPATH: "$CI_PROJECT_DIR/src" # Python-moduulien hakupolku
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip" # Pipin välimuistin sijainti
 
+# Cache-asetukset (välimuistin sijainnit)
 cache:
   paths:
     - .cache/pip
     - .pytest_cache
     - __pycache__
 
+# Oletusskriptit, joita ajetaan ennen varsinaisia vaiheita
 .default_settings:
   before_script:
     - python --version
@@ -29,95 +34,100 @@ cache:
     - mkdir -p tests/artefacts
     - export PYTHONPATH=$CI_PROJECT_DIR/src
 
+# Linttausvaihe: tarkistaa koodin tyyli-/syntaksivirheet
 lint:
   stage: lint
   image: python:3.9-slim
   extends: .default_settings
   tags:
     - docker
-  allow_failure: true
+  allow_failure: true # Virheet linttausvaiheessa eivät estä pipelinea etenemästä
   script:
-    - ruff check src -v    
-    
+    - ruff check src -v # Suorittaa Ruff-linttausohjelman   
+
+# Testausvaihe: suorittaa testit ja generoi testiraportit    
 test:
   stage: test
   image: python:3.9-slim
   extends: .default_settings
   tags:
     - docker
-  allow_failure: false  
+  allow_failure: false # Pipeline epäonnistuu, jos testit epäonnistuvat  
   script:
-    - coverage run -m pytest -v
+    - coverage run -m pytest -v # Suorittaa testit ja mittaa testien kattavuutta
   variables:
     CLOCKIFY_TOKEN: $CLOCKIFY_TOKEN
     GITLAB_TOKEN: $GITLAB_TOKEN
-  artifacts:
+  artifacts: # Tiedostot, jotka säilytetään vaiheen jälkeen
     paths:
       - .coverage
       - tests/reports/*.html
       - tests/artefacts/
-    expire_in: 1 week
+    expire_in: 1 week # Artefact-tiedostojen säilytysaika
 
+# Kattavuusraportin vaihe: tulostaa ja generoi kattavuusraportin
 coverage:
   stage: coverage
   image: python:3.9-slim
   extends: .default_settings
   tags:
     - docker
-  allow_failure: true  
+  allow_failure: true # Pipeline ei epäonnistu kattavuusraportin epäonnistumisesta  
   script:
     - if [ -f .coverage ]; then coverage report -m; fi
     - if [ -f .coverage ]; then coverage html -d tests/reports/coverage_html; fi
-  artifacts:
+  artifacts: # Tiedostot, jotka säilytetään vaiheen jälkeen
     paths:
       - tests/reports/coverage_html/
-    expire_in: 1 week
+    expire_in: 1 week # Artefact-tiedostojen säilytysaika
 
+# Dokumentaation rakentaminen MkDocsilla
 docs:
   stage: docs
   image: python:3.9-slim
   extends: .default_settings
   tags:
-    - dind
-  environment: production
-  before_script:
-    - docker info
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - docker
   script:
-    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .
-    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
+    - mkdocs build # Rakentaa dokumentaation
+  artifacts: # Tiedostot, jotka säilytetään vaiheen jälkeen
+    paths:
+      - site/ # Valmiin dokumentaation sijainti
+    expire_in: 1 week # Artefact-tiedostojen säilytysaika
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
 
+# Tuotantoversion Docker-imagen rakentaminen
 build-prod:
   stage: build-prod
   image: docker:24.0.5
   services:
     - docker:24.0.5-dind
   tags:
-    - dind
-  environment: production
+    - dind # Käytetään Docker-in-Docker-ympäristöä
+  environment: production # Asettaa ympäristön tuotantoympäristöksi
   before_script:
-    - docker info
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - docker info # Tulostaa Dockerin tiedot
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin # Kirjautuu Docker-rekisteriin
   script:
-    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .
-    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
+    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .  # Rakentaa Docker-kuvan
+    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut # Pushaa kuvan rekisteriin
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
 
+# Tuotantoversion käyttöönottaminen
 deploy-prod:
   stage: deploy-prod
   tags:
-    - shell
-  environment: production
+    - shell # Käyttää Shell-tagiin liitettyä runneria
+  environment: production # Asettaa ympäristön tuotantoympäristöksi
   script:
-    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' # Varmistaa, että SSH-agent on asennettu
+    - eval $(ssh-agent -s) # Käynnistää SSH-agentin
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - # Lisää yksityisen SSH-avaimen
+    - mkdir -p ~/.ssh # Luo .ssh-hakemiston
     - chmod 700 ~/.ssh
-    - ssh-keyscan $DEPLOYMENT_SERVER >> ~/.ssh/known_hosts
+    - ssh-keyscan $DEPLOYMENT_SERVER >> ~/.ssh/known_hosts # Lisää palvelimen avaimet known_hosts-tiedostoon
     - chmod 644 ~/.ssh/known_hosts
     - |
       ssh $SSH_USER@$DEPLOYMENT_SERVER "
@@ -126,6 +136,6 @@ deploy-prod:
       "
     - echo "Application successfully deployed."
 
-  when: manual
+  when: manual # Käyttöönotto tehdään manuaalisesti
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"' # Käyttöönotto vain main-branchista
