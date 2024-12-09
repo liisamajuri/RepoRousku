@@ -1,5 +1,5 @@
 services:
-  streamlit_front:
+  reporousku_front:
     image: gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut
     labels:
       - "traefik.enable=true"
