@@ -8,7 +8,7 @@ services:
       - "traefik.http.routers.palikkapalvelut.middlewares=palikkapalvelut-strip-prefix"
       - "traefik.http.middlewares.palikkapalvelut-strip-prefix.stripprefix.prefixes=/palikkapalvelut"
     expose:
-      - "8501"
+      - "8511"
     networks:
       - microservices-network
 
