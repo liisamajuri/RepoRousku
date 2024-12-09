@@ -1,12 +1,12 @@
 services:
   streamlit_front:
-    image: gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut/reporousku
+    image: gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut/palikkapalvelut
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.palikkapalvelut.rule=Host(`jvprojekti2024s.dclabra.fi`) && PathPrefix(`/reporousku`)"
+      - "traefik.http.routers.palikkapalvelut.rule=Host(`jvprojekti2024s.dclabra.fi`) && PathPrefix(`/palikkapalvelut`)"
       - "traefik.http.routers.palikkapalvelut.entrypoints=web"
       - "traefik.http.routers.palikkapalvelut.middlewares=palikkapalvelut-strip-prefix"
-      - "traefik.http.middlewares.palikkapalvelut-strip-prefix.stripprefix.prefixes=/reporousku"
+      - "traefik.http.middlewares.palikkapalvelut-strip-prefix.stripprefix.prefixes=/palikkapalvelut"
     expose:
       - "8501"
     networks:
