@@ -112,6 +112,7 @@ build-prod:
   script:
     - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .  # Rakentaa Docker-kuvan
     - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut # Pushaa kuvan rekisteriin
+    - docker compose build --no-cache --push
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
 
@@ -134,12 +135,12 @@ deploy-prod:
     - |
       ssh $SSH_USER@$DEPLOYMENT_SERVER "
       echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin &&
-        # docker ps --filter name=palikkapalvelut* --filter status=running -aq | xargs docker rm --force; echo "Running containers stopped and removed" || true &&
-        #  sleep 3 &&
+      docker ps --filter name=palikkapalvelut* --filter status=running -aq | xargs docker rm --force; echo "Running containers stopped and removed" || true &&
+      sleep 3 &&
       cd ~/code/microservices/palikkapalvelut &&
       docker compose -f docker-compose.prod.yml pull; echo "Pulled new image from registry" &&
       docker compose -f docker-compose.prod.yml up -d; echo "Started container" &&
-        # docker image prune -f; echo "Pruned dangling images"
+      docker image prune -f; echo "Pruned dangling images"
       "
     - echo "Application successfully deployed."
   rules:
