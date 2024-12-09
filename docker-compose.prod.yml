@@ -11,3 +11,7 @@ services:
       - "8501"
     networks:
       - microservices-network
+
+networks:
+  microservices-network:
+    external: true
