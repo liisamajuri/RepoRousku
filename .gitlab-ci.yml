@@ -98,22 +98,22 @@ cache:
 #     - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
 
 # Tuotantoversion Docker-imagen rakentaminen
-# build-prod:
-#   stage: build-prod
-#   image: docker:24.0.5
-#   services:
-#     - docker:24.0.5-dind
-#   tags:
-#     - dind # Käytetään Docker-in-Docker-ympäristöä
-#   environment: production # Asettaa ympäristön tuotantoympäristöksi
-#   before_script:
-#     - docker info # Tulostaa Dockerin tiedot
-#     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin # Kirjautuu Docker-rekisteriin
-#   script:
-#     - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .  # Rakentaa Docker-kuvan
-#     - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut # Pushaa kuvan rekisteriin
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
+build-prod:
+  stage: build-prod
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  tags:
+    - dind # Käytetään Docker-in-Docker-ympäristöä
+  environment: production # Asettaa ympäristön tuotantoympäristöksi
+  before_script:
+    - docker info # Tulostaa Dockerin tiedot
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin # Kirjautuu Docker-rekisteriin
+  script:
+    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .  # Rakentaa Docker-kuvan
+    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut # Pushaa kuvan rekisteriin
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
 
 # Tuotantoversion käyttöönottaminen
 deploy-prod:
