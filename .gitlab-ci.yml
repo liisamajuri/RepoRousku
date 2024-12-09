@@ -118,6 +118,7 @@ build-prod:
 # Tuotantoversion käyttöönottaminen
 deploy-prod:
   stage: deploy-prod
+  when: manual
   tags:
     - shell # Käyttää Shell-tagiin liitettyä runneria
   environment: production # Asettaa ympäristön tuotantoympäristöksi
@@ -135,8 +136,8 @@ deploy-prod:
       docker ps --filter name=palikkapalvelut* --filter status=running -aq | xargs docker rm --force; echo "Running containers stopped and removed" || true &&
       sleep 3 &&
       cd ~/code/microservices/palikkapalvelut &&
-      docker compose -f docker-compose-prod.yml pull; echo "Pulled new image from registry" &&
-      docker compose -f docker-compose-prod.yml up -d; echo "Started container" &&
+      docker compose -f docker-compose.prod.yml pull; echo "Pulled new image from registry" &&
+      docker compose -f docker-compose.prod.yml up -d; echo "Started container" &&
       docker image prune -f; echo "Pruned dangling images"
       "
     - echo "Application successfully deployed."
