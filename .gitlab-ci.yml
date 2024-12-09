@@ -130,6 +130,7 @@ deploy-prod:
     - chmod 700 ~/.ssh
     - ssh-keyscan $DEPLOYMENT_SERVER >> ~/.ssh/known_hosts # Lisää palvelimen avaimet known_hosts-tiedostoon
     - chmod 644 ~/.ssh/known_hosts
+    - scp docker-compose.prod.yml $SSH_USER@$DEPLOYMENT_SERVER:~/code/microservices/palikkapalvelut
     - |
       ssh $SSH_USER@$DEPLOYMENT_SERVER "
       echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin &&
