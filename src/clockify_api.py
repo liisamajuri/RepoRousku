@@ -37,6 +37,14 @@ class ClockifyData:
         self.clockify_url = clockify_url
         self.get_workspaces()
 
+    def _get(self, endpoint):
+        """ Apufunktio GET-pyyntöjen tekemiseen Clockify-APIin. """
+        url = f"{self.clockify_url}/{endpoint}"
+        response = requests.get(url, headers=self.headers)
+        if response.status_code != 200:
+            raise Exception(f"API-pyyntö epäonnistui: {response.status_code} - {response.text}")
+        return response.json()
+    
     def iso_duration_to_seconds(self, duration):
         """Muuntaa ISO 8601 -kestoarvon sekunneiksi."""
         if duration is None:
@@ -104,6 +112,30 @@ class ClockifyData:
         else:
             print(f"Virhe haettaessa käyttäjiä: {response.status_code}")
             return []
+
+    def get_workspace_id_by_name(self, workspace_name):
+        """ Hakee työtilan ID:n nimen perusteella. """
+        workspaces = self.get_workspaces()
+        for workspace in workspaces:
+            if workspace['name'].lower() == workspace_name.lower():
+                return workspace['id']
+        raise Exception(f"Työtilaa '{workspace_name}' ei löytynyt.")
+
+    def get_project_id_by_name(self, workspace_id, project_name):
+        """ Hakee projektin ID:n nimen perusteella. """
+        projects = self._get(f"workspaces/{workspace_id}/projects")
+        for project in projects:
+            if project['name'].lower() == project_name.lower():
+                return project['id']
+        raise Exception(f"Projektia '{project_name}' ei löytynyt työtilasta.")
+
+    def get_user_id_by_name(self, workspace_id, user_name):
+        """ Hakee käyttäjän ID:n nimen perusteella. """
+        users = self._get(f"workspaces/{workspace_id}/users")
+        for user in users:
+            if user['name'].lower() == user_name.lower():
+                return user['id']
+        raise Exception(f"Käyttäjää '{user_name}' ei löytynyt työtilasta.")
 
     def get_time_entries_df(self, user_id, project_id):
         """
@@ -272,7 +304,7 @@ class ClockifyData:
                 tag_name = tag["name"]
                 tagged_entries = [
                     entry for entry in time_entries
-                    if "tagIds" in entry and tag_id in entry["tagIds"]
+                    if "tagIds" in entry and isinstance(entry["tagIds"], list) and tag_id in entry["tagIds"]
                 ]
                 total_hours = sum(
                     self.iso_duration_to_seconds(entry["timeInterval"].get("duration", "PT0S")) / 3600
