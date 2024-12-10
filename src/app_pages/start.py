@@ -252,7 +252,7 @@ def start_page():
                         st.error(error_msg, icon="❗")
     with col3:
         # Tallenna tokenit
-        if st.button(save_tokens, use_container_width = True, help = save_tokens_help):
+        if st.button(save_tokens, use_container_width = True, help = save_tokens_help, disabled=True):
             if gitlab_token_value or clockify_token_value:
                 et.save_tokens_to_env(gitlab_token_value, clockify_token_value)
                 env_gitlab_token, env_clockify_token = et.get_env_tokens()
@@ -261,7 +261,7 @@ def start_page():
                 st.error(missing_token_values, icon="❗")
     with col4:
         # Poista tallennetut tokenit
-        if st.button(remove_tokens, use_container_width = True, help = remove_tokens_help):
+        if st.button(remove_tokens, use_container_width = True, help = remove_tokens_help, disabled=True):
             et.remove_tokens_from_env_file()
             env_gitlab_token, env_clockify_token = et.get_env_tokens()
 
