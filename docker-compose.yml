@@ -1,5 +1,5 @@
 services:
-  streamlit:
+  reporousku:
     build:
       context: .
       dockerfile: Dockerfile
