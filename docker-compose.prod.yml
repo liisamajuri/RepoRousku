@@ -11,6 +11,11 @@ services:
       - "8511"
     networks:
       - microservices-network
+    command: >
+      sh -c "
+      streamlit run src/app.py --server.port=8511 --server.enableCORS=false 
+      "
+
 
 networks:
   microservices-network:
