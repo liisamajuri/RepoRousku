@@ -110,8 +110,6 @@ build-prod:
     - docker info # Tulostaa Dockerin tiedot
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin # Kirjautuu Docker-rekisteriin
   script:
-    - docker build -t gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut .  # Rakentaa Docker-kuvan
-    - docker push gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut # Pushaa kuvan rekisteriin
     - docker compose build --no-cache --push
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
