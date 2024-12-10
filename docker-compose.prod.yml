@@ -1,5 +1,5 @@
 services:
-  reporousku_front:
+  reporousku:
     image: gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut/reporousku
     labels:
       - "traefik.enable=true"
