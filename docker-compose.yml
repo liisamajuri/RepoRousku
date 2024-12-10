@@ -13,6 +13,6 @@ services:
       - ./.streamlit:/app/.streamlit
     command: >
       sh -c "
-      pip install -r requirements.txt &&
+       #pip install -r requirements.txt &&
       streamlit run src/app.py --server.port=8511 --server.enableCORS=false 
       "
