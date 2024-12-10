@@ -12,10 +12,7 @@
   - [KÄYTTÖYMPÄRISTÖ](#käyttöympäristö)
   - [RIIPPUVUUDET](#riippuvuudet)
 - [KÄYTTÖ](#käyttöohjeita)
-  - [MODUULIT](#moduulit)
-  - [OHJELMAKOKONAISUUDET](#ohjelmakokonaisuudet)
-  - [MODUULIEN KUVAUKSET](#moduulien-kuvaukset)
-  - [OHJELMIEN KUVAUKSET](#ohjelmien-kuvaukset)
+- [MODUULIT](#moduulit)
 - [DOKUMENTAATIO](#dokumentaatio)
 
 ***
@@ -39,7 +36,7 @@ Tämä ohjelma on rakennettu Streamlitillä, Pythonilla ja sillä noudetaan data
 ***
 
 <!-- REPOSITORION SISÄLTÖ -->
-## ==REPOSITORION SISÄLTÖ==
+## REPOSITORION SISÄLTÖ
 
 #### Repositorion hakemistorakenne:
 ```
@@ -82,11 +79,11 @@ Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaatio
 <!-- ALOITTAMINEN -->
 ## ALOITTAMINEN
 
-1. **Kloonaa repo komennolla:** 
+**Kloonaa repo komennolla:** 
 ```bash
 git clone git@gitlab.dclabra.fi:projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut.git
 ```
-2. **Jos haluat ensin tarkastella tarkempaa käyttöliittymäohjetta tai koodidokumentaatiota, aja projektin juurikansiossa komennot:**
+**Jos haluat ensin tarkastella tarkempaa käyttöliittymäohjetta tai tarkempaa koodidokumentaatiota, aja projektin juurikansiossa komennot:**
 
 ```bash
 chmod +x docs/serve_docs.sh
@@ -96,57 +93,18 @@ chmod +x docs/serve_docs.sh
 ***
 
 <!-- KÄYTTÖYMPÄRISTÖ -->
-### KÄYTTÖYMPÄRISTÖ
+### KÄYTTÖYMPÄRISTÖ (DEV)
 
-**YMPÄRISTÖN PYSTYTTÄMINEN:**
+**Docker imagen buildaus ja konttien käynnistys projektin juurikansiossa:**
 
-- **Docker imagen buildaus:**
-
-```shell=
-docker compose build
+```bash
+docker compose -f docker-compose.dev.yml up --build
 ```
 
-- **Kaikkien konttien käynnistys:**
-
-```shell=
-docker compose up
+**Kontit alas:**
+```bash
+docker compose -f docker-compose.dev.yml down
 ```
-
-- **Pelkän Streamlit-sovellus -kontin käynnistys:**
-
-```shell=
-docker compose up streamlit
-```
-
-- **Pelkän testikontin käynnistys:**
-
-```shell=
-docker compose up tests
-```
-
-
-- **Pelkän testiraporttikontin käynnistys:**
-
-```shell=
-docker compose up reports
-```
-
-
-- **Pelkän dokumentaatiokontin käynnistys:**
-
-```shell=
-docker compose up docs
-```
-
-
-**YMPÄRISTÖN ALASAJO:**
-
-* **Aja projektin juurikansiossa komento:**
-
-```shell=
-docker compose down
-```
-
 
 ***
 
@@ -158,97 +116,15 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 
 ***
 
-<!-- KÄYTTÖ -->
-## KÄYTTÖOHJEITA
-
-### Personal Access Tokenin lisääminen ympäristömuuttujaan
-- Bash-terminaali:
-  ``` 
-  # Lisää tiedoston loppuun seuraava rivi (vaihda "YOUR_GITLAB_TOKEN" token-arvoon):
-  export GITLAB_TOKEN="YOUR_GITLAB_TOKEN"
-  
-  # Varmista ympäristömuuttujan tallentuminen:
-  echo $GITLAB_TOKEN
-  ```
-  - Ympäristömuuttujaan tallennetun tokenin käyttö:
-      - *docker-compose.yml*:
-      ```
-      ...
-        ...
-          environment:
-            GITLAB_TOKEN: "${GITLAB_TOKEN}"
-
-      ```
-      - *app\.py* tms. kooditiedosto:
-      ```
-      gitlab_token = os.getenv("GITLAB_TOKEN")
-      ```
-
-
-
-## API-rajapinnan testaamiseen käytettävän REST Clientin asennusohje:
-
-Tässä projektissa käytetään **REST Client** -laajennusta API-pyyntöjen testaamiseen. Seuraavilla ohjeilla voit asentaa REST Clientin ja käyttää sitä helposti.
-
-### Asennusohjeet
-
-1. Avaa **Visual Studio Code**.
-2. Siirry **Extensions**-näkymään:
-   - Klikkaa vasemmassa reunassa olevaa **laajennusten kuvaketta** (ikonissa on neliö, jossa on pieni neliö sisällä).
-   - Vaihtoehtoisesti voit painaa näppäinyhdistelmää `Ctrl+Shift+X`.
-3. Kirjoita hakukenttään **"REST Client"** ja paina `Enter`.
-4. Valitse **REST Client** ja klikkaa **Install**-painiketta.
-
-### Käyttöohjeet
-
-1. Varmista, että olet asettanut ympäristömuuttujat, kuten `GITLAB_TOKEN`, `.env`-tiedostoon tai VS Code -asetuksiin. 
-   - Katso lisätietoa ympäristömuuttujien asettamisesta projektin dokumentaatiosta.
-2. Avaa projektin juurihakemistosta **`gitlab_requests.rest`**-tiedosto.
-3. Klikkaa haluamasi HTTP-pyynnön vieressä näkyvää **Send Request** -painiketta.
-4. REST Client suorittaa pyynnön ja näyttää vastauksen erillisessä paneelissa.
-
-
-## TESTAUS
-
-==HUOM!== 
-
-Etsitään tälle järkevämpi paikka README:ssä, nyt vain kirjattu komennot talteen.
-
-**Ruff**-linterin käyttö koodin tyyli- ja syntaksivirheiden tunnistamiseen ja korjaamiseen:
-- Asennetaan  ja suoritetaan automaattisesti kontin käynnistyksen yhteydessä (`docker compose up`)
-- Ruff-testin suorittaminen kontin pystytyksen jälkeen *src*-kansion koodien tarkistukseen (`docker-compose run --rm palikka ruff check src -v`)
-
-**Yksikkötestit** funktioiden ja luokkien yms. testaukseen:
-- Asennetaan  ja suoritetaan automaattisesti kontin pystytyksessä (`docker compose up`)
-- Yksikkötestien suorittaminen kontin käynnistyksen jälkeen (`docker-compose run --rm palikka pytest -v -s --tb=short --html=tests/reports/unit_test_report.html --self-contained-html tests/unit_tests.py`)
-
-
-
-***
-
 <!-- MODUULIT JA OHJELMAKOKONAISUUDET-->
-### MODUULIT
+**API**
 
+**DOCS**
 
+**SRC**
 
-### OHJELMAKOKONAISUUDET
+**TESTS**
 
-* **gitlab_link.py:** Vastaa GitLab-linkkien avaamisesta ja navigoinnista.
-* **members.py:** Näyttää projektiryhmän jäsenten tiedot ja tilastot.
-* **project.py:** Esittää projektin keskeiset tiedot ja metriikat visuaalisesti.
-* **start.py:** Projektin aloitussivu, joka sisältää pääsytietojen syötön.
-* **components.py:** Erilaisia visuaalisia komponentteja, kuten donitsikaavioita ja otsikoita, jotka käytetään eri näkymissä.
-* **app.py:** Sovelluksen pääohjelma, joka yhdistää eri ohjelmakokonaisuudet ja mahdollistaa käyttöliittymän toiminnan Streamlitissä.
-
-
-
-***
-
-<!-- MODUULIEN JA OHJELMIEN KUVAUKSET -->
-### MODUULIEN KUVAUKSET
-
-
-### OHJELMIEN KUVAUKSET
 
 
 ***
@@ -256,10 +132,20 @@ Etsitään tälle järkevämpi paikka README:ssä, nyt vain kirjattu komennot ta
 <!-- DOKUMENTAATIO -->
 ## DOKUMENTAATIO
 
+
+* Käyttöliittymä tarkasteltavissa sivulla: http://localhost:8501
+* Testiraportti tarkasteltavissa sivulla: http://localhost:8010
+* Koodidokumentaatio tarkasteltavissa sivulla: http://localhost:8502/
+* api-dokumentaatio tarkasteltavissa sivulla: http://localhost:8088/docs
+
+<br>
+
+
 - Projektikurssin Reppu-ympäristö: [_Projektiopinnot 4 - Digitaaliset palvelut_](https://reppu.kamk.fi/course/view.php?id=1451)
-- Ohjelman vaatimukset: [_Vaatimukset-dokumentaatio_](Tähän linkki)
-- Ohjelman testaus: [_Testausdokumentaatio_](Tähän linkki)
-- 
+- Ohjelman vaatimukset: [_Vaatimusmäärittely_](https://gitlab.dclabra.fi/wiki/v8kBWGJpSLGDysLJMLUIsw)
+- Tiimin Scrum-palaveridokumentaatio [_Projektiblogi_](https://gitlab.dclabra.fi/wiki/WlaG1MzxSmCmUx31mzz4Aw)
+- Ohjelman testaus: [_Testaussuunnitelma_](https://gitlab.dclabra.fi/wiki/g2UW2QM6TzG6xkVaMlMeZg)
+- Ohjelman käyttöliittymäsuunnitelma: [_Käyttöliittymäsuunnitelma_](https://gitlab.dclabra.fi/wiki/EKt-cLrXTvOSyllLJq12Tg)
 
 ***
 
