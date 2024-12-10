@@ -37,6 +37,14 @@ class ClockifyData:
         self.clockify_url = clockify_url
         self.get_workspaces()
 
+    def _get(self, endpoint):
+        """ Apufunktio GET-pyyntöjen tekemiseen Clockify-APIin. """
+        url = f"{self.clockify_url}/{endpoint}"
+        response = requests.get(url, headers=self.headers)
+        if response.status_code != 200:
+            raise Exception(f"API-pyyntö epäonnistui: {response.status_code} - {response.text}")
+        return response.json()
+    
     def iso_duration_to_seconds(self, duration):
         """Muuntaa ISO 8601 -kestoarvon sekunneiksi."""
         if duration is None:
@@ -104,6 +112,30 @@ class ClockifyData:
         else:
             print(f"Virhe haettaessa käyttäjiä: {response.status_code}")
             return []
+
+    def get_workspace_id_by_name(self, workspace_name):
+        """ Hakee työtilan ID:n nimen perusteella. """
+        workspaces = self.get_workspaces()
+        for workspace in workspaces:
+            if workspace['name'].lower() == workspace_name.lower():
+                return workspace['id']
+        raise Exception(f"Työtilaa '{workspace_name}' ei löytynyt.")
+
+    def get_project_id_by_name(self, workspace_id, project_name):
+        """ Hakee projektin ID:n nimen perusteella. """
+        projects = self._get(f"workspaces/{workspace_id}/projects")
+        for project in projects:
+            if project['name'].lower() == project_name.lower():
+                return project['id']
+        raise Exception(f"Projektia '{project_name}' ei löytynyt työtilasta.")
+
+    def get_user_id_by_name(self, workspace_id, user_name):
+        """ Hakee käyttäjän ID:n nimen perusteella. """
+        users = self._get(f"workspaces/{workspace_id}/users")
+        for user in users:
+            if user['name'].lower() == user_name.lower():
+                return user['id']
+        raise Exception(f"Käyttäjää '{user_name}' ei löytynyt työtilasta.")
 
     def get_time_entries_df(self, user_id, project_id):
         """
@@ -272,7 +304,7 @@ class ClockifyData:
                 tag_name = tag["name"]
                 tagged_entries = [
                     entry for entry in time_entries
-                    if "tagIds" in entry and tag_id in entry["tagIds"]
+                    if "tagIds" in entry and isinstance(entry["tagIds"], list) and tag_id in entry["tagIds"]
                 ]
                 total_hours = sum(
                     self.iso_duration_to_seconds(entry["timeInterval"].get("duration", "PT0S")) / 3600
@@ -394,3 +426,35 @@ class ClockifyData:
                         "total_sprint_hours": sprint_total_hours
                     })
         return pd.DataFrame(tag_and_sprint_hours_list)
+    
+    def get_project_task_hours(self):
+        """ Hae taskit ja niiden tunnit projektista
+        """
+        if not self.workspace_id or not self.project_id:
+            raise ValueError("Workspace ID tai Project ID puuttuu.")
+        
+        url = f"{self.base_url}/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        tasks = response.json()
+
+        task_data = []
+        for task in tasks:
+            duration_str = task.get("duration", "PT0S") 
+            hours, minutes = 0, 0
+            if "H" in duration_str:
+                hours = int(duration_str.split("H")[0].replace("PT", ""))
+                duration_str = duration_str.split("H")[1]
+            if "M" in duration_str:
+                minutes = int(duration_str.split("M")[0])
+            total_hours = hours + minutes / 60
+
+            task_data.append({
+                "Task ID": task.get("id"),
+                "Task Name": task.get("name"),
+                "Status": task.get("status"),
+                "Duration (hours)": round(total_hours, 2), 
+                "Estimated Time (ms)": task.get("estimate", 0)
+            })
+
+        return pd.DataFrame(task_data)

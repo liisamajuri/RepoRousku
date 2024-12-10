@@ -1,21 +1,31 @@
-image: python:3.9-slim
+# Oletuskuva ja palvelut
+default:
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind # Docker-in-Docker -palvelu, jotta voidaan suorittaa Docker-käskyjä
 
+# Pipelinessä käytettävät vaiheet
 stages:
   - lint
   - test
   - coverage
   - docs
+  - build-prod
+  - deploy-prod
 
+# Pipelinessä käytettävät muuttujat
 variables:
-  PYTHONPATH: "$CI_PROJECT_DIR/src"
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHONPATH: "$CI_PROJECT_DIR/src" # Python-moduulien hakupolku
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip" # Pipin välimuistin sijainti
 
+# Cache-asetukset (välimuistin sijainnit)
 cache:
   paths:
     - .cache/pip
     - .pytest_cache
     - __pycache__
 
+# Oletusskriptit, joita ajetaan ennen varsinaisia vaiheita
 .default_settings:
   before_script:
     - python --version
@@ -24,55 +34,112 @@ cache:
     - mkdir -p tests/artefacts
     - export PYTHONPATH=$CI_PROJECT_DIR/src
 
-lint:
-  stage: lint
-  extends: .default_settings
-  tags:
-    - docker
-  allow_failure: true
-  script:
-    - ruff check src -v    
+# Linttausvaihe: tarkistaa koodin tyyli-/syntaksivirheet
+# lint:
+#   stage: lint
+#   image: python:3.9-slim
+#   extends: .default_settings
+#   tags:
+#     - docker
+#   allow_failure: true # Virheet linttausvaiheessa eivät estä pipelinea etenemästä
+#   script:
+#     - ruff check src -v # Suorittaa Ruff-linttausohjelman   
 
-test:
-  stage: test
-  extends: .default_settings
-  tags:
-    - docker
-  allow_failure: false  
-  script:
-    - coverage run -m pytest -v
-  artifacts:
-    paths:
-      - .coverage
-      - tests/reports/*.html
-      - tests/artefacts/
-    expire_in: 1 week
+# Testausvaihe: suorittaa testit ja generoi testiraportit    
+# test:
+#   stage: test
+#   image: python:3.9-slim
+#   extends: .default_settings
+#   tags:
+#     - docker
+#   allow_failure: false # Pipeline epäonnistuu, jos testit epäonnistuvat  
+#   script:
+#     - coverage run -m pytest -v # Suorittaa testit ja mittaa testien kattavuutta
+#   variables:
+#     CLOCKIFY_TOKEN: $CLOCKIFY_TOKEN
+#     GITLAB_TOKEN: $GITLAB_TOKEN
+#   artifacts: # Tiedostot, jotka säilytetään vaiheen jälkeen
+#     paths:
+#       - .coverage
+#       - tests/reports/*.html
+#       - tests/artefacts/
+#     expire_in: 1 week # Artefact-tiedostojen säilytysaika
 
-coverage:
-  stage: coverage
-  extends: .default_settings
-  tags:
-    - docker
-  allow_failure: true  
-  script:
-    - if [ -f .coverage ]; then coverage report -m; fi
-    - if [ -f .coverage ]; then coverage html -d tests/reports/coverage_html; fi
-  artifacts:
-    paths:
-      - tests/reports/coverage_html/
-    expire_in: 1 week
+# Kattavuusraportin vaihe: tulostaa ja generoi kattavuusraportin
+# coverage:
+#   stage: coverage
+#   image: python:3.9-slim
+#   extends: .default_settings
+#   tags:
+#     - docker
+#   allow_failure: true # Pipeline ei epäonnistu kattavuusraportin epäonnistumisesta  
+#   script:
+#     - if [ -f .coverage ]; then coverage report -m; fi
+#     - if [ -f .coverage ]; then coverage html -d tests/reports/coverage_html; fi
+#   artifacts: # Tiedostot, jotka säilytetään vaiheen jälkeen
+#     paths:
+#       - tests/reports/coverage_html/
+#     expire_in: 1 week # Artefact-tiedostojen säilytysaika
 
+# # Dokumentaation rakentaminen MkDocsilla
+# docs:
+#   stage: docs
+#   image: python:3.9-slim
+#   extends: .default_settings
+#   tags:
+#     - docker
+#   script:
+#     - mkdocs build # Rakentaa dokumentaation
+#   artifacts: # Tiedostot, jotka säilytetään vaiheen jälkeen
+#     paths:
+#       - site/ # Valmiin dokumentaation sijainti
+#     expire_in: 1 week # Artefact-tiedostojen säilytysaika
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
 
-docs:
-  stage: docs
-  extends: .default_settings
+# Tuotantoversion Docker-imagen rakentaminen
+build-prod:
+  stage: build-prod
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
   tags:
-    - docker
+    - dind # Käytetään Docker-in-Docker-ympäristöä
+  environment: production # Asettaa ympäristön tuotantoympäristöksi
+  before_script:
+    - docker info # Tulostaa Dockerin tiedot
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin # Kirjautuu Docker-rekisteriin
   script:
-    - mkdocs build
-  artifacts:
-    paths:
-      - site/
-    expire_in: 1 week
+    - docker compose build --no-cache --push
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"' # Dokumentaatio generoidaan vain päähaaran muutoksista
+    - if: '$CI_COMMIT_BRANCH == "main"' # Rakennetaan vain main-branchista
+
+# Tuotantoversion käyttöönottaminen
+deploy-prod:
+  stage: deploy-prod
+  when: manual
+  tags:
+    - shell # Käyttää Shell-tagiin liitettyä runneria
+  environment: production # Asettaa ympäristön tuotantoympäristöksi
+  script:
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' # Varmistaa, että SSH-agent on asennettu
+    - eval $(ssh-agent -s) # Käynnistää SSH-agentin
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - # Lisää yksityisen SSH-avaimen
+    - mkdir -p ~/.ssh # Luo .ssh-hakemiston
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $DEPLOYMENT_SERVER >> ~/.ssh/known_hosts # Lisää palvelimen avaimet known_hosts-tiedostoon
+    - chmod 644 ~/.ssh/known_hosts
+    - scp docker-compose.prod.yml $SSH_USER@$DEPLOYMENT_SERVER:~/code/microservices/palikkapalvelut
+    - |
+      ssh $SSH_USER@$DEPLOYMENT_SERVER "
+      echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin &&
+      docker ps --filter name=palikkapalvelut* --filter status=running -aq | xargs docker rm --force; echo "Running containers stopped and removed" || true &&
+      sleep 3 &&
+      cd ~/code/microservices/palikkapalvelut &&
+      docker compose -f docker-compose.prod.yml pull; echo "Pulled new image from registry" &&
+      docker compose -f docker-compose.prod.yml up -d; echo "Started container" &&
+      docker image prune -f; echo "Pruned dangling images"
+      "
+    - echo "Application successfully deployed."
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

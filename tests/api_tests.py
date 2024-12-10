@@ -1,13 +1,12 @@
 """
 API-testit (PalikkaPalvelut)
 
-Tämä moduuli sisältää API-testit GitLab-projektille. Näissä testeissä tarkastellaan erityisesti projektitietojen 
-hakua eri token-tilanteissa: toimivalla, virheellisellä ja vanhentuneella tokenilla sekä jäsenyys- ja näkyvyystilanteita.
+Tämä moduuli sisältää API-testit GitLab- ja Clockify-projekteille. Näissä testeissä tarkastellaan erityisesti projektitietojen
+hakua eri token-tilanteissa: toimivalla, virheellisellä ja vanhentuneella tokenilla. GitLabin osalta testataan myös jäsenyys- ja näkyvyystilanteita.
 
 Huom: Tässä tiedostossa ei testata tapausta, jossa token puuttuu kokonaan. Tämä johtuu siitä, että sovelluksen 
 käyttöliittymä (`start.py`) tarkistaa tokenin olemassaolon ennen API-kutsuja. Jos token puuttuu, sovellus 
-näyttää virheilmoituksen käyttöliittymässä eikä aloita projektitietojen hakua. Tämän vuoksi puuttuvan tokenin 
-tapaus testataan käyttöliittymän testauksen yhteydessä eikä osana API-testejä.
+näyttää virheilmoituksen käyttöliittymässä eikä aloita projektitietojen hakua.
 """
 
 
@@ -19,27 +18,14 @@ import pandas as pd
 from unittest.mock import patch
 
 
-### MOCK-TOKENIT ###
-
-MOCK_CLOCKIFY_TOKEN = "mock_clockify_token"
-MOCK_GITLAB_TOKEN = "mock_gitlab_token"
-
-@pytest.fixture(autouse=True)
-def mock_env_tokens(monkeypatch):
-    """
-    Asettaa mock-tokenit ympäristömuuttujiin.
-    """
-    monkeypatch.setenv("CLOCKIFY_TOKEN", MOCK_CLOCKIFY_TOKEN)
-    monkeypatch.setenv("GITLAB_TOKEN", MOCK_GITLAB_TOKEN)
-
 
 ### GITLAB-KOMPONENTTI ###
 
-valid_token = os.getenv("GITLAB_TOKEN")
+valid_token = "glpat-FQxEmCqZTL18jrbDwtqm"
 invalid_token = "12345-6789-012345678901234"
 expired_token = "glpat-HUpy-42ye9m3oLFY5hPx"
 
-own_project_url = "https://gitlab.dclabra.fi/palikkapalvelut/PalikkaTesti-Small-Public"
+own_project_url = "https://gitlab.dclabra.fi/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut"
 public_project_url = "https://gitlab.dclabra.fi/eerohu/tietokantojen-perusteet-ja-tietokantaohjelmointi"
 private_project_url = "https://gitlab.dclabra.fi/kipe/devops-2024"
 
@@ -107,7 +93,7 @@ def test_private_project_no_access(private_project_no_access):
 ### CLOCKIFY-KOMPONENTTI ###
 
 # Mockataan ClockifyData käytettäväksi testeissä
-valid_clockify_token = os.getenv("CLOCKIFY_TOKEN")
+valid_clockify_token = "ZWQzZTZkMWUtOTg2Yi00Y2I2LTk2NGQtZTIzODg2NGJmMjZi"
 invalid_clockify_token = "12345-6789-012345678901234"
 clockify_url = "https://api.clockify.me/api/v1"
 valid_workspace_id = "671fabab605d557fc5342652"

@@ -1,5 +1,7 @@
 """
 Moduuli tokenien salauksen käsittelyyn.
+
+Ei käytössä nykyisessä RepoRouskussa. Suunniteltu jatkokehityskohteeksi.
 """
 
 from cryptography.fernet import Fernet

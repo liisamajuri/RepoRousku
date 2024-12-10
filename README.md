@@ -31,7 +31,13 @@
 
 RepoRousku on mikropalvelupohjainen sovellus, joka tarjoaa yhdellä silmäyksellä GitLab-repositorioprojektin tilan, koostaen projektihallinnan näkökulmasta projektin keskeisimmät tunnusluvut sekä projektitiimiläisten tuntitiedot yhteen näkymään. 
 
-Tämä ohjelma on rakennettu Streamlitillä, Pythonilla ja sillä noudetaan dataa GitLabista ja Clockifystä REST API -rajapintojen avulla. Dockerilla kontitettu ympäristö mahdollistaa sovelluksen helpon käyttöönoton.
+Tämä ohjelma on rakennettu mm. seuraavilla teknologioilla:
+
+*  **Streamlit**: Frontend- ja käyttöliittymä
+* **Python**: Backend- ja logiikkatoiminnot
+* **REST API**: Datan haku GitLabista ja Clockifystä
+* **Docker**: Kontitetut ympäristöt 
+* **CI/CD**: Ohjelman testit, dokumentaatio sekä deployaus tapahtuvat automaattisesti. 
 
 ***
 
@@ -41,38 +47,52 @@ Tämä ohjelma on rakennettu Streamlitillä, Pythonilla ja sillä noudetaan data
 #### Repositorion hakemistorakenne:
 ```
 Palikkapalvelut/
+|-- api/
+    |-- main.py
 |-- docs/
 |   |-- images/
 |   |-- configuration.md
 |   |-- index.md
 |   |-- modules_api_reference.md
+|   |-- serve_docs.sh
 |   |-- usage.md
+|-- requests/
+|   |-- clockify_requests.rest
+|   |-- functionality_check.rest
+|   |-- gitlab_requests.rest
 |-- site/
 |-- src/
 |   |-- .streamlit/
 |   |   |-- config.toml
 |   |-- app_pages/
-|   |   |-- gitlab_link.py
 |   |   |-- members.py
 |   |   |-- project.py
 |   |   |-- start.py
 |   |-- libraries/
 |   |   |-- components.py
+|   |   |-- encryption.py
+|   |   |-- env_tokens.py
 |   |-- images/
 |   |-- app.py
+|   |-- clockify_api.py
 |   |-- gitlab_api.py
 |-- tests/
 |   |-- reports/
 |   |-- api_tests.py
+|   |-- unit_tests.py 
 |   |-- unit_tests.py
+|-- .env
+|-- .gitignore
+|-- .gitlab-ci.yml
 |-- Dockerfile
 |-- docker-compose.yml
 |-- mkdocs.yml
+|-- pytest.ini
 |-- README.md
 |-- requirements.txt
 ```
 
-Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaation, sovelluksen lähdekoodin, testit ja Docker-konfiguraatiotiedostot.
+Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaation, sovelluksen lähdekoodin, testit, deploymentin sekä Docker-konfiguraatiotiedostot.
 
 ***
 
@@ -112,7 +132,6 @@ docker compose -f docker-compose.dev.yml down
 ### RIIPPUVUUDET
 
 Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tiedostoon. Kirjastot asennetaan Docker-kontin pystytyksen yhteydessä automaattisesti.
-
 
 ***
 

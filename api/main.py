@@ -45,7 +45,6 @@ if not GITLAB_TOKEN:
 if not CLOCKIFY_TOKEN:
     raise RuntimeError("CLOCKIFY_TOKEN ympäristömuuttujaa ei löydy. Varmista, että .env-tiedosto on määritetty oikein.")
 
-logger.info("Ympäristömuuttujat ladattu onnistuneesti.")
 
 @app.get("/")
 async def root():
@@ -259,6 +258,32 @@ async def get_member_summary(project_url: str, member: str, token: str = Depends
 
 CLOCKIFY_URL = "https://api.clockify.me/api/v1"
 
+def get_id_from_name_if_needed(clockify, workspace_name=None, project_name=None, user_name=None):
+    """
+    Hakee ID:n, jos syöte on nimi (muuten käyttää suoraan ID:tä).
+    """
+    # Hakee workspace ID:n, jos syötteenä on nimi
+    if workspace_name and not workspace_name.isdigit():
+        workspace_id = clockify.get_workspace_id_by_name(workspace_name)
+    else:
+        workspace_id = workspace_name
+    
+    # Hakee project ID:n, jos syötteenä on nimi
+    if project_name and not project_name.isdigit():
+        project_id = clockify.get_project_id_by_name(workspace_id, project_name)
+    else:
+        project_id = project_name
+    
+    # Hakee user ID:n, jos syötteenä on nimi
+    if user_name and not user_name.isdigit():
+        user_id = clockify.get_user_id_by_name(workspace_id, user_name)
+    else:
+        user_id = user_name
+    
+    return workspace_id, project_id, user_id
+
+
+
 
 @app.get("/api/v1/clockify/workspaces")
 async def get_workspaces():
@@ -280,6 +305,13 @@ async def get_projects(workspace_id: str):
     """
     try:
         clockify = ClockifyData(CLOCKIFY_URL)
+        
+        # Muunna työtilan nimi ID:ksi tarvittaessa
+        workspace_id, _, _ = get_id_from_name_if_needed(
+            clockify, 
+            workspace_name=workspace_id
+        )
+
         clockify.workspace_id = workspace_id
         projects = clockify.get_projects()
         if not projects:
@@ -296,14 +328,24 @@ async def get_users_and_hours(workspace_id: str, project_id: str):
     """
     try:
         clockify = ClockifyData(CLOCKIFY_URL)
+        
+        # Muunna nimet ID:iksi tarvittaessa
+        workspace_id, project_id, _ = get_id_from_name_if_needed(
+            clockify, 
+            workspace_name=workspace_id, 
+            project_name=project_id
+        )
+        
         clockify.workspace_id = workspace_id
         clockify.project_id = project_id
         user_hours_df = clockify.get_all_user_hours_df()
         if user_hours_df.empty:
             return {"users": [], "message": "Ei löytynyt tunnitietoja käyttäjille projektissa."}
-        return JSONResponse(user_hours_df.to_dict(orient="records"))
+        # Palauta tulokset JSON-muodossa
+        return JSONResponse(content=user_hours_df.to_dict(orient="records"))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Käyttäjätuntien haku epäonnistui: {str(e)}")
+
 
 
 @app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/users/{user_id}/time-entries")
@@ -313,29 +355,53 @@ async def get_time_entries(workspace_id: str, project_id: str, user_id: str):
     """
     try:
         clockify = ClockifyData(CLOCKIFY_URL)
+        
+        # Muunna nimet ID:iksi tarvittaessa
+        workspace_id, project_id, user_id = get_id_from_name_if_needed(
+            clockify, 
+            workspace_name=workspace_id, 
+            project_name=project_id, 
+            user_name=user_id
+        )
+        
+        # Aseta ID:t ClockifyData-objektiin
         clockify.workspace_id = workspace_id
         clockify.project_id = project_id
+        # Hae aikakirjaukset
         time_entries_df = clockify.get_time_entries_df(user_id, project_id)
         if time_entries_df.empty:
             return {"time_entries": [], "message": "Ei löytynyt aikakirjauksia käyttäjälle projektissa."}
-        return JSONResponse(time_entries_df.to_dict(orient="records"))
+        # Palauta tulokset JSON-muodossa
+        return JSONResponse(content=time_entries_df.to_dict(orient="records"))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Aikakirjausten haku epäonnistui: {str(e)}")
+
     
 @app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/total-hours")
 async def get_project_total_hours(workspace_id: str, project_id: str):
     """
-    Palauttaa projektin kokonaistunnit.
+    Palauttaa projektin kokonaistunnit työtilassa.
     """
     try:
         clockify = ClockifyData(CLOCKIFY_URL)
+        
+        # Muunna nimet ID:iksi tarvittaessa
+        workspace_id, project_id, _ = get_id_from_name_if_needed(clockify, workspace_name=workspace_id, project_name=project_id)
+        
         clockify.workspace_id = workspace_id
         clockify.project_id = project_id
+        
+        # Hae kaikkien käyttäjien tunnit
         user_hours_df = clockify.get_all_user_hours_df()
+        
+        # Laske projektin kokonaistunnit
         total_hours = user_hours_df["Työtunnit"].sum() if not user_hours_df.empty else 0
+        
         return {"project_id": project_id, "total_hours": total_hours}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Projektin kokonaistuntien haku epäonnistui: {str(e)}")
+
+
     
     
 @app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/users/{user_id}/total-hours")
@@ -344,7 +410,12 @@ async def get_user_total_hours(workspace_id: str, project_id: str, user_id: str)
     Palauttaa käyttäjän kokonaistunnit projektissa.
     """
     try:
+        # Muutetaan nimistä ID:t tarvittaessa
         clockify = ClockifyData(CLOCKIFY_URL)
+        workspace_id, project_id, user_id = get_id_from_name_if_needed(clockify, workspace_id, project_id, user_id)
+        
+        # Käsitellään Clockify API:lla
+        
         clockify.workspace_id = workspace_id
         clockify.project_id = project_id
         time_entries_df = clockify.get_time_entries_df(user_id, project_id)
@@ -352,3 +423,123 @@ async def get_user_total_hours(workspace_id: str, project_id: str, user_id: str)
         return {"user_id": user_id, "project_id": project_id, "total_hours": total_hours}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Käyttäjän kokonaistuntien haku epäonnistui: {str(e)}")
+
+@app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/sprint-hours")
+async def get_sprint_hours(
+    workspace_id: str,
+    project_id: str,
+    gitlab_url: str = Query(..., description="GitLab-projektin URL"),
+    token: str = Header(None, alias="Authorization"),
+):
+    """
+    Palauttaa käyttäjien sprinttikohtaiset tunnit GitLabin milestonejen perusteella.
+    """
+    # Käsitellään GitLab-token
+    gitlab_token = token.replace("Bearer ", "") if token else GITLAB_TOKEN
+    if not gitlab_token:
+        raise HTTPException(status_code=401, detail="GitLab-token puuttuu!")
+
+    try:
+        clockify = ClockifyData(CLOCKIFY_URL)
+
+        # Muunna nimet ID:ksi tarvittaessa
+        workspace_id, project_id, _ = get_id_from_name_if_needed(
+            clockify,
+            workspace_name=workspace_id,
+            project_name=project_id,
+        )
+
+    
+        clockify.workspace_id = workspace_id
+        clockify.project_id = project_id
+
+        # Hae sprinttikohtaiset tunnit ClockifyData-luokalla
+        sprint_hours_df = clockify.get_sprint_hours(gitlab_url, gitlab_token)
+        if sprint_hours_df.empty:
+            return {
+                "sprint_hours": [],
+                "message": "Ei löytynyt sprinttikohtaisia tietoja annetulle projektille ja työtilalle.",
+            }
+        # Palauta tulokset JSON-muodossa
+        return JSONResponse(sprint_hours_df.to_dict(orient="records"))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Sprinttituntien haku epäonnistui: {str(e)}",
+        )
+
+@app.get("/api/v1/clockify/workspaces/{workspace_id}/projects/{project_id}/tag-hours")
+async def get_tag_hours(
+    workspace_id: str,
+    project_id: str,
+    user_names: Optional[str] = Query(None, description="Pilkuilla eroteltu lista käyttäjän nimistä, joille tunnit haetaan.")
+):
+    """
+    Palauttaa projektin työtunnit tageittain. Tukee käyttäjien nimien tai kaikkien käyttäjien hakemista.
+
+    Args:
+        workspace_id (str): Clockify-työtilan ID tai nimi.
+        project_id (str): Clockify-projektin ID tai nimi.
+        user_names (str, optional): Käyttäjänimet pilkuilla eroteltuna. Oletuksena hakee kaikille käyttäjille.
+    """
+    try:
+        # ClockifyData-objekti
+        clockify = ClockifyData(CLOCKIFY_URL)
+
+        # Muunna nimet ID:ksi tarvittaessa
+        workspace_id, project_id, _ = get_id_from_name_if_needed(
+            clockify, workspace_name=workspace_id, project_name=project_id
+        )
+        clockify.workspace_id = workspace_id
+
+        # Käyttäjien ID:t nimien perusteella, jos käyttäjänimiä annetaan
+        if not user_names:  # Tämä tarkistaa, onko user_names None tai tyhjä
+            users_in_workspace = clockify.get_users_in_workspace()
+            if not users_in_workspace:
+                raise ValueError("Ei löytynyt työtilan käyttäjiä.")
+            user_ids = [user["id"] for user in users_in_workspace]
+        else:
+            # Käyttäjänimet tai ID:t, jaetaan ne pilkuilla ja käsitellään erikseen
+            user_names_or_ids = user_names.split(",")
+            user_ids = []
+            for item in user_names_or_ids:
+                item = item.strip()
+                if item.isdigit():  # Jos se on numero, se on ID
+                    user_ids.append(item)
+                else:  # Jos se ei ole numero, se käsitellään käyttäjänimenä
+                    user_id = clockify.get_user_id_by_name(workspace_id, item)
+                    if user_id:  # Varmistetaan, että user_id ei ole None
+                        user_ids.append(user_id)
+                    else:
+                        raise ValueError(f"Käyttäjänimi '{item}' ei ole kelvollinen.")
+                
+            # Jos user_ids on tyhjä, se ei voi jatkua
+            if not user_ids:
+                raise ValueError("Ei löytynyt kelvollisia käyttäjiä.")
+        
+        # Debug: tulosta käyttäjä-ID:t ennen tagi-tuntien hakua
+        print(f"User IDs: {user_ids}")
+
+        # Hae projektin tagikohtaiset tunnit
+        tag_hours_df = clockify.get_project_tag_hours(project_id, user_ids)
+
+        # Tarkistetaan, ettei tag_hours_df ole None tai tyhjä
+        if tag_hours_df is None or tag_hours_df.empty:
+            return {"tag_hours": [], "message": "Ei löytynyt tunnitietoja."}
+
+        # Käydään läpi kaikki tagit ja poistetaan tyhjät tagit
+        tag_hours = []
+        for tag in tag_hours_df.to_dict(orient="records"):
+            if tag.get("tag") is not None:  # Varmistetaan, että tag ei ole None
+                tag_hours.append(tag)
+        
+        # Palautetaan tagit 
+        return JSONResponse({
+            "tag_hours": tag_hours,
+        })
+    
+    except Exception as e:
+        print(f"Virhe: {str(e)}")  # Debugging virheilmoitusta varten
+        raise HTTPException(status_code=500, detail=f"Tagien tuntien haku epäonnistui: {str(e)}")
+
+
