@@ -8,11 +8,13 @@
 - [YLEISET TIEDOT](#yleiset-tiedot)
 - [PROJEKTIN KUVAUS](#projektin-kuvaus)
 - [REPOSITORION SISÄLTÖ](#repositorion-sisältö)
+- [OHJELMAKOKONAISUUDET](#ohjelmakokonaisuudet)
 - [ALOITTAMINEN](#aloittaminen)
   - [KÄYTTÖYMPÄRISTÖ](#käyttöympäristö)
   - [RIIPPUVUUDET](#riippuvuudet)
 - [KÄYTTÖ](#käyttöohjeita)
 - [MODUULIT](#moduulit)
+- [VAATIMUKSET](#vaatimukset)
 - [DOKUMENTAATIO](#dokumentaatio)
 
 ***
@@ -38,41 +40,67 @@ Tämä ohjelma on rakennettu Streamlitillä, Pythonilla ja sillä noudetaan data
 <!-- REPOSITORION SISÄLTÖ -->
 ## REPOSITORION SISÄLTÖ
 
-#### Repositorion hakemistorakenne:
+### Repositorion hakemistorakenne:
 ```
 Palikkapalvelut/
+|-- .streamlit/
+|   |--config.toml
+|-- api/
+|   |-- main.py
 |-- docs/
 |   |-- images/
 |   |-- configuration.md
 |   |-- index.md
 |   |-- modules_api_reference.md
+|   |-- serve_docs.sh
 |   |-- usage.md
+|-- requests/
+|-- |-- clockify_requests.rest
+|-- |-- functionality_check.rest
+|-- |-- gitlab_requests.rest
 |-- site/
 |-- src/
-|   |-- .streamlit/
-|   |   |-- config.toml
 |   |-- app_pages/
-|   |   |-- gitlab_link.py
 |   |   |-- members.py
 |   |   |-- project.py
 |   |   |-- start.py
+|   |-- images/
 |   |-- libraries/
 |   |   |-- components.py
-|   |-- images/
+|   |   |-- encryption.py
+|   |   |-- env_tokens.py
 |   |-- app.py
+|   |-- clockify_api.py
 |   |-- gitlab_api.py
 |-- tests/
 |   |-- reports/
 |   |-- api_tests.py
+|   |-- integration_tests.py
 |   |-- unit_tests.py
-|-- Dockerfile
+|-- .gitlab-ci.yml
+|-- docker-compose.dev.yml
+|-- docker-compose.prod.yml
 |-- docker-compose.yml
+|-- Dockerfile
+|-- generate_rest_docs.py
 |-- mkdocs.yml
 |-- README.md
 |-- requirements.txt
 ```
 
-Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaation, sovelluksen lähdekoodin, testit ja Docker-konfiguraatiotiedostot.
+Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaation, sovelluksen lähdekoodin, testit, API-rajapinnat, CI/CD-pipelinen sekä Docker-konfiguraatiotiedostot.
+
+<!-- MODUULIT JA OHJELMAKOKONAISUUDET-->
+### OHJELMAKOKONAISUUDET
+
+**API**
+
+**DOCS**
+
+**SRC/STREAMLIT**
+
+**TESTS**
+
 
 ***
 
@@ -83,7 +111,7 @@ Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaatio
 ```bash
 git clone git@gitlab.dclabra.fi:projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut.git
 ```
-**Jos haluat ensin tarkastella tarkempaa käyttöliittymäohjetta tai tarkempaa koodidokumentaatiota, aja projektin juurikansiossa komennot:**
+**Jos haluat ensin tarkastella tarkempaa käyttöliittymäohjetta tai koodidokumentaatiota, aja projektin juurikansiossa komennot:**
 
 ```bash
 chmod +x docs/serve_docs.sh
@@ -113,18 +141,15 @@ docker compose -f docker-compose.dev.yml down
 
 Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tiedostoon. Kirjastot asennetaan Docker-kontin pystytyksen yhteydessä automaattisesti.
 
-
 ***
+<!-- VAATIMUKSET -->
+## VAATIMUKSET
 
-<!-- MODUULIT JA OHJELMAKOKONAISUUDET-->
-**API**
+Projektin tarkoituksena on toteuttaa Streamlitillä interaktiivinen käyttöliittymä, joka tarjoaa visuaalisen esityksen projektin keskeisistä tiedoista, kuten milestonejen edistymisestä, tiimin suorituskyvystä, tiimin projektiin käyttämistä tunneista ja muista projektin metriikoista. Käyttäjä voi valita tarkasteltavaa dataa ajan tai käyttäjän perusteella ja tutkia tietoa dynaamisesti erilaisten kaavioiden avulla. 
 
-**DOCS**
+Ohjelmakoodi on toteutettu ja dokumentoitu kauttaaltaan niin, että se mahdollistaa API-rajapintojen laajentamisen sekä ohjelman jatkokehittämisen.  
 
-**SRC**
-
-**TESTS**
-
+**Toiminnallisista** ja **ei toiminnallisista vaatimuksista** sekä niiden täyttymisestä voit lukea lisää vaatimusmäärittely-[dokumentista](https://gitlab.dclabra.fi/wiki/v8kBWGJpSLGDysLJMLUIsw?both#Toiminnalliset-vaatimukset).
 
 
 ***
@@ -132,14 +157,12 @@ Erikseen asennettavat kirjastot on koottu erilliseen **_requirements.txt_**-tied
 <!-- DOKUMENTAATIO -->
 ## DOKUMENTAATIO
 
-
 * Käyttöliittymä tarkasteltavissa sivulla: http://localhost:8501
 * Testiraportti tarkasteltavissa sivulla: http://localhost:8010
 * Koodidokumentaatio tarkasteltavissa sivulla: http://localhost:8502/
 * api-dokumentaatio tarkasteltavissa sivulla: http://localhost:8088/docs
 
 <br>
-
 
 - Projektikurssin Reppu-ympäristö: [_Projektiopinnot 4 - Digitaaliset palvelut_](https://reppu.kamk.fi/course/view.php?id=1451)
 - Ohjelman vaatimukset: [_Vaatimusmäärittely_](https://gitlab.dclabra.fi/wiki/v8kBWGJpSLGDysLJMLUIsw)
