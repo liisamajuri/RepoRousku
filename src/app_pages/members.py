@@ -215,12 +215,7 @@ def member_page():
             else:
                 with col2_2:
                 # näytä logo, jos Clockify-data ei ole saatavilla
-                    bc = cl.get_background_color()
-                    if bc and bc == white_color:
-                        image_path = Path(__file__).parent.parent / 'images' / 'mushroom_light.png'
-
-                    else:
-                        image_path = Path(__file__).parent.parent / 'images' / 'mushroom_dark.png'
+                    image_path = Path(__file__).parent.parent / 'images' / 'mushroom_transparent.png'
                     st.image(str(image_path), caption=clockify_not_available)
 
 # Sivun otsikko 
