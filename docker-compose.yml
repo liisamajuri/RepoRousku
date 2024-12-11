@@ -15,3 +15,13 @@ services:
       sh -c "
       streamlit run src/app.py --server.port=8511 --server.enableCORS=false 
       "
+
+  documentation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut/documentation
+    command: >
+      sh -c "
+      mkdocs serve -a 0.0.0.0:8502
+      "
