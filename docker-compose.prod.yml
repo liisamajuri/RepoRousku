@@ -20,10 +20,10 @@ services:
     image: gitlab.dclabra.fi:4567/projektiopinnot-4-digitaaliset-palvelut/palikkapalvelut/documentation
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.palikkapalvelut.rule=Host(`jvprojekti2024s.dclabra.fi`) && PathPrefix(`/palikkapalvelut`)"
+      - "traefik.http.routers.palikkapalvelut.rule=Host(`jvprojekti2024s.dclabra.fi`) && PathPrefix(`/palikkapalvelut/documentation`)"
       - "traefik.http.routers.palikkapalvelut.entrypoints=web"
       - "traefik.http.routers.palikkapalvelut.middlewares=palikkapalvelut-strip-prefix"
-      - "traefik.http.middlewares.palikkapalvelut-strip-prefix.stripprefix.prefixes=/palikkapalvelut"
+      - "traefik.http.middlewares.palikkapalvelut-strip-prefix.stripprefix.prefixes=/palikkapalvelut/documentation"
     expose:
       - "8502"
     networks:
