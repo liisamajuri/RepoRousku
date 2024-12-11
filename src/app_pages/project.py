@@ -328,11 +328,9 @@ def project_page():
             tabs.append(work_hours)
 
         tab_objects_b = st.tabs(tabs)
-        tab_b1, tab_b2 = tab_objects_b[:2]
-
-        tab_b3 = None
-        if cl.clockify_available():
-            tab_b3 = tab_objects_b[2]
+        tab_b1 = tab_objects_b[0] if len(tab_objects_b) > 0 else None
+        tab_b2 = tab_objects_b[1] if len(tab_objects_b) > 1 else None
+        tab_b3 = tab_objects_b[2] if len(tab_objects_b) > 2 else None
 
         # Suljetut issuet ja commitit milestoneittain
         with tab_b1:
@@ -347,22 +345,23 @@ def project_page():
         start_date, end_date = milestone_selector()
 
         # Välilehdet aikasarjakaavioihin
-        tab_objects_l = st.tabs(tabs)
-        tab_l1, tab_l2 = tab_objects_l[:2]
-        if cl.clockify_available():
-            tab_l3 = tab_objects_l[2]
+        tabs_l = [closed_issues, commits]
+        if False and cl.clockify_available(): # Jatkokehitykseen
+            tabs_l.append(work_hours)
 
-        # Aikasarjat suljetuista issueista ja commiteista
+        tab_objects_l = st.tabs(tabs_l)
+        tab_l1 = tab_objects_l[0] if len(tab_objects_l) > 0 else None
+        tab_l2 = tab_objects_l[1] if len(tab_objects_l) > 1 else None
+        tab_l3 = tab_objects_l[2] if len(tab_objects_l) > 2 else None
+
+        # Aikasarjat suljetuista issueista, commiteista ja työtunneista
         with tab_l1:
             closed_issues_by_date(members, start_date, end_date)
         with tab_l2:
             commits_by_date(members, start_date, end_date)
-
-        # Aikasarjat Clockify työtunneille
-        if cl.clockify_available():
+        if tab_l3:
             with tab_l3:
-                pass
-
+                pass # Jatkokehitykseen
 
 if not st.session_state[proj_data]:
     cl.make_page_title(project_title)
