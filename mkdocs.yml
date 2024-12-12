@@ -52,6 +52,9 @@ plugins:
         python:
           rendering:
             show_root_toc_entry: false
+          options:
+            heading_level: 3 #O docstring-otsikkotaso 3. levelille
+            
             
 copyright: |
   PalikkaPalvelut in 2024.

@@ -11,19 +11,19 @@
       
       
       
-      <link rel="icon" href="/images/logo_sieni_mkdocs.png">
+      <link rel="icon" href="../images/logo_sieni_mkdocs.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.43">
     
     
       
-        <title>RepoRouskun koodidokumentaatio ja käyttöohjeet</title>
+        <title>REST API Dokumentaatio - RepoRouskun koodidokumentaatio ja käyttöohjeet</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.0253249f.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.0253249f.min.css">
       
         
-        <link rel="stylesheet" href="/assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -42,9 +42,9 @@
       
     
     
-      <link rel="stylesheet" href="/assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -67,6 +67,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#rest-api-dokumentaatio" class="md-skip">
+          Hyppää sisältöön
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -79,9 +84,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Ylätunniste">
-    <a href="/." title="RepoRouskun koodidokumentaatio ja käyttöohjeet" class="md-header__button md-logo" aria-label="RepoRouskun koodidokumentaatio ja käyttöohjeet" data-md-component="logo">
+    <a href=".." title="RepoRouskun koodidokumentaatio ja käyttöohjeet" class="md-header__button md-logo" aria-label="RepoRouskun koodidokumentaatio ja käyttöohjeet" data-md-component="logo">
       
-  <img src="/images/logo_sieni_mkdocs.png" alt="logo">
+  <img src="../images/logo_sieni_mkdocs.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              REST API Dokumentaatio
             
           </span>
         </div>
@@ -173,9 +178,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigaatio" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/." title="RepoRouskun koodidokumentaatio ja käyttöohjeet" class="md-nav__button md-logo" aria-label="RepoRouskun koodidokumentaatio ja käyttöohjeet" data-md-component="logo">
+    <a href=".." title="RepoRouskun koodidokumentaatio ja käyttöohjeet" class="md-nav__button md-logo" aria-label="RepoRouskun koodidokumentaatio ja käyttöohjeet" data-md-component="logo">
       
-  <img src="/images/logo_sieni_mkdocs.png" alt="logo">
+  <img src="../images/logo_sieni_mkdocs.png" alt="logo">
 
     </a>
     RepoRouskun koodidokumentaatio ja käyttöohjeet
@@ -190,7 +195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -210,7 +215,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/usage/" class="md-nav__link">
+      <a href="../usage/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -230,7 +235,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/modules_api_reference/" class="md-nav__link">
+      <a href="../modules_api_reference/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -250,7 +255,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -280,6 +285,43 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Sisällysluettelo
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#clockify_requestsrest" class="md-nav__link">
+    <span class="md-ellipsis">
+      clockify_requests.rest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functionality_checkrest" class="md-nav__link">
+    <span class="md-ellipsis">
+      functionality_check.rest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gitlab_requestsrest" class="md-nav__link">
+    <span class="md-ellipsis">
+      gitlab_requests.rest
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -291,8 +333,100 @@
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+<h1 id="rest-api-dokumentaatio">REST API Dokumentaatio</h1>
+<p>Tämä dokumentaatio sisältää yleiskuvauksen .rest-testitiedostoista. Tarkempi Swagger-dokumentaatio löytyy <a href="http://localhost:8088/docs">täältä</a>.</p>
+<h2 id="clockify_requestsrest">clockify_requests.rest</h2>
+<p>Tämä tiedosto sisältää REST-pyynnöt Clockify-integraation testaamiseksi RepoRouskun API:ssa.</p>
+<table>
+<thead>
+<tr>
+<th>Pyyntö</th>
+<th>Kuvaus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET <code>/api/v1/clockify/workspaces</code></td>
+<td>Hae kaikki työtilat</td>
+</tr>
+<tr>
+<td>GET <code>/api/v1/clockify/workspaces/{workspaceId}/projects</code></td>
+<td>Hae työtilan projektit</td>
+</tr>
+<tr>
+<td>GET <code>/api/v1/clockify/workspaces/{workspaceId}/projects/{projectId}/users</code></td>
+<td>Hae kaikkien käyttäjien työtunnit projektista</td>
+</tr>
+<tr>
+<td>GET <code>/api/v1/clockify/workspaces/{workspaceId}/projects/{projectId}/users/{userId}/time-entries</code></td>
+<td>Hae yksittäisen käyttäjän aikakirjaukset projektista</td>
+</tr>
+<tr>
+<td>GET <code>/api/v1/clockify/workspaces/{workspaceId}/projects/{projectId}/total-hours</code></td>
+<td>Hae projektin kokonaistunnit</td>
+</tr>
+<tr>
+<td>GET <code>/api/v1/clockify/workspaces/{workspaceId}/projects/{projectId}/users/{userId}/total-hours</code></td>
+<td>Hae käyttäjän kokonaistunnit projektissa</td>
+</tr>
+</tbody>
+</table>
+<h2 id="functionality_checkrest">functionality_check.rest</h2>
+<p>Tämä tiedosto sisältää REST-pyynnöt API-rajapinnan yleisen toimivuuden testaamiseksi RepoRouskun API:ssa.</p>
+<table>
+<thead>
+<tr>
+<th>Pyyntö</th>
+<th>Kuvaus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET <code>/health</code></td>
+<td>Tarkista API:n toimivuus</td>
+</tr>
+<tr>
+<td>GET <code>/status</code></td>
+<td>Tarkista API:n status</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gitlab_requestsrest">gitlab_requests.rest</h2>
+<p>Tämä tiedosto sisältää REST-pyynnöt GitLab-integraation testaamiseksi RepoRouskun API:ssa.</p>
+<table>
+<thead>
+<tr>
+<th>Pyyntö</th>
+<th>Kuvaus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET <code>/api/v1/gitlab/project-summary?project_url={projectUrl}</code></td>
+<td>Hae GitLab-projektin yleiset tiedot</td>
+</tr>
+<tr>
+<td>GET <code>/api/v1/gitlab/member-summary?project_url={projectUrl}&amp;member={memberName}</code></td>
+<td>Hae GitLab-projektin jäsenen tilastot</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -330,10 +464,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "/", "features": ["content.tooltips"], "search": "/assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Kopioitu leikep\u00f6yd\u00e4lle", "clipboard.copy": "Kopioi leikep\u00f6yd\u00e4lle", "search.result.more.one": "1 lis\u00e4\u00e4 t\u00e4ll\u00e4 sivulla", "search.result.more.other": "# lis\u00e4\u00e4 t\u00e4ll\u00e4 sivulla", "search.result.none": "Ei t\u00e4sm\u00e4\u00e4vi\u00e4 dokumentteja", "search.result.one": "1 t\u00e4sm\u00e4\u00e4v\u00e4 dokumentti", "search.result.other": "# t\u00e4sm\u00e4\u00e4v\u00e4\u00e4 dokumenttia", "search.result.placeholder": "Kirjoita aloittaaksesi haun", "search.result.term.missing": "Puuttuu", "select.version": "Valitse versio"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tooltips"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Kopioitu leikep\u00f6yd\u00e4lle", "clipboard.copy": "Kopioi leikep\u00f6yd\u00e4lle", "search.result.more.one": "1 lis\u00e4\u00e4 t\u00e4ll\u00e4 sivulla", "search.result.more.other": "# lis\u00e4\u00e4 t\u00e4ll\u00e4 sivulla", "search.result.none": "Ei t\u00e4sm\u00e4\u00e4vi\u00e4 dokumentteja", "search.result.one": "1 t\u00e4sm\u00e4\u00e4v\u00e4 dokumentti", "search.result.other": "# t\u00e4sm\u00e4\u00e4v\u00e4\u00e4 dokumenttia", "search.result.placeholder": "Kirjoita aloittaaksesi haun", "search.result.term.missing": "Puuttuu", "select.version": "Valitse versio"}}</script>
     
     
-      <script src="/assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>

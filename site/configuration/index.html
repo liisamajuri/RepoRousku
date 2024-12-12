@@ -13,12 +13,12 @@
       
       
       
-      <link rel="icon" href="../images/logo.png">
+      <link rel="icon" href="../images/logo_sieni_mkdocs.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.43">
     
     
       
-        <title>Konfiguraatioista - RepoRouskun koodidokumentaatio</title>
+        <title>Konfiguraatioista - RepoRouskun koodidokumentaatio ja käyttöohjeet</title>
       
     
     
@@ -86,9 +86,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Ylätunniste">
-    <a href=".." title="RepoRouskun koodidokumentaatio" class="md-header__button md-logo" aria-label="RepoRouskun koodidokumentaatio" data-md-component="logo">
+    <a href=".." title="RepoRouskun koodidokumentaatio ja käyttöohjeet" class="md-header__button md-logo" aria-label="RepoRouskun koodidokumentaatio ja käyttöohjeet" data-md-component="logo">
       
-  <img src="../images/logo.png" alt="logo">
+  <img src="../images/logo_sieni_mkdocs.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -99,7 +99,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            RepoRouskun koodidokumentaatio
+            RepoRouskun koodidokumentaatio ja käyttöohjeet
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -180,12 +180,12 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigaatio" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="RepoRouskun koodidokumentaatio" class="md-nav__button md-logo" aria-label="RepoRouskun koodidokumentaatio" data-md-component="logo">
+    <a href=".." title="RepoRouskun koodidokumentaatio ja käyttöohjeet" class="md-nav__button md-logo" aria-label="RepoRouskun koodidokumentaatio ja käyttöohjeet" data-md-component="logo">
       
-  <img src="../images/logo.png" alt="logo">
+  <img src="../images/logo_sieni_mkdocs.png" alt="logo">
 
     </a>
-    RepoRouskun koodidokumentaatio
+    RepoRouskun koodidokumentaatio ja käyttöohjeet
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -201,7 +201,7 @@
         
   
   <span class="md-ellipsis">
-    Aloitus
+    Tervehdys
   </span>
   
 
@@ -221,7 +221,7 @@
         
   
   <span class="md-ellipsis">
-    Käyttö-ohjeet
+    Käyttöohjeet
   </span>
   
 
@@ -312,9 +312,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dockerfile-konfiguraatio" class="md-nav__link">
+  <a href="#dockerfile" class="md-nav__link">
     <span class="md-ellipsis">
-      Dockerfile-konfiguraatio
+      Dockerfile
     </span>
   </a>
   
@@ -324,6 +324,24 @@
   <a href="#docker-compose-konfiguraatio" class="md-nav__link">
     <span class="md-ellipsis">
       Docker Compose -konfiguraatio
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gitlab-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitLab CI/CD
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mkdocs-konfiguraatio" class="md-nav__link">
+    <span class="md-ellipsis">
+      MkDocs-konfiguraatio
     </span>
   </a>
   
@@ -373,9 +391,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dockerfile-konfiguraatio" class="md-nav__link">
+  <a href="#dockerfile" class="md-nav__link">
     <span class="md-ellipsis">
-      Dockerfile-konfiguraatio
+      Dockerfile
     </span>
   </a>
   
@@ -385,6 +403,24 @@
   <a href="#docker-compose-konfiguraatio" class="md-nav__link">
     <span class="md-ellipsis">
       Docker Compose -konfiguraatio
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gitlab-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitLab CI/CD
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mkdocs-konfiguraatio" class="md-nav__link">
+    <span class="md-ellipsis">
+      MkDocs-konfiguraatio
     </span>
   </a>
   
@@ -407,68 +443,131 @@
 
 <h1 id="konfiguraatio">Konfiguraatio</h1>
 <h2 id="yleiskuvaus">Yleiskuvaus</h2>
-<p>Tämä konfiguraatiodokumentti auttaa ymmärtämään RepoRouskun käyttämät konfiguraatiot, kuten Dockerin, Docker Composen ja GitLab CI/CD -putken asetukset. Näiden konfiguraatioiden avulla RepoRousku saadaan helposti käyttöön ja testaukset suoritetaan automaattisesti.</p>
-<h2 id="dockerfile-konfiguraatio">Dockerfile-konfiguraatio</h2>
-<p><strong>Dockerfile</strong></p>
-<p>RepoRousku on kontitettu käyttäen seuraavaa Dockerfileä, joka määrittelee ympäristön, jossa sovellus suoritetaan.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Virallinen Python 3.9 -image</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">FROM</span> <span class="n">python</span><span class="p">:</span><span class="mf">3.9</span><span class="o">-</span><span class="n">slim</span>
+<p>Tämä dokumentti esittelee RepoRouskun tärkeimmät konfiguraatiotiedostot, kuten:
+* <strong>Dockerfile</strong>
+* <strong>Docker Compose -konfiguraatio</strong>
+* <strong>GitLab CI/CD -putken määrittely</strong>
+* <strong>MkDocs-dokumentaation konfiguraatio</strong></p>
+<p>Näiden konfiguraatioiden avulla sovellus voidaan asentaa, testata, käyttää ja dokumentoida tehokkaasti.</p>
+<h2 id="dockerfile">Dockerfile</h2>
+<p>Dockerfile määrittää ympäristön, jossa RepoRousku-sovellus suoritetaan.</p>
+<div class="language-dockerfile highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c"># Python 3.9 -image</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.9-slim</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Aseta työhakemisto</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">WORKDIR</span> <span class="o">/</span><span class="n">app</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c"># Aseta työhakemisto</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Kopioi requirements.txt juurikansiosta konttiin</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">COPY</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="o">.</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c"># Kopioi riippuvuudet</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>.
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Asenna riippuvuudet</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">RUN</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">cache</span><span class="o">-</span><span class="nb">dir</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c"># Asenna riippuvuudet</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># Kopioi kaikki tiedostot src-kansiosta konttiin</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">COPY</span> <span class="n">src</span> <span class="o">/</span><span class="n">app</span><span class="o">/</span><span class="n">src</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1"># Aseta oletuskomento, joka suorittaa Streamlit-sovelluksen</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">CMD</span> <span class="p">[</span><span class="s2">&quot;streamlit&quot;</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;src/app.py&quot;</span><span class="p">,</span> <span class="s2">&quot;--server.port=8501&quot;</span><span class="p">,</span> <span class="s2">&quot;--server.enableCORS=false&quot;</span><span class="p">]</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c"># Kopioi lähdekoodi ja dokumentaatio</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="k">COPY</span><span class="w"> </span>src<span class="w"> </span>/app/src
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="k">COPY</span><span class="w"> </span>tests<span class="w"> </span>/app/tests
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">COPY</span><span class="w"> </span>api<span class="w"> </span>/app/api
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="k">COPY</span><span class="w"> </span>mkdocs.yml<span class="w"> </span>.
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="k">COPY</span><span class="w"> </span>docs<span class="w"> </span>/app/docs
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="c"># Oletuskomento (API:n käynnistys)</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;uvicorn&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;api.main:app&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--host&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--port&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;8088&quot;</span><span class="p">]</span>
 </span></code></pre></div>
 <p><strong>Selitys:</strong></p>
 <ul>
-<li>
-<p><strong>Base Image:</strong> Dockerfile käyttää python:3.9-slim-peruskuvaa, joka on kevyempi versio Python-kuvasta.</p>
-</li>
-<li>
-<p><strong>WORKDIR:</strong> Asettaa työskentelyhakemistoksi /app.</p>
-</li>
-<li>
-<p><strong>COPY ja RUN:</strong> Kopioi riippuvuustiedoston ja asentaa sovelluksen vaatimat riippuvuudet.</p>
-</li>
-<li>
-<p><strong>CMD:</strong> Asettaa oletuskomennoksi Streamlit-sovelluksen suorittamisen portissa 8501.</p>
-</li>
+<li><strong>Base image</strong>: Kevyt Python 3.9 -kuva (slim).
+<strong>Riippuvuuksien hallinta</strong>: Pip-asennus requirements.txt-tiedostosta.
+<strong>Lähdekoodi</strong>: Sisältää lähdekoodin, testit, dokumentaation ja API:n.
+<strong>Oletuskomento</strong>: Käynnistää API:n Uvicorn-palvelimella.</li>
 </ul>
 <h2 id="docker-compose-konfiguraatio">Docker Compose -konfiguraatio</h2>
-<p><strong>docker-compose.yml</strong></p>
-<p>Docker Compose -tiedosto mahdollistaa sovelluksen suorittamisen Dockerilla yksinkertaisemmin määrittelemällä, miten kontit käynnistetään ja mitkä ympäristömuuttujat tarvitaan.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">services</span><span class="p">:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  <span class="n">palikka</span><span class="p">:</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">build</span><span class="p">:</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>      <span class="n">context</span><span class="p">:</span> <span class="o">.</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>      <span class="n">dockerfile</span><span class="p">:</span> <span class="n">Dockerfile</span> 
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">ports</span><span class="p">:</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>      <span class="o">-</span> <span class="s2">&quot;8501:8501&quot;</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">environment</span><span class="p">:</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>      <span class="n">GITLAB_TOKEN</span><span class="p">:</span> <span class="s2">&quot;$</span><span class="si">{GITLAB_TOKEN}</span><span class="s2">&quot;</span>
+<p>docker-compose.yml määrittää sovelluksen eri palvelut.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">services</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">streamlit</span><span class="p">:</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">build</span><span class="p">:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">      </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dockerfile</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8501:8501&quot;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">      </span><span class="nt">GITLAB_TOKEN</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${GITLAB_TOKEN}&quot;</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">      </span><span class="nt">PYTHONPATH</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/app/src&quot;</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./tests/reports:/app/tests/reports</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">      </span><span class="no">sh -c &quot;</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">      </span><span class="no">pip install -r requirements.txt &amp;&amp;</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">      </span><span class="no">streamlit run src/app.py --server.port=8501 --server.enableCORS=false&quot;</span>
 </span></code></pre></div>
-<p><strong>Selitys:</strong></p>
+<p><strong>Palvelut:</strong></p>
 <ul>
-<li>
-<p><strong>services:</strong> Määrittelee palvelun nimeltä <code>palikka</code>, joka rakentuu projektin Dockerfilen avulla.</p>
-</li>
-<li>
-<p><strong>ports:</strong> Kartoitus portista 8501, jotta Streamlit-sovellus on saatavilla.</p>
-</li>
-<li>
-<p><strong>environment:</strong> Ympäristömuuttuja GITLAB_TOKEN määritellään, jotta sovellus voi käyttää GitLabin APIa.</p>
-</li>
+<li><strong>streamlit</strong>: Käynnistää RepoRouskun Streamlit-sovelluksen portissa 8501.</li>
+<li><strong>reports</strong>: Tarjoaa testiraportit HTTP-palvelimella.</li>
+<li><strong>docs</strong>: Käynnistää MkDocs-dokumentaation palvelimella portissa 8502.</li>
+<li><strong>api</strong>: Käynnistää API:n Uvicorn-palvelimella portissa 8088.</li>
 </ul>
+<h2 id="gitlab-cicd">GitLab CI/CD</h2>
+<p>GitLab CI/CD -putki sisältää neljä vaihetta:</p>
+<ol>
+<li>Lint</li>
+<li>Test</li>
+<li>Coverage</li>
+<li>Docs</li>
+</ol>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">stages</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lint</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">coverage</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">lint</span><span class="p">:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lint</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruff check src -v</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nt">test</span><span class="p">:</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">coverage run -m pytest -v</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="nt">coverage</span><span class="p">:</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">coverage</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">coverage report -m</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">coverage html -d tests/reports/coverage_html</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="nt">docs</span><span class="p">:</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mkdocs build</span>
+</span></code></pre></div>
+<p><strong>Selitys:</strong>
+1. Lint: Tarkistaa koodin laadun Ruffin avulla.
+2. Test: Suorittaa yksikkö-, API- ja integraatiotestit Pytestillä.
+3. Coverage: Generoi koodikattavuusraportin.
+4. Docs: Rakentaa dokumentaation MkDocsilla.</p>
+<h2 id="mkdocs-konfiguraatio">MkDocs-konfiguraatio</h2>
+<p>MkDocs luo staattisen sivuston sovelluksen dokumentaatiosta.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">site_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RepoRouskun koodidokumentaatio ja käyttöohjeet</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">theme</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">material</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">palette</span><span class="p">:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">primary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">black</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="nt">accent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deep orange</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="nt">nav</span><span class="p">:</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Tervehdys</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Käyttöohjeet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">usage.md</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Koodidokumentaatio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modules_api_reference.md</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Konfiguraatioista</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">configuration.md</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="nt">plugins</span><span class="p">:</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">search</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mkdocstrings</span><span class="p">:</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">      </span><span class="nt">handlers</span><span class="p">:</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">        </span><span class="nt">python</span><span class="p">:</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">          </span><span class="nt">rendering</span><span class="p">:</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">            </span><span class="nt">show_root_toc_entry</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span></code></pre></div>
+<p><strong>Selitys:</strong>
+* <strong>Teema:</strong> Material Design (slate-värimaailma).
+* <strong>Navigaatio:</strong> Sivut esitetään järjestyksessä nav-osassa.
+* <strong>Plugins:</strong> Hakutoiminnallisuus ja automaattisesti generoitu Python-koodidokumentaatio.</p>
 
 
 
