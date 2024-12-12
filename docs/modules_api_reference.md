@@ -6,7 +6,7 @@ Tässä dokumentaatiossa kuvataan RepoRouskun Python-koodin eri moduulien toimin
 ---
 
 
-## Aloitussivu
+## OHJELMAN ALOITUSSIVU
 
 Dokumentaatio `start.py` -moduulista, joka käsittelee projektin aloitussivun ja tokenien syötön.
 
@@ -14,7 +14,7 @@ Dokumentaatio `start.py` -moduulista, joka käsittelee projektin aloitussivun ja
 
 ---
 
-## Main -sovellus
+## MAIN
 
 Dokumentaatio `app.py` -moduulista, joka sisältää sovelluksen päätoiminnot ja navigaation.
 
@@ -22,7 +22,7 @@ Dokumentaatio `app.py` -moduulista, joka sisältää sovelluksen päätoiminnot 
 
 ---
 
-## Projektin tiedot -sivu
+## PROJEKTIN TIEDOT
 
 Dokumentaatio `project.py` -moduulista, joka näyttää projektin keskeiset tiedot ja visualisoi ne käyttäjälleen.
 
@@ -30,7 +30,7 @@ Dokumentaatio `project.py` -moduulista, joka näyttää projektin keskeiset tied
 
 ---
 
-## Käyttäjät -sivu
+## JÄSENET
 
 Dokumentaatio `members.py` -moduulista, joka sisältää funktiot projektiryhmän jäsenten tietojen käsittelyyn.
 
@@ -38,7 +38,7 @@ Dokumentaatio `members.py` -moduulista, joka sisältää funktiot projektiryhmä
 
 ---
 
-## GitLab-integraatio
+## GITLAB-INTEGRAATIO
 
 Dokumentaatio `gitlab_api.py` -moduulista, joka sisältää luokan GitLabin tietojen hakuun ja käsittelyyn.
 
@@ -46,7 +46,7 @@ Dokumentaatio `gitlab_api.py` -moduulista, joka sisältää luokan GitLabin tiet
 
 ---
 
-## Clockify-integraatio
+## CLOCKIFY-INTEGRAATIO
 
 Dokumentaatio `clockify_api.py` -moduulista, joka sisältää luokan Clockifyn tietojen hakuun ja käsittelyyn.
 
@@ -54,7 +54,7 @@ Dokumentaatio `clockify_api.py` -moduulista, joka sisältää luokan Clockifyn t
 
 ---
 
-## Komponentit
+## KOMPONENTIT
 
 Dokumentaatio `components.py` -moduulista, joka sisältää useita erilaisia komponentteja, kuten sivun otsikon ja graafisten esitysten luomisen, joita käytetään useissa eri näkymissä.
 
@@ -62,7 +62,7 @@ Dokumentaatio `components.py` -moduulista, joka sisältää useita erilaisia kom
 
 ---
 
-## Tokenit
+## TOKENIT
 
 Dokumentaatio `env_tokens.py` -moduulista, joka sisältää tokenien käsittelyyn liittyvät funktiot.
 
@@ -70,15 +70,15 @@ Dokumentaatio `env_tokens.py` -moduulista, joka sisältää tokenien käsittelyy
 
 ---
 
-## Salaus
+## SALAUS
 
-Dokumentaatio `encryption.py` -moduulista, joka sisältää tokenien salaukseen liittyvät funktiot.
+Dokumentaatio `encryption.py` -moduulista, joka sisältää tokenien salaukseen liittyvät funktiot. Tokenien salausta ei ole käytössä ohjelmistossa, mutta tässä oiva jatkokehityskohde. 
 
 ::: src.libraries.encryption
 
 ---
 
-## Inbound API
+## INBOUND API
 
 Dokumentaatio  `api/main.py` -moduulista, joka määrittelee RepoRouskun tarjoaman APIn.
 
@@ -86,7 +86,7 @@ Dokumentaatio  `api/main.py` -moduulista, joka määrittelee RepoRouskun tarjoam
 
 ---
 
-## Yksikkötestaus
+## YKSIKKÖTESTAUS
 
 Dokumentaatio `unit_tests.py` moduulista.
 
@@ -94,7 +94,7 @@ Dokumentaatio `unit_tests.py` moduulista.
 
 ---
 
-## Integraatiotestaus
+## INTEGRAATIOTESTAUS
 
 Dokumentaatio `integration_tests.py` moduulista.
 
@@ -102,7 +102,7 @@ Dokumentaatio `integration_tests.py` moduulista.
 
 ---
 
-## Outbound APIn testaus
+## OUTBOUND APIn TESTAUS
 
 Dokumentaatio `api_tests.py` moduulista, joka testaa tietojen hakua GitLabista ja Clockifystä.
 
@@ -110,6 +110,6 @@ Dokumentaatio `api_tests.py` moduulista, joka testaa tietojen hakua GitLabista j
 
 ---
 
-## Inbound APIn testaus
+## INBOUND APIn TESTAUS
 
 Yleiskuvaus .rest-testitiedostoista löytyy [täältä](rest_tests.md) ja yksityiskohtaisempi Swagger-dokumentaatio löytyy [täältä](http://localhost:8088/docs).
