@@ -15,8 +15,6 @@ services:
       sh -c "
       streamlit run src/app.py --server.port=8511 --server.enableCORS=false 
       "
-    volumes:
-      - ./.streamlit:/app/.streamlit
     
 networks:
   microservices-network:
