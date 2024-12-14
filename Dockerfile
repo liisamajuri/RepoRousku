@@ -20,7 +20,7 @@ COPY mkdocs.yml .
 COPY docs /app/docs
 
 # Kopioi tyylitiedosto
-COPY .streamlit /app/.streamlit
+COPY .streamlit/config.toml /app/.streamlit/config.toml
 
 # Kopioi tarvittavat tiedotot .rest-tiedostojen autodokumentaatiota varten
 COPY requests /app/requests
