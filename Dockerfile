@@ -19,6 +19,9 @@ COPY api /app/api
 COPY mkdocs.yml .
 COPY docs /app/docs
 
+# Kopioi tyylitiedosto
+COPY .streamlit /app/.streamlit
+
 # Kopioi tarvittavat tiedotot .rest-tiedostojen autodokumentaatiota varten
 COPY requests /app/requests
 COPY generate_rest_docs.py ./generate_rest_docs.py
