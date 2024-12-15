@@ -867,19 +867,24 @@ class ProjectData:
 
         # Lisätään puuttuvat milestone-assignee-yhdistelmät
         df_milestones = self.get_milestones()
-        all_milestones = df_milestones[key_title].unique()
-        grouped_data = (
-            grouped_data.set_index([key_milestone, key_assignees])
-            .reindex(pd.MultiIndex.from_product([all_milestones, members], names=[key_milestone, key_assignees]), fill_value=0)
-            .reset_index())
 
-        # Uudelleennimetään sarake
-        grouped_data = grouped_data.rename(columns={key_assignees: key_member})
+        if len(df_milestones):
+            all_milestones = df_milestones[key_title].unique()
+            grouped_data = (
+                grouped_data.set_index([key_milestone, key_assignees])
+                .reindex(pd.MultiIndex.from_product([all_milestones, members], names=[key_milestone, key_assignees]), fill_value=0)
+                .reset_index())
 
-        # Lukumäärä kokonaisluvuksi
-        grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+            # Uudelleennimetään sarake
+            grouped_data = grouped_data.rename(columns={key_assignees: key_member})
 
-        return grouped_data, key_milestone, key_pcs, key_member
+            # Lukumäärä kokonaisluvuksi
+            grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+
+            return grouped_data, key_milestone, key_pcs, key_member
+
+        else:
+            return pd.DataFrame(), key_milestone, key_pcs, key_member
 
 
     def get_commits_by_milestone(self, members):
