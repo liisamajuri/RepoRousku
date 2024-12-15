@@ -148,7 +148,7 @@ def closed_issues_by_milestone(members):
     """
     if len(members):
         data, x_field, y_field, color_field = st.session_state[proj_data].get_closed_issues_by_milestone(members)
-        if data[y_field].sum():
+        if len(data) and data[y_field].sum():
             st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
         else:
             st.warning(no_issues_by_milestones)
