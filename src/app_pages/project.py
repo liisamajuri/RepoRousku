@@ -32,6 +32,8 @@ slider_help = "Valitse tarkasteltavan ajanjakson alku ja loppu. Ajanjakso sisäl
 no_members = "Valitse vähintään yksi jäsen"
 no_issues = "Ei suljettuja issueita valituilla jäsenillä"
 no_commits = "Ei committeja valituilla jäsenillä"
+no_issues_by_milestones = "Ei suljettuja issueita milestoneissa valituilla jäsenillä"
+no_commits_by_milestones = "Ei committeja milestoneissa valituilla jäsenillä"
 
 # Muuttujat
 proj_data = "proj_data"
@@ -149,7 +151,7 @@ def closed_issues_by_milestone(members):
         if data[y_field].sum():
             st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
         else:
-            st.warning(no_issues)
+            st.warning(no_issues_by_milestones)
     else:
         st.warning(no_members)
 
@@ -166,7 +168,7 @@ def commits_by_milestone(members):
         if data[y_field].sum():
             st.bar_chart(data, x=x_field, y=y_field, color=color_field, horizontal=True)
         else:
-            st.warning(no_commits)
+            st.warning(no_commits_by_milestones)
     else:
         st.warning(no_members)
 
