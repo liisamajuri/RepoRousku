@@ -52,6 +52,7 @@ Palikkapalvelut/
 |   |-- configuration.md
 |   |-- index.md
 |   |-- modules_api_reference.md
+|   |-- rest_tests.md
 |   |-- serve_docs.sh
 |   |-- usage.md
 |-- requests/
