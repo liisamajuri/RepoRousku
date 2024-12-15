@@ -19,6 +19,7 @@ nav:
   - Tervehdys: index.md
   - Käyttöohjeet: usage.md
   - Koodidokumentaatio: modules_api_reference.md
+  - APIdokumentaatio: rest_tests.md
   - Konfiguraatioista: configuration.md
 
 markdown_extensions:
