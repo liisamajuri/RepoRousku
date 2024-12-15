@@ -2,6 +2,8 @@
 Moduuli tarjoaa apufunktioita ympäristömuuttujatiedoston käsittelyyn.
 Se sisältää toiminnallisuudet access tokenien tallentamiseen, poistamiseen ja noutamiseen
 ympäristötiedostosta.
+
+Ei käytössä nykyisessä RepoRouskussa. Ympäristötiedoston käyttö ei soveltunut tuotantoympäristöön.
 """
 import os
 from dotenv import load_dotenv
