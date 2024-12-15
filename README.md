@@ -52,6 +52,7 @@ Palikkapalvelut/
 |   |-- configuration.md
 |   |-- index.md
 |   |-- modules_api_reference.md
+|   |-- rest_tests.md
 |   |-- serve_docs.sh
 |   |-- usage.md
 |-- requests/
@@ -93,13 +94,93 @@ Hakemistorakenne sisältää kaikki tarvittavat komponentit, kuten dokumentaatio
 <!-- MODUULIT JA OHJELMAKOKONAISUUDET-->
 ### OHJELMAKOKONAISUUDET
 
-**API**
+#### Ohjelman aloitussivu
 
-**DOCS**
+`start.py`
 
-**SRC/STREAMLIT**
+**Kuvaus:**
 
-**TESTS**
+Tämä ohjelma muodostaa RepoRouskun aloitussivun, jossa käyttäjä syöttää projektin GitLab-URL:n ja tarvittavat Access Tokenit. Clockify-integraation avulla käyttäjä voi tarkistastella myös projektin ajankäyttöä. 
+
+
+#### Pääohjelma
+
+`app.py`
+
+**Kuvaus:**
+
+Sovelluksen pääohjelma, joka yhdistää kaikki toiminnallisuudet ja luo navigointivalikon eri näkymien välillä. 
+
+**Keskeiset funktiot:**
+
+* `create_navigation_panel()`: Luo navigointivalikon.
+* `main()`: Käynnistää sovelluksen ja määrittää aloitussivun.
+* `set_appearance()`: Hallitsee sovelluksen visuaalista ulkoasua.
+
+#### Projekti tiedot
+
+`project.py`
+
+**Kuvaus:**
+
+Tämä moduuli tarjoaa projektitietojen dashboardin, jossa käyttäjä voi tarkastella projektin valmiusastetta, suljettuja issueita, committeja ja milestoneja.
+
+#### Käyttäjien tiedot
+
+`members.py`
+
+**Kuvaus:**
+
+Dashboard, jossa käyttäjä voi tarkastella projektiryhmän jäsenten työtunteja ja kontribuutioita. Soveltuu erityisesti yksittäisen jäsenen suoritusten tarkasteluun.
+
+#### Gitlab-integraation
+
+`gitlab_api.py`
+
+**Kuvaus:**
+
+Vastaa GitLabin API-rajapinnan hyödyntämisestä projektidatan hakemiseen. Tämä moduuli sisältää ProjectData-luokan, joka tarjoaa jäsenneltyä dataa käyttöliittymälle.
+
+**Keskeiset funktiot:**
+
+* `count_open_issues()`: Palauttaa avoimien issueiden määrän.
+* `get_commits_by_date(members, min_date, max_date)`: Hakee commitit aikajakson perusteella.
+* `get_milestones()`: Palauttaa projektin milestone-tiedot.
+* `get_readiness_issues()`: Laskee projektin valmiusasteen issueiden perusteella.
+
+#### Clockify-integraatio
+
+`clockify_api.py`
+
+**Kuvaus:**
+
+Hoitaa Clockify-rajapinnan kautta projektin työaikatietojen noutamisen ja analysoinnin.
+
+**Keskeiset funktiot:**
+* `get_all_user_hours_df()`: Palauttaa kaikkien käyttäjien työtunnit DataFrame-muodossa.
+* `get_tag_hours()`: Laskee tunnit kullekin tagille.
+* `get_sprint_hours()`: Yhdistää sprinttikohtaiset työtunnit milestoneihin.
+
+#### Inbound API
+
+`api/main.py`
+
+**Kuvaus:**
+
+Määrittelee RepoRouskun tarjoaman FastAPI-rajapinnan. Tämä API mahdollistaa projektin tietojen haun suoraan RepoRouskun kautta.
+
+#### Testaus
+
+`unit_tests.py`, `integration_tests.py`, `api_tests.py`
+
+**Kuvaus:**
+
+Testimoduulit kattavat RepoRouskun eri toiminnallisuudet, kuten yksikkötestit (luokat ja funktiot), integraatiotestit (API-rajapinnat) ja ulkoiset API-kutsut (GitLab ja Clockify).
+
+
+
+Tämä dokumentaatio tarjoaa yleiskatsauksen moduuleista. Yksityiskohtainen tekninen kuvaus on saatavilla projektin mkdocs-dokumentaatiossa.
+
 
 
 ***
