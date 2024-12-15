@@ -9,7 +9,6 @@ import streamlit as st
 from pathlib import Path
 
 import libraries.components as cl
-import libraries.env_tokens as et
 from gitlab_api import ProjectData
 from clockify_api import ClockifyData
 import os
@@ -19,10 +18,10 @@ app_title = "RepoRousku"
 repo_address = "GitLab-repositorion osoite"
 text_gitlab_token = "GitLab Access Token"
 text_clockify_token = "Clockify Access Token"
-save_tokens = "Tallenna tokenit"
+save_tokens = "Tallenna tokenit istunnon ajaksi"
 remove_tokens = "Poista tallennetut tokenit"
 crunch = "Rouskuta"
-save_tokens_help = "Tallenna access tokenit. Aiemmin tallennetut access tokenit poistetaan."
+save_tokens_help = "Tallenna access tokenit istunnon ajaksi. Aiemmin tallennetut access tokenit poistetaan."
 remove_tokens_help = "Poista tallennetut access tokenit"
 help_required = "Pakollinen. Projektitietojen haku GitLabista edellyttää GitLabin access tokenia."
 help_optional = "Valinnainen. Jos Clockifyn access tokenia ei määritetä, tietoja ei haeta Clockifystä."
@@ -34,6 +33,8 @@ missing_url = "GitLab-projektin osoite puuttuu!"
 invalid_url = "Virheellinen GitLab-projektin osoite!"
 error_msg = "Tarkista GitLab-osoite ja Access Token!"
 missing_token_values = "Access Token(it) puuttuu!"
+tokens_saved = "Token(it) tallennettu."
+tokens_removed = "Token(it) poistettu."
 
 
 # Muuttujat
@@ -41,6 +42,8 @@ proj_data = "proj_data"
 white_color = "#ffffff"
 clockify_workspace = "clockify_workspace"
 clockify_project = "clockify_project"
+gitlab_token_key = "gitlab_token"
+clockify_token_key = "clockify_token"
 
 
 def setup_clockify(clockify_token):
@@ -173,6 +176,11 @@ def start_page():
         st.session_state[clockify_workspace] = None
     if clockify_project not in st.session_state:
         st.session_state[clockify_project] = None
+    if gitlab_token_key not in st.session_state:
+        st.session_state[gitlab_token_key] = ""
+    if clockify_token_key not in st.session_state:
+        st.session_state[clockify_token_key] = ""
+
     
     # Otsikkorivi
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -200,13 +208,11 @@ def start_page():
 
     # Access tokenit
     with col3:
-        env_gitlab_token, env_clockify_token = et.get_env_tokens()
-
         placeholder_g = st.empty()
         placeholder_c = st.empty()
-        gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=env_gitlab_token, type = "password", help = help_required, key = "g1")
-        clockify_token_value = placeholder_c.text_input(text_clockify_token, value = env_clockify_token, type = "password", help = help_optional, key = "c1")
-        #Linkki ohjeseen
+        gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=st.session_state[gitlab_token_key], type = "password", help = help_required, key = "g1")
+        clockify_token_value = placeholder_c.text_input(text_clockify_token, value = st.session_state[clockify_token_key], type = "password", help = help_optional, key = "c1")
+        # Linkki ohjeseen
         st.markdown("[Katso Ohje](https://gitlab.dclabra.fi/wiki/MOpevPu-QrClH4_ouAV04A?view)", unsafe_allow_html=True)
 
     st.write("")
@@ -224,11 +230,11 @@ def start_page():
         # Rouskuta-painike
         if st.button(crunch, use_container_width = True, help = help_crunch):
             
-            # Jos käyttäjä ei ole antanut access tokenia, otetaan se uudestaan ympäristöstä, jos mahdollista
-            if not gitlab_token_value and env_gitlab_token:
-                    gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=env_gitlab_token, type = "password", help = help_required, key = "g2")
-            if not clockify_token_value and env_clockify_token:
-                    clockify_token_value = placeholder_c.text_input(text_clockify_token, value=env_clockify_token, type = "password", help = help_optional, key = "c2")
+            # Jos käyttäjä ei ole antanut access tokenia, otetaan se session statesta, jos mahdollista
+            if not gitlab_token_value and st.session_state[gitlab_token_key]:
+                    gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=st.session_state[gitlab_token_key], type = "password", help = help_required, key = "g2")
+            if not clockify_token_value and st.session_state[clockify_token_key]:
+                    clockify_token_value = placeholder_c.text_input(text_clockify_token, value=st.session_state[clockify_token_key], type = "password", help = help_optional, key = "c2")
 
             # Tarkistetaan, että tarvittavat syötteet on annettu
             if not gitlab_url:
@@ -252,18 +258,23 @@ def start_page():
                         st.error(error_msg, icon="❗")
     with col3:
         # Tallenna tokenit
-        if st.button(save_tokens, use_container_width = True, help = save_tokens_help, disabled=True):
+        if st.button(save_tokens, use_container_width = True, help = save_tokens_help, disabled=False):
             if gitlab_token_value or clockify_token_value:
-                et.save_tokens_to_env(gitlab_token_value, clockify_token_value)
-                env_gitlab_token, env_clockify_token = et.get_env_tokens()
-
+                if gitlab_token_value:
+                    st.session_state[gitlab_token_key] = gitlab_token_value
+                if clockify_token_value:
+                    st.session_state[clockify_token_key] = clockify_token_value
+                st.success(tokens_saved)
             else:
                 st.error(missing_token_values, icon="❗")
     with col4:
         # Poista tallennetut tokenit
-        if st.button(remove_tokens, use_container_width = True, help = remove_tokens_help, disabled=True):
-            et.remove_tokens_from_env_file()
-            env_gitlab_token, env_clockify_token = et.get_env_tokens()
+        if st.button(remove_tokens, use_container_width = True, help = remove_tokens_help, disabled=False):
+            st.session_state[gitlab_token_key] = ""
+            st.session_state[clockify_token_key] = ""
+            #gitlab_token_value = "" # Kommentissa, koska kentän arvoa ei haluta tyhjentää
+            #clockify_token_value = "" # Kommentissa, koska kentän arvoa ei haluta tyhjentää
+            st.success(tokens_removed)
 
 
 start_page()
