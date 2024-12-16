@@ -206,7 +206,7 @@ def start_page():
         placeholder_c = st.empty()
         gitlab_token_value = placeholder_g.text_input(text_gitlab_token, value=env_gitlab_token, type = "password", help = help_required, key = "g1")
         clockify_token_value = placeholder_c.text_input(text_clockify_token, value = env_clockify_token, type = "password", help = help_optional, key = "c1")
-        #Linkki ohjeseen
+        # Linkki ohjeseen
         st.markdown("[Katso Ohje](https://gitlab.dclabra.fi/wiki/MOpevPu-QrClH4_ouAV04A?view)", unsafe_allow_html=True)
 
     st.write("")
@@ -217,6 +217,9 @@ def start_page():
         with col2:
             clockify = setup_clockify(clockify_token_value)
             fetch_clockify_data(clockify)
+    else:
+        clockify = None
+        st.session_state[clockify_project] = None
 
     # Painikkeet
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
@@ -240,7 +243,6 @@ def start_page():
             else:                
                 with st.spinner(fetching_data):
                     
-
                     # GitLab-projektin tietojen haku
                     if get_project_data(gitlab_url, gitlab_token_value):
                         # Clockify-datan haku
