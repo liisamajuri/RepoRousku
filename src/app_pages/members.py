@@ -75,6 +75,8 @@ def member_page():
 
             # Suodata valitun jäsenen mukaan
             if selected_member != all_members:
+                # Tiputetaan pois rivit, joilla ei ole assigneeta (none tai tyhjä lista)
+                closed_issues = closed_issues[closed_issues["assignees"].apply(lambda x: bool(x))]
                 closed_issues = closed_issues[closed_issues["assignees"].apply(lambda assignees: selected_member in assignees)]
             
             # Suodata valittujen milestonien mukaan
@@ -97,6 +99,8 @@ def member_page():
 
             # Suodata valitun jäsenen mukaan
             if selected_member != all_members:
+                # Tiputetaan pois rivit, joilla ei ole assigneeta (none tai tyhjä lista)
+                open_issues = open_issues[open_issues["assignees"].apply(lambda x: bool(x))]
                 open_issues = open_issues[open_issues["assignees"].apply(lambda assignees: selected_member in assignees)]
 
             # Suodata valittujen milestonien mukaan
@@ -142,6 +146,8 @@ def member_page():
         # Suljetut issuet valitun jäsenen ja milestonejen mukaan
         closed_issues = st.session_state[proj_data].get_closed_issues()
         if selected_member != all_members:
+            # Tiputetaan pois rivit, joilla ei ole assigneeta (none tai tyhjä lista)
+            closed_issues = closed_issues[closed_issues["assignees"].apply(lambda x: bool(x))]
             closed_issues = closed_issues[closed_issues["assignees"].apply(lambda assignees: selected_member in assignees)]
         if selected_milestones:
             closed_issues = closed_issues[closed_issues["milestone"].isin(selected_milestones)]
@@ -153,6 +159,8 @@ def member_page():
         # Avoimet issuet valitun jäsenen ja milestonejen mukaan
         open_issues = st.session_state[proj_data].get_open_issues()
         if selected_member != all_members:
+            # Tiputetaan pois rivit, joilla ei ole assigneeta (none tai tyhjä lista)
+            open_issues = open_issues[open_issues["assignees"].apply(lambda x: bool(x))]
             open_issues = open_issues[open_issues["assignees"].apply(lambda assignees: selected_member in assignees)]
 
         if selected_milestones:
