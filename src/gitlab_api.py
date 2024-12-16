@@ -515,10 +515,10 @@ class ProjectData:
         commits = self.get_commits()
 
         if not issues.empty:
-            issue_members = issues.explode(key_assignees)[key_assignees].unique().tolist()
+            issue_members = issues.explode(key_assignees)[key_assignees].dropna().unique().tolist()
 
         if not commits.empty:
-            commit_members = commits[key_author_name].unique().tolist()
+            commit_members = commits[key_author_name].dropna().unique().tolist()
 
         return sorted(set(issue_members + commit_members))
 
@@ -736,14 +736,14 @@ class ProjectData:
             return 0,0
 
 
-    def get_closed_issues_by_date(self, members, min_date, max_date):
+    def get_closed_issues_by_date(self, members, min_date=None, max_date=None):
         """
         Palauttaa dataframen suljetuista issueista päivämäärän mukaan.
 
         Args:
             members (list): Lista jäsenten nimistä, joiden mukaan issuet suodatetaan.
-            min_date (date): Aikajakson ensimmäinen pivämäärä.
-            max_date (date): Aikajakson viimeinen pivämäärä.
+            min_date (date): Aikajakson ensimmäinen päivämäärä.
+            max_date (date): Aikajakson viimeinen päivämäärä.
 
         Returns:
             (DataFrame): Suljetut issuet jäsenten ja aikajakson mukaan suodatettuna.
@@ -760,8 +760,9 @@ class ProjectData:
 
         df[key_closed_at] = df[key_closed_at]
 
-        start_date = df[key_closed_at].min()
-        end_date = df[key_closed_at].max()
+        # Datasta löytyvät ajanjakson alku- ja loppupäivät
+        start_date = df[key_closed_at].min() if len(df) else None
+        end_date = df[key_closed_at].max() if len(df) else None
 
         # Suodatetaan ajanjakson mukaan, jos se on määritelty
         if min_date and max_date:
@@ -790,14 +791,14 @@ class ProjectData:
         return df, key_date, key_pcs
 
 
-    def get_commits_by_date(self, members, min_date, max_date):
+    def get_commits_by_date(self, members, min_date=None, max_date=None):
         """
         Palauttaa dataframen commiteista päivämäärän mukaan.
 
         Args:
             members (list): Lista jäsenten nimistä, joiden mukaan issuet suodatetaan.
-            min_date (date): Aikajakson ensimmäinen pivämäärä.
-            max_date (date): Aikajakson viimeinen pivämäärä.
+            min_date (date): Aikajakson ensimmäinen päivämäärä.
+            max_date (date): Aikajakson viimeinen päivämäärä.
 
         Returns:
             (DataFrame): Commitit jäsenten ja aikajakson mukaan suodatettuna.
@@ -806,8 +807,8 @@ class ProjectData:
         """
         df = self.get_commits(members)
 
-        start_date = df[key_committed_date].min()
-        end_date = df[key_committed_date].max()
+        start_date = df[key_committed_date].min() if len(df) else None
+        end_date = df[key_committed_date].max() if len(df) else None
 
         # Suodatetaan ajanjakson mukaan, jos se on määritelty
         if min_date and max_date:
@@ -820,6 +821,7 @@ class ProjectData:
 
         # Ryhmitellään data päivämäärän ja jäsenen mukaan
         df = df.groupby([df[key_date], key_member]).size().unstack(fill_value=0)
+
 
         if start_date and end_date:
             # Täydennetään dataframe, että kaikki päivämäärät ajanjaksolta ovat mukana
@@ -865,19 +867,24 @@ class ProjectData:
 
         # Lisätään puuttuvat milestone-assignee-yhdistelmät
         df_milestones = self.get_milestones()
-        all_milestones = df_milestones[key_title].unique()
-        grouped_data = (
-            grouped_data.set_index([key_milestone, key_assignees])
-            .reindex(pd.MultiIndex.from_product([all_milestones, members], names=[key_milestone, key_assignees]), fill_value=0)
-            .reset_index())
 
-        # Uudelleennimetään sarake
-        grouped_data = grouped_data.rename(columns={key_assignees: key_member})
+        if len(df_milestones):
+            all_milestones = df_milestones[key_title].unique()
+            grouped_data = (
+                grouped_data.set_index([key_milestone, key_assignees])
+                .reindex(pd.MultiIndex.from_product([all_milestones, members], names=[key_milestone, key_assignees]), fill_value=0)
+                .reset_index())
 
-        # Lukumäärä kokonaisluvuksi
-        grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+            # Uudelleennimetään sarake
+            grouped_data = grouped_data.rename(columns={key_assignees: key_member})
 
-        return grouped_data, key_milestone, key_pcs, key_member
+            # Lukumäärä kokonaisluvuksi
+            grouped_data[key_pcs] = grouped_data[key_pcs].astype(int)
+
+            return grouped_data, key_milestone, key_pcs, key_member
+
+        else:
+            return pd.DataFrame(), key_milestone, key_pcs, key_member
 
 
     def get_commits_by_milestone(self, members):
