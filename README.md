@@ -24,7 +24,7 @@
 - **Tekijät:** Hakkarainen, Nadina; Majuri, Liisa; Mikkonen, Henna; Tishchenko, Vladimir
 - **Ryhmätunnus:** TTM22SAI
 - **Organisaatio:** Kajaanin ammattikorkeakoulu (KAMK)
-- **Projektiin käytetyt tunnit:** XXX
+- **Projektiin käytetyt tunnit:** ~ 516 h
 
 ***
 
